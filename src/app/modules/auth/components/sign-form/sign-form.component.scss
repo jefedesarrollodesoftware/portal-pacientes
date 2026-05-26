@@ -1,177 +1,60 @@
 @use 'app/styles/colors' as *;
+@use 'app/styles/font' as *;
 
-.form {
-  width: 100%;
+.sign-form {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 
-  &__input {
+  &__row {
+    display: flex;
+    gap: 12px;
+
+    @media (max-width: 480px) {
+      flex-direction: column;
+      gap: 2px;
+    }
+  }
+
+  &__field {
     width: 100%;
-    margin-top: -15px;
+  }
+
+  &__btn {
+    width: 100%;
+    margin-top: 12px;
+    height: 44px;
+    font-size: $fs-normal;
+    font-weight: $fw-normal;
+    letter-spacing: 0.3px;
+  }
+
+  &__spinner {
+    animation: spin 1s linear infinite;
+    margin-right: 4px;
+  }
+
+  &__error {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #fce4ec;
+    color: #c62828;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: $fs-small;
+    margin-top: 8px;
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
   }
 }
 
-.form-actions {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 5px;
-
-  &__create {
-    margin: 0;
-    width: 95%;
-    box-shadow: 0 0 11px 0 $shadow-white, 0 0 0 -2px $shadow-grey,
-      0 1px 8px 0 $shadow-dark-grey;
-  }
-}
-
-.notification {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  margin-top: 16px;
-  margin-bottom: 16px;
-  height: 45px;
-  border-radius: 45px;
-
-  &_solid {
-    &-pink {
-      background-color: $pink;
-    }
-
-    &-blue {
-      background-color: $blue;
-    }
-
-    &-green {
-      background-color: $green;
-    }
-
-    &-yellow {
-      background-color: $yellow;
-    }
-
-    &-violet {
-      background-color: $violet;
-    }
-  }
-
-  &_transparent {
-    &-pink {
-      background-color: $pink-15;
-    }
-
-    &-blue {
-      background-color: $blue-15;
-    }
-
-    &-green {
-      background-color: $green-15;
-    }
-
-    &-yellow {
-      background-color: $yellow-15;
-    }
-
-    &-violet {
-      background-color: $violet-15;
-    }
-  }
-
-  &__title {
-    margin: 0;
-
-    &_white {
-      color: $white;
-    }
-  }
-
-  &__icon-wrapper {
-    height: 45px;
-    width: 45px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    &_transparent {
-      color: $white-80;
-
-      &-pink {
-        color: $pink;
-      }
-
-      &-blue {
-        color: $blue;
-      }
-
-      &-green {
-        color: $green;
-      }
-
-      &-yellow {
-        color: $yellow;
-      }
-
-      &-violet {
-        color: $violet;
-      }
-    }
-
-    &_solid {
-      &-pink {
-        color: $pink;
-      }
-
-      &-blue {
-        color: $blue;
-      }
-
-      &-green {
-        color: $green;
-      }
-
-      &-yellow {
-        color: $yellow;
-      }
-
-      &-violet {
-        color: $violet;
-      }
-    }
-  }
-
-  &__icon-wrapper-circle {
-    height: 45px;
-    width: 45px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 45px;
-    margin-right: 16px;
-
-    &_transparent {
-      &-pink {
-        color: $pink;
-        background-color: $pink-15;
-      }
-
-      &-blue {
-        color: $blue;
-        background-color: $blue-15;
-      }
-
-      &-green {
-        color: $green;
-        background-color: $green-15;
-      }
-
-      &-yellow {
-        color: $yellow;
-        background-color: $yellow-15;
-      }
-
-      &-violet {
-        color: $violet;
-        background-color: $violet-15;
-      }
-    }
-  }
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }

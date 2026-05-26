@@ -8,18 +8,31 @@
 |---|---|
 | **Base URL** | `https://portal-pacientes.local/api/v1` |
 | **Formato de respuesta** | JSON |
-| **Autenticación** | Bearer Token (Laravel Sanctum) |
+| **Autenticación** | Bearer Token (Laravel Sanctum) o API Key |
 | **Encoding** | UTF-8 |
 | **Content-Type (peticiones con body)** | `application/json` |
 | **Content-Type (respuestas)** | `application/json` |
 
-### 1.1 Cabeceras requeridas en toda petición autenticada
+### 1.1 Cabeceras requeridas
+
+#### Peticiones autenticadas (con sesión)
 
 ```
 Authorization: Bearer {token}
 Accept: application/json
 Content-Type: application/json   (solo en POST)
 ```
+
+#### Peticiones públicas (sin sesión: auth/token, patients/register, patient-attributes)
+
+```
+X-API-Key: {api_key}
+Accept: application/json
+Content-Type: application/json   (solo en POST)
+```
+
+> La API Key se obtiene de la configuración del backend (`APP_API_KEY` en `.env`).
+> Si se envía un `Authorization: Bearer` válido, la API Key no es necesaria.
 
 ### 1.2 Envoltorio de respuesta estándar (AjaxResponse)
 
@@ -635,7 +648,7 @@ interface Patient {
 |---|---|
 | **Método** | `GET` |
 | **URL** | `/api/v1/patient-attributes` |
-| **Autenticación** | Bearer Token |
+| **Autenticación** | API Key (`X-API-Key`) |
 
 #### Respuesta exitosa — `200 OK`
 
@@ -707,7 +720,7 @@ type PatientAttributesResponse = Record<string, PatientAttribute[]>;
 |---|---|
 | **Método** | `GET` |
 | **URL** | `/api/v1/patient-attributes/{type}` |
-| **Autenticación** | Bearer Token |
+| **Autenticación** | API Key (`X-API-Key`) |
 
 `{type}` es el slug del tipo de atributo (ej: `tipo-documento`, `sexo`, `genero`, `estado-civil`, `nivel-escolar`, `ocupacion`, `division-politica`, `zona-residencia`, `sede`, `asegurador`, `tipo-ingreso`, `causa-ingreso`, `via-ingreso`, `consultorio`, `linea-pago`, `diagnostico`).
 
@@ -748,7 +761,8 @@ type PatientAttributesResponse = Record<string, PatientAttribute[]>;
 
 | Código | Condición |
 |---|---|
-| `400` | Usuario no asociado a empresa |
+| `401` | API key inválida o no proporcionada (falta `X-API-Key`) |
+| `400` | Usuario no asociado a empresa o `company_id` no proporcionado |
 | `404` | Tipo de atributo no encontrado (slug inválido o sin atributos) |
 | `500` | Error interno |
 
@@ -773,6 +787,8 @@ interface PatientAttribute {
 
 ### 6.1 No autenticado — `401`
 
+#### Token Sanctum faltante o inválido (rutas con `auth:sanctum`)
+
 ```json
 {
   "message": "Unauthenticated."
@@ -780,6 +796,18 @@ interface PatientAttribute {
 ```
 
 El backend de Laravel devuelve este mensaje cuando el token falta, es inválido o expiró. No sigue el formato `AjaxResponse` porque es interceptado antes por el middleware `auth:sanctum`.
+
+#### API Key faltante o inválida (rutas públicas)
+
+```json
+{
+  "status": false,
+  "message": "API key inválida o no proporcionada.",
+  "data": null
+}
+```
+
+Se devuelve cuando no se envía la cabecera `X-API-Key` o su valor no coincide con `APP_API_KEY` del backend.
 
 ### 6.2 Error de validación — `422`
 
@@ -975,45 +1003,57 @@ type PatientAttributesGrouped = Record<string, PatientAttribute[]>;
 
 | # | Método | URL | Autenticación | Throttle | Descripción |
 |---|---|---|---|---|---|
-| 1 | `POST` | `/api/v1/auth/token` | No | `patient-auth` | Iniciar sesión |
-| 2 | `DELETE` | `/api/v1/auth/token` | Sí | — | Cerrar sesión |
-| 3 | `GET` | `/api/v1/auth/me` | Sí | — | Datos del usuario autenticado |
-| 4 | `POST` | `/api/v1/patients/register` | No | `patients` | Autoregistro de paciente |
-| 5 | `POST` | `/api/v1/patients` | Sí | `patients` | Creación manual |
-| 6 | `GET` | `/api/v1/patients/{documentType}/{documentNumber}` | Sí | `patients` | Consultar paciente |
-| 7 | `POST` | `/api/v1/patients/update` | Sí | `patients` | Actualizar datos |
-| 8 | `POST` | `/api/v1/patients/update-password` | Sí | `patients` | Cambiar contraseña |
-| 9 | `POST` | `/api/v1/patients/disable-enable` | Sí | `patients` | Habilitar/deshabilitar |
-| 10 | `POST` | `/api/v1/patients/sync` | Sí | `patients` | Sincronizar con Gomedisys |
-| 11 | `GET` | `/api/v1/patient-attributes` | Sí | — | Catálogos agrupados |
-| 12 | `GET` | `/api/v1/patient-attributes/{type}` | Sí | — | Catálogos por tipo |
+| 1 | `POST` | `/api/v1/auth/token` | API Key | `patient-auth` | Iniciar sesión |
+| 2 | `DELETE` | `/api/v1/auth/token` | Bearer Token | — | Cerrar sesión |
+| 3 | `GET` | `/api/v1/auth/me` | Bearer Token | — | Datos del usuario autenticado |
+| 4 | `POST` | `/api/v1/patients/register` | API Key | `patients` | Autoregistro de paciente |
+| 5 | `POST` | `/api/v1/patients` | Bearer Token | `patients` | Creación manual |
+| 6 | `GET` | `/api/v1/patients/{documentType}/{documentNumber}` | Bearer Token | `patients` | Consultar paciente |
+| 7 | `POST` | `/api/v1/patients/update` | Bearer Token | `patients` | Actualizar datos |
+| 8 | `POST` | `/api/v1/patients/update-password` | Bearer Token | `patients` | Cambiar contraseña |
+| 9 | `POST` | `/api/v1/patients/disable-enable` | Bearer Token | `patients` | Habilitar/deshabilitar |
+| 10 | `POST` | `/api/v1/patients/sync` | Bearer Token | `patients` | Sincronizar con Gomedisys |
+| 11 | `GET` | `/api/v1/patient-attributes` | API Key | — | Catálogos agrupados |
+| 12 | `GET` | `/api/v1/patient-attributes/{type}` | API Key | — | Catálogos por tipo |
 
 ---
 
 ## 9. Flujo de autenticación recomendado (Angular)
 
-1. El usuario ingresa email + password en un formulario de login.
-2. Se llama a `POST /api/v1/auth/token`.
-3. Si es exitoso, se almacena el `token` en `localStorage`/`sessionStorage` y en un `HttpInterceptor` que agrega `Authorization: Bearer {token}` a todas las peticiones.
-4. Se redirige al dashboard.
-5. En cada petición, si se recibe `401`, se redirige al login y se limpia el token almacenado.
-6. Al cerrar sesión, se llama a `DELETE /api/v1/auth/token` y se elimina el token del almacenamiento local.
+### 9.1 API Key para endpoints públicos
 
-### Ejemplo de HttpInterceptor
+Los endpoints sin autenticación de sesión (`/auth/token`, `/patients/register`, `/patient-attributes`) requieren la cabecera `X-API-Key`. Recomendamos configurarla en el `environment` de Angular:
+
+```typescript
+// environments/environment.ts
+export const environment = {
+  production: false,
+  apiUrl: 'https://portal-pacientes.local/api/v1',
+  apiKey: '3f7a2b1c-8d4e-5f69-a0b1-c2d3e4f5a6b7', // misma que APP_API_KEY en .env
+};
+```
+
+Y crear un `HttpInterceptor` que agregue la API Key a todas las peticiones y el Bearer token cuando exista:
 
 ```typescript
 @Injectable()
-export class AuthInterceptor implements HttpInterceptor {
+export class ApiInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    let headers: { [header: string]: string } = {};
+
+    // Siempre enviar API Key (para endpoints públicos)
+    headers['X-API-Key'] = environment.apiKey;
+
+    // Si hay sesión, agregar Bearer token (reemplaza la API Key)
     const token = localStorage.getItem('auth_token');
     if (token) {
-      req = req.clone({
-        setHeaders: { Authorization: `Bearer ${token}` }
-      });
+      headers['Authorization'] = `Bearer ${token}`;
     }
+
+    req = req.clone({ setHeaders: headers });
     return next.handle(req).pipe(
       catchError((error: HttpErrorResponse) => {
-        if (error.status === 401) {
+        if (error.status === 401 && token) {
           localStorage.removeItem('auth_token');
           // redirigir al login
         }
@@ -1024,24 +1064,38 @@ export class AuthInterceptor implements HttpInterceptor {
 }
 ```
 
+### 9.2 Flujo de inicio de sesión
+
+1. El usuario ingresa email + password en un formulario de login.
+2. Se llama a `POST /api/v1/auth/token` (con `X-API-Key`).
+3. Si es exitoso, se almacena el `token` en `localStorage`/`sessionStorage`. Las siguientes peticiones incluirán `Authorization: Bearer {token}` además de `X-API-Key`.
+4. Se redirige al dashboard.
+5. En cada petición, si se recibe `401` teniendo un token almacenado, se redirige al login y se limpia el token.
+6. Al cerrar sesión, se llama a `DELETE /api/v1/auth/token` y se elimina el token del almacenamiento local.
+
 ---
 
 ## 10. Consideraciones para formularios reactivos en Angular
 
 ### 10.1 Carga de catálogos en selects/dropdowns
 
-Para poblar selects con valores de catálogo (tipo de documento, sexo, etc.):
+Para poblar selects con valores de catálogo (tipo de documento, sexo, etc.), los catálogos requieren un `company_id` (empresa). Si el usuario no ha iniciado sesión, debes enviar el `company_id` como query parameter:
 
 ```typescript
 // En el servicio
-getPatientAttributes(): Observable<ApiResponse<PatientAttributesGrouped>> {
+getPatientAttributes(companyId?: number): Observable<ApiResponse<PatientAttributesGrouped>> {
+  let params = {};
+  if (companyId) {
+    params = { company_id: companyId };
+  }
   return this.http.get<ApiResponse<PatientAttributesGrouped>>(
-    `${environment.apiUrl}/patient-attributes`
+    `${environment.apiUrl}/patient-attributes`,
+    { params }
   );
 }
 
-// En el componente
-this.patientService.getPatientAttributes().subscribe({
+// En el componente (sin sesión — ejemplo con company_id fijo)
+this.patientService.getPatientAttributes(1).subscribe({
   next: (res) => {
     this.documentTypes = res.data['tipo-documento'] || [];
     this.genders = res.data['sexo'] || [];
@@ -1049,7 +1103,14 @@ this.patientService.getPatientAttributes().subscribe({
     // etc.
   }
 });
+
+// En el componente (con sesión — el backend resuelve la empresa automáticamente)
+this.patientService.getPatientAttributes().subscribe({
+  next: (res) => { /* ... */ }
+});
 ```
+
+> **Nota:** Cuando se usa con `Authorization: Bearer` (usuario autenticado), el `company_id` se resuelve automáticamente desde la empresa del usuario. No es necesario enviar `company_id` en ese caso.
 
 ### 10.2 Validaciones frontend
 

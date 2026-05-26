@@ -9,7 +9,13 @@ export const httpInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const config = inject(APP_RUNTIME_CONFIG);
 
-  req = req.clone({ url: config.baseURLApi + req.url });
+  if (config.baseURLApi) {
+    req = req.clone({ url: config.baseURLApi + req.url });
+  }
+
+  req = req.clone({
+    headers: req.headers.set('X-API-Key', config.apiKey),
+  });
 
   const token = localStorage.getItem(AUTH_TOKEN_STORAGE_KEY);
   if (token) {

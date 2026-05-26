@@ -8,6 +8,8 @@ export interface AppRuntimeConfig {
   hostApi: string;
   portApi: string;
   baseURLApi: string;
+  companyId: number;
+  apiKey: string;
   auth: {
     email: string;
     password: string;
@@ -15,11 +17,9 @@ export interface AppRuntimeConfig {
 }
 
 const buildRuntimeConfig = (): AppRuntimeConfig => {
-  const hostApi = environment.production
-    ? 'https://sing-generator-node.flatlogic.com'
-    : 'http://localhost';
-  const portApi = environment.production ? '' : '8080';
-  const baseURLApi = `${hostApi}${portApi ? `:${portApi}` : ``}`;
+  const baseURLApi = (environment as any).apiUrl ?? '';
+  const hostApi = baseURLApi;
+  const portApi = '';
 
   return {
     version: '1.2.0',
@@ -28,6 +28,8 @@ const buildRuntimeConfig = (): AppRuntimeConfig => {
     hostApi,
     portApi,
     baseURLApi,
+    companyId: environment.companyId,
+    apiKey: environment.appApiKey || '',
     auth: {
       email: 'admin@flatlogic.com',
       password: 'password',

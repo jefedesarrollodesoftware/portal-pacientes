@@ -1,7 +1,8 @@
 @use 'app/styles/variables' as *;
 @use 'app/styles/font' as *;
+@use 'app/styles/colors' as *;
 
-.auth-page {
+.medical-auth {
   width: 100%;
   height: 100%;
   display: flex;
@@ -9,143 +10,167 @@
   @media (max-width: $medium) {
     flex-direction: column;
   }
+}
 
-  &__content-block {
-    width: 37%;
-    height: 100%;
-    background-color: $white;
-    display: flex;
-    align-items: center;
-    flex-direction: column;
+// === Brand Panel (left) ===
 
-    @media (max-width: $medium) {
-      width: 100%;
-    }
+.medical-auth__brand {
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
   }
 
-  &__content-wrapper {
-    width: 45%;
-    height: 100%;
-    padding: 16px;
-    display: flex;
-    justify-content: space-between;
-    flex-direction: column;
-
-    @media (max-width: $small) {
-      width: 70%;
-    }
-
-    @media (min-width: $medium) and (max-width: $large) {
-      width: 45%;
-    }
+  @media (max-width: $medium) {
+    display: none;
   }
+}
 
-  &__group {
-    margin-top: 28px;
-  }
+.medical-auth__brand-content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  color: $white;
+}
 
-  &__group-title {
-    font-size: 32px;
-    font-weight: $fw-normal;
-    margin-top: 37px;
-    letter-spacing: -0.7px;
-    text-align: center;
-    line-height: 37px;
-    color: $dark-grey;
-  }
+.medical-auth__brand-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 24px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  &__group-sub-title {
-    font-size: $fs-large;
-    font-weight: $fw-normal;
-    margin-bottom: 60px;
-    letter-spacing: -0.5px;
-    text-align: center;
-    line-height: 24px;
-    color: $dark-grey;
-  }
-
-  &__google-button-wrapper {
-    margin-top: 32px;
-    margin-bottom: 10px;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  &__google-button {
-    width: 95%;
-    padding: 0;
-    background-color: $white;
-    box-shadow: 0 0 11px 0 $shadow-white, 0 0 0 -2px $shadow-grey,
-      0 1px 8px 0 $shadow-dark-grey;
-  }
-
-  &__google-button-icon {
-    width: 20px;
-    margin-right: 16px;
-  }
-
-  &__border-wrapper {
-    align-items: center;
-    display: flex;
-    justify-content: center;
-    margin: 32px 0;
-  }
-
-  &__border-line {
-    height: 1px;
-    width: 100%;
-    background-color: $light-grey;
-    opacity: 0.3;
-  }
-
-  &__border-title {
-    font-size: $fs-xs;
-    padding: 0 16px;
-    margin: 0;
-    color: $dark-grey;
-  }
-
-  &__logo {
-    width: 63%;
-    height: 100%;
-    background-color: $blue;
-    display: flex;
-    align-items: center;
-
-    @media (max-width: $medium) {
-      display: none;
-    }
-  }
-
-  &__logo-wrapper {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  &__logo-img {
-    margin-bottom: 50px;
-  }
-
-  &__logo-title {
-    font-size: 62px;
+  mat-icon {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
     color: $white;
-    font-weight: 500;
-    letter-spacing: -1.5px;
-    line-height: 62px;
   }
+}
 
-  &__footer-title {
-    color: $blue;
-    font-size: 10px;
-    opacity: 0.7;
-    a {
-      text-decoration: none;
-      color: $blue;
+.medical-auth__brand-title {
+  font-size: 32px;
+  font-weight: $fw-bold;
+  margin: 0 0 12px;
+  letter-spacing: -0.5px;
+}
+
+.medical-auth__brand-subtitle {
+  font-size: $fs-small;
+  line-height: 1.6;
+  opacity: 0.85;
+  margin: 0 0 48px;
+  max-width: 320px;
+}
+
+.medical-auth__brand-features {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  text-align: left;
+  max-width: 280px;
+  margin: 0 auto;
+}
+
+.medical-auth__feature {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: $fs-small;
+  opacity: 0.9;
+}
+
+.medical-auth__feature-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  color: $white;
+  flex-shrink: 0;
+}
+
+// === Form Panel (right) ===
+
+.medical-auth__form {
+  width: 55%;
+  height: 100%;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  overflow-y: auto;
+
+  @media (max-width: $medium) {
+    width: 100%;
+  }
+}
+
+.medical-auth__tabs {
+  width: 100%;
+  max-width: 420px;
+  background: $white;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+  padding: 32px;
+
+  --mat-tab-header-active-label-text-color: #1a73e8;
+  --mat-tab-header-inactive-label-text-color: rgba(0,0,0,0.54);
+  --mat-tab-header-active-ripple-color: #1a73e8;
+  --mat-tab-header-inactive-ripple-color: #1a73e8;
+  --mat-tab-header-active-hover-label-text-color: #1a73e8;
+  --mat-tab-header-active-focus-label-text-color: #1a73e8;
+  --mdc-tab-indicator-active-indicator-color: #1a73e8;
+}
+
+.medical-auth__tab-content {
+  padding: 16px 0 0;
+}
+
+.medical-auth__tab-title {
+  font-size: 22px;
+  font-weight: $fw-bold;
+  color: $dark-grey;
+  margin: 0 0 4px;
+}
+
+.medical-auth__tab-desc {
+  font-size: $fs-small;
+  color: $gray-08;
+  margin: 0 0 24px;
+}
+
+.medical-auth__switch-text {
+  text-align: center;
+  margin-top: 20px;
+  font-size: $fs-small;
+  color: $gray-08;
+
+  a {
+    color: #1a73e8;
+    text-decoration: none;
+    font-weight: $fw-normal;
+
+    &:hover {
+      text-decoration: underline;
     }
   }
 }

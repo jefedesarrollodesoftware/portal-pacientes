@@ -19,7 +19,6 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { PatientsRoutingModule } from './patients-routing.module';
-import { PatientRegisterComponent } from './containers/patient-register/patient-register.component';
 import { PatientListComponent } from './containers/patient-list/patient-list.component';
 import { PatientDetailComponent } from './containers/patient-detail/patient-detail.component';
 import { AppointmentListComponent } from './containers/appointment-list/appointment-list.component';
@@ -27,7 +26,6 @@ import { AppointmentDetailComponent } from './containers/appointment-detail/appo
 
 @NgModule({
   declarations: [
-    PatientRegisterComponent,
     PatientListComponent,
     PatientDetailComponent,
     AppointmentListComponent,

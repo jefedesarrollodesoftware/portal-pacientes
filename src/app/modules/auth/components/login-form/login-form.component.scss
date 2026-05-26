@@ -1,27 +1,21 @@
-@use '../../../../styles/colors' as *;
-@use '../../../../styles/font' as *;
+@use 'app/styles/colors' as *;
+@use 'app/styles/font' as *;
 
-.form {
-  width: 100%;
-
-  &__input {
-    width: 100%;
-    margin-top: 6px;
-  }
-}
-
-.form-actions {
+.login-form {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 4px;
 
-  &__login {
-    margin-right: 10px;
+  &__field {
+    width: 100%;
   }
 
-  &__forget {
-    font-size: 12px;
-    font-weight: $fw-lighter;
-    color: $blue;
+  &__btn {
+    width: 100%;
+    margin-top: 8px;
+    height: 44px;
+    font-size: $fs-normal;
+    font-weight: $fw-normal;
+    letter-spacing: 0.3px;
   }
 }

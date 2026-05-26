@@ -1,8 +1,16 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { HttpErrorResponse } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
+
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 
 import { PatientService } from '../../services/patient.service';
 import { PatientAttributesService } from '../../services/patient-attributes.service';
@@ -13,12 +21,31 @@ import { setBackendErrors } from '../../utils/form-error-handler';
   selector: 'app-patient-register',
   templateUrl: './patient-register.component.html',
   styleUrls: ['./patient-register.component.scss'],
-  standalone: false,
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatIconModule,
+    MatButtonModule,
+  ],
 })
 export class PatientRegisterComponent implements OnInit {
   registerForm: FormGroup;
   submitting = false;
   documentTypes: PatientAttribute[] = [];
+
+  private readonly FALLBACK_DOC_TYPES: PatientAttribute[] = [
+    { id: 1, code: 'CC', name: 'Cédula de Ciudadanía', short: 'CC', value: 'CC', description: null, order: 1, icon: null },
+    { id: 2, code: 'CE', name: 'Cédula de Extranjería', short: 'CE', value: 'CE', description: null, order: 2, icon: null },
+    { id: 3, code: 'NIT', name: 'NIT', short: 'NIT', value: 'NIT', description: null, order: 3, icon: null },
+    { id: 4, code: 'PPT', name: 'Permiso por Protección Temporal', short: 'PPT', value: 'PPT', description: null, order: 4, icon: null },
+    { id: 5, code: 'Pasaporte', name: 'Pasaporte', short: 'Pasaporte', value: 'Pasaporte', description: null, order: 5, icon: null },
+  ];
 
   constructor(
     private fb: FormBuilder,
@@ -59,10 +86,10 @@ export class PatientRegisterComponent implements OnInit {
   private loadDocumentTypes(): void {
     this.patientAttributesService.getAll().subscribe({
       next: (res) => {
-        this.documentTypes = res.data['tipo-documento'] || [];
+        this.documentTypes = res.data['tipo-documento'] || this.FALLBACK_DOC_TYPES;
       },
       error: () => {
-        this.toastr.error('No se pudieron cargar los tipos de documento.');
+        this.documentTypes = this.FALLBACK_DOC_TYPES;
       },
     });
   }

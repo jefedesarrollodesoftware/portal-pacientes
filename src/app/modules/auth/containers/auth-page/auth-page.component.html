@@ -1,75 +1,53 @@
-<div class="auth-page">
-  <div class="auth-page__content-block">
-    <div class="auth-page__content-wrapper">
-      <mat-tab-group class="auth-page__group" mat-stretch-tabs>
-        <mat-tab label="Login">
-          <h4 class="auth-page__group-title">Welcome!</h4>
-          <div class="auth-page__google-button-wrapper">
-            <button
-              mat-raised-button
-              class="auth-page__google-button"
-              (click)="googleLogin()"
-            >
-              <img
-                class="auth-page__google-button-icon"
-                src="./assets/auth/google.svg"
-                alt="google"
-              />Sign in with Google
-            </button>
-          </div>
+<div class="medical-auth">
+  <div class="medical-auth__brand">
+    <div class="medical-auth__brand-content">
+      <div class="medical-auth__brand-icon">
+        <mat-icon>local_hospital</mat-icon>
+      </div>
+      <h1 class="medical-auth__brand-title">Portal del Paciente</h1>
+      <p class="medical-auth__brand-subtitle">
+        Gestiona tus citas médicas, consulta resultados y mantén tu historial
+        clínico al día.
+      </p>
+      <div class="medical-auth__brand-features">
+        <div class="medical-auth__feature">
+          <mat-icon class="medical-auth__feature-icon">calendar_today</mat-icon>
+          <span>Agenda y administra tus citas</span>
+        </div>
+        <div class="medical-auth__feature">
+          <mat-icon class="medical-auth__feature-icon">assignment</mat-icon>
+          <span>Consulta tu historial clínico</span>
+        </div>
+        <div class="medical-auth__feature">
+          <mat-icon class="medical-auth__feature-icon">medication</mat-icon>
+          <span>Accede a tus recetas médicas</span>
+        </div>
+      </div>
+    </div>
+  </div>
 
-          <div class="auth-page__border-wrapper">
-            <div class="auth-page__border-line"></div>
-            <p class="auth-page__border-title">or</p>
-            <div class="auth-page__border-line"></div>
-          </div>
-
+  <div class="medical-auth__form">
+    <mat-tab-group class="medical-auth__tabs" mat-stretch-tabs animationDuration="300ms">
+      <mat-tab label="Iniciar Sesión">
+        <div class="medical-auth__tab-content">
+          <h2 class="medical-auth__tab-title">Bienvenido de nuevo</h2>
+          <p class="medical-auth__tab-desc">Ingresa tus credenciales para acceder al portal.</p>
           <app-login-form
             (sendLoginForm)="sendLoginForm($event)"
           ></app-login-form>
-        </mat-tab>
-        <mat-tab label="New User">
-          <h4 class="auth-page__group-title">Welcome!</h4>
-          <p class="auth-page__group-sub-title">Create you account</p>
-
+          <p class="medical-auth__switch-text">
+            ¿No tienes cuenta?
+            <a [routerLink]="routers.PATIENTS_REGISTER">Regístrate aquí</a>
+          </p>
+        </div>
+      </mat-tab>
+      <mat-tab label="Registrarse">
+        <div class="medical-auth__tab-content">
+          <h2 class="medical-auth__tab-title">Crear cuenta</h2>
+          <p class="medical-auth__tab-desc">Completa tus datos para registrarte en el portal.</p>
           <app-sign-form (sendSignForm)="sendSignForm($event)"></app-sign-form>
-
-          <div class="auth-page__border-wrapper">
-            <div class="auth-page__border-line"></div>
-            <p class="auth-page__border-title">or</p>
-            <div class="auth-page__border-line"></div>
-          </div>
-
-          <div class="auth-page__google-button-wrapper">
-            <button
-              mat-raised-button
-              class="auth-page__google-button"
-              (click)="googleLogin()"
-            >
-              <img
-                class="auth-page__google-button-icon"
-                src="./assets/auth/google.svg"
-                alt="google"
-              />Sign in with Google
-            </button>
-          </div>
-        </mat-tab>
-      </mat-tab-group>
-
-      <p class="auth-page__footer-title">
-        © 2014-{{ todayDate | year }}
-        <a href="https://flatlogic.com">Flatlogic</a>, LLC. All rights reserved.
-      </p>
-    </div>
-  </div>
-  <div class="auth-page__logo">
-    <div class="auth-page__logo-wrapper">
-      <img
-        class="auth-page__logo-img"
-        src="./assets/auth/logo.svg"
-        alt="logo"
-      />
-      <h6 class="auth-page__logo-title">Angular Material Admin Full</h6>
-    </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
   </div>
 </div>

@@ -20,8 +20,10 @@ export const APP_ROUTES: Routes = [
   },
   {
     path: 'patients/register',
-    loadChildren: () =>
-      import('./modules/patients/patients.module').then((m) => m.PatientsModule),
+    loadComponent: () =>
+      import('./modules/patients/containers/patient-register/patient-register.component').then(
+        (m) => m.PatientRegisterComponent,
+      ),
   },
   {
     path: '404',

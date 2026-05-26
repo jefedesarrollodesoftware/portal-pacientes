@@ -1,49 +1,127 @@
-@if (authService.errorMessage) {
-  <div
-    class="notification notification_transparent-pink"
-    >
-    <div class="notification__icon-wrapper notification__icon-wrapper_solid-pink">
-      <mat-icon>report</mat-icon>
-    </div>
-    <p class="notification__title">{{ authService.errorMessage }}</p>
+<form [formGroup]="form" (ngSubmit)="register()" class="sign-form">
+  <div class="sign-form__row">
+    <mat-form-field appearance="outline" class="sign-form__field">
+      <mat-label>Tipo de Documento</mat-label>
+      <mat-select formControlName="document_type_code">
+        <mat-option *ngFor="let doc of documentTypes" [value]="doc.code">
+          {{ doc.name }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.get('document_type_code')?.hasError('required')">Selecciona un tipo de documento</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="sign-form__field">
+      <mat-label>N° Documento</mat-label>
+      <input matInput formControlName="document_number" placeholder="1234567890" />
+      <mat-error *ngIf="form.get('document_number')?.hasError('required')">Obligatorio</mat-error>
+      <mat-error *ngIf="form.get('document_number')?.hasError('maxlength')">Máx. 45 caracteres</mat-error>
+    </mat-form-field>
   </div>
-}
-<form class="form" [formGroup]="form" (ngSubmit)="register()">
-  <mat-form-field class="form__input">
-    <input
-      matInput
-      placeholder="Email Address"
-      type="email"
-      formControlName="email"
-      />
+
+  <mat-form-field appearance="outline" class="sign-form__field">
+    <mat-label>Fecha de Expedición del Documento</mat-label>
+    <input matInput [matDatepicker]="expPicker" formControlName="document_expedition_date" placeholder="DD/MM/AAAA" />
+    <mat-datepicker-toggle matIconSuffix [for]="expPicker"></mat-datepicker-toggle>
+    <mat-datepicker #expPicker></mat-datepicker>
   </mat-form-field>
 
-  <mat-form-field class="form__input">
-    <input
-      matInput
-      placeholder="Password"
-      type="password"
-      formControlName="password"
-      />
-  </mat-form-field>
+  <div class="sign-form__row">
+    <mat-form-field appearance="outline" class="sign-form__field">
+      <mat-label>Nombres</mat-label>
+      <input matInput formControlName="first_name" placeholder="Carlos" />
+      <mat-error *ngIf="form.get('first_name')?.hasError('required')">Obligatorio</mat-error>
+    </mat-form-field>
 
-  <mat-form-field class="form__input">
-    <input
-      matInput
-      placeholder="Confirm Password"
-      type="password"
-      formControlName="confirmPassword"
-      />
-  </mat-form-field>
-
-  <div class="form-actions">
-    <button
-      class="form-actions__create"
-      mat-raised-button
-      color="primary"
-      type="submit"
-      >
-      Create your account
-    </button>
+    <mat-form-field appearance="outline" class="sign-form__field">
+      <mat-label>Apellidos</mat-label>
+      <input matInput formControlName="last_name" placeholder="García" />
+      <mat-error *ngIf="form.get('last_name')?.hasError('required')">Obligatorio</mat-error>
+    </mat-form-field>
   </div>
+
+  <div class="sign-form__row">
+    <mat-form-field appearance="outline" class="sign-form__field">
+      <mat-label>Fecha de Nacimiento</mat-label>
+      <input matInput [matDatepicker]="birthPicker" formControlName="date_birth" placeholder="DD/MM/AAAA" />
+      <mat-datepicker-toggle matIconSuffix [for]="birthPicker"></mat-datepicker-toggle>
+      <mat-datepicker #birthPicker></mat-datepicker>
+      <mat-error *ngIf="form.get('date_birth')?.hasError('required')">Obligatorio</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="sign-form__field">
+      <mat-label>Género</mat-label>
+      <mat-select formControlName="gender_code">
+        <mat-option *ngFor="let g of genders" [value]="g.code">
+          {{ g.name }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.get('gender_code')?.hasError('required')">Selecciona un género</mat-error>
+    </mat-form-field>
+  </div>
+
+  <mat-form-field appearance="outline" class="sign-form__field">
+    <mat-label>Estado Civil</mat-label>
+    <mat-select formControlName="civil_status_code">
+      <mat-option *ngFor="let cs of civilStatuses" [value]="cs.code">
+        {{ cs.name }}
+      </mat-option>
+    </mat-select>
+    <mat-error *ngIf="form.get('civil_status_code')?.hasError('required')">Selecciona un estado civil</mat-error>
+  </mat-form-field>
+
+  <div class="sign-form__row">
+    <mat-form-field appearance="outline" class="sign-form__field">
+      <mat-label>Teléfono Celular</mat-label>
+      <input matInput formControlName="cellphone" placeholder="3001234567" type="tel" />
+      <mat-icon matIconPrefix>phone</mat-icon>
+      <mat-error *ngIf="form.get('cellphone')?.hasError('required')">Obligatorio</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="sign-form__field">
+      <mat-label>Correo Electrónico</mat-label>
+      <input matInput formControlName="email" placeholder="paciente@correo.com" type="email" />
+      <mat-icon matIconPrefix>email</mat-icon>
+      <mat-error *ngIf="form.get('email')?.hasError('required')">Obligatorio</mat-error>
+      <mat-error *ngIf="form.get('email')?.hasError('email')">Correo inválido</mat-error>
+    </mat-form-field>
+  </div>
+
+  <mat-form-field appearance="outline" class="sign-form__field">
+    <mat-label>Dirección</mat-label>
+    <input matInput formControlName="address" placeholder="Cra 1 # 2-3" />
+  </mat-form-field>
+
+  <div class="sign-form__row">
+    <mat-form-field appearance="outline" class="sign-form__field">
+      <mat-label>Contraseña</mat-label>
+      <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" placeholder="••••••••" />
+      <mat-icon matIconPrefix>lock</mat-icon>
+      <button matIconSuffix type="button" (click)="hidePassword = !hidePassword" tabindex="-1">
+        <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+      </button>
+      <mat-error *ngIf="form.get('password')?.hasError('required')">Obligatorio</mat-error>
+      <mat-error *ngIf="form.get('password')?.hasError('minlength')">Mín. 6 caracteres</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="sign-form__field">
+      <mat-label>Confirmar Contraseña</mat-label>
+      <input matInput [type]="hideConfirm ? 'password' : 'text'" formControlName="password_confirmation" placeholder="••••••••" />
+      <mat-icon matIconPrefix>lock</mat-icon>
+      <button matIconSuffix type="button" (click)="hideConfirm = !hideConfirm" tabindex="-1">
+        <mat-icon>{{ hideConfirm ? 'visibility_off' : 'visibility' }}</mat-icon>
+      </button>
+      <mat-error *ngIf="form.get('password_confirmation')?.hasError('required')">Obligatorio</mat-error>
+      <mat-error *ngIf="form.get('password_confirmation')?.hasError('mismatch')">Las contraseñas no coinciden</mat-error>
+    </mat-form-field>
+  </div>
+
+  <div *ngIf="authService.errorMessage" class="sign-form__error">
+    <mat-icon>report</mat-icon>
+    <span>{{ authService.errorMessage }}</span>
+  </div>
+
+  <button mat-flat-button color="primary" class="sign-form__btn" type="submit" [disabled]="form.invalid || submitting">
+    <mat-icon *ngIf="submitting" class="sign-form__spinner">sync</mat-icon>
+    {{ submitting ? 'Registrando...' : 'Crear Cuenta' }}
+  </button>
 </form>

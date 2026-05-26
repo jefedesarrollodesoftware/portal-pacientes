@@ -1,5 +1,7 @@
 export const environment = {
-  production: true,
+  production: false,
   hmr: false,
-  backend: true
+  backend: true,
+  companyId: 1,
+  appApiKey: '3f7a2b1c-8d4e-5f69-a0b1-c2d3e4f5a6b7',
 };

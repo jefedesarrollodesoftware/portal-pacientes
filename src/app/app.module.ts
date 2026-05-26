@@ -1,12 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import {
-  PreloadAllModules,
-  RouterModule,
-  provideRouter,
-  withPreloading,
-} from '@angular/router';
+import { RouterModule, provideRouter } from '@angular/router';
 import { ToastrModule } from 'ngx-toastr';
 
 import { AppComponent } from './app.component';
@@ -33,7 +28,7 @@ import { httpInterceptor } from './shared/services/http-interceptor.service';
         panelWidth: null,
       },
     },
-    provideRouter(APP_ROUTES, withPreloading(PreloadAllModules)),
+    provideRouter(APP_ROUTES),
     provideHttpClient(withInterceptors([httpInterceptor])),
   ],
   bootstrap: [AppComponent],

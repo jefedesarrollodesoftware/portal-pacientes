@@ -1,7 +1,8 @@
 import { Component, DestroyRef, inject } from '@angular/core';
-import { ActivatedRoute, Params } from '@angular/router';
+import { ActivatedRoute, Params, RouterModule } from '@angular/router';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { routes } from '../../../../consts';
@@ -12,17 +13,15 @@ import {
 } from '../../../../shared/services/auth.service';
 import { LoginFormComponent } from '../../components/login-form/login-form.component';
 import { SignFormComponent } from '../../components/sign-form/sign-form.component';
-import { YearPipe } from '../../pipes/year.pipe';
 
 @Component({
-    selector: 'app-auth-page',
-    templateUrl: './auth-page.component.html',
-    styleUrls: ['./auth-page.component.scss'],
-    standalone: true,
-    imports: [MatTabsModule, MatButtonModule, LoginFormComponent, SignFormComponent, YearPipe]
+  selector: 'app-auth-page',
+  templateUrl: './auth-page.component.html',
+  styleUrls: ['./auth-page.component.scss'],
+  standalone: true,
+  imports: [RouterModule, MatTabsModule, MatButtonModule, MatIconModule, LoginFormComponent, SignFormComponent],
 })
 export class AuthPageComponent {
-  public todayDate: Date = new Date();
   public routers: typeof routes = routes;
   private readonly destroyRef = inject(DestroyRef);
 
@@ -50,9 +49,5 @@ export class AuthPageComponent {
 
   public sendSignForm(creds: RegisterCredentials): void {
     this.authService.registerUser(creds);
-  }
-
-  public googleLogin() {
-    this.authService.loginUser({ social: 'google' });
   }
 }

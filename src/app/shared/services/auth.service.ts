@@ -14,15 +14,26 @@ type JwtPayload = {
 };
 
 export type LoginCredentials = {
-  email?: string;
-  password?: string;
-  social?: string;
+  document_type_code: string;
+  document_number: string;
+  password: string;
 };
 
 export type RegisterCredentials = {
-  email?: string;
-  password?: string;
-  confirmPassword?: string;
+  document_type_code: string;
+  document_number: string;
+  document_expedition_date: string;
+  first_name: string;
+  last_name: string;
+  date_birth: string;
+  gender_code: string;
+  civil_status_code: string;
+  cellphone: string;
+  email: string;
+  address: string;
+  password: string;
+  password_confirmation: string;
+  company_id: number;
 };
 
 export type ChangePasswordPayload = {
@@ -184,7 +195,6 @@ export class AuthService {
 
     const data = this.decodeJwtPayload(token);
     if (!data) {
-      this.router.navigate(['/login']);
       return false;
     }
 
@@ -199,68 +209,44 @@ export class AuthService {
 
   public loginUser(creds: LoginCredentials): void {
     this.requestLogin();
-    if (!this.config.isBackend) {
-      this.receiveToken('token');
-      return;
-    }
 
-    if (creds.social) {
-      window.location.href = `${this.config.baseURLApi}${this.api}/signin/${creds.social}`;
-      return;
-    }
-
-    const email = creds.email || '';
-    const password = creds.password || '';
-    if (email.length > 0 && password.length > 0) {
-      this.http
-        .post(`${this.api}/signin/local`, creds, { responseType: 'text' })
-        .pipe(take(1))
-        .subscribe({
-          next: (token: string) => {
+    this.http
+      .post(`/api/v1/auth/token`, {
+        email: creds.document_number,
+        password: creds.password,
+        device_name: 'web-angular-app',
+      })
+      .pipe(take(1))
+      .subscribe({
+        next: (res: any) => {
+          const token = res?.data?.token || res?.token || '';
+          if (token) {
             this.receiveToken(token);
-          },
-          error: () => {
-            this.toastr.error('Something was wrong. Try again');
-          },
-        });
-      return;
-    }
-
-    this.toastr.error('Something was wrong. Try again');
+          }
+        },
+        error: () => {
+          this.toastr.error('Credenciales inválidas. Intenta de nuevo.');
+        },
+      });
   }
 
   public registerUser(payload: RegisterCredentials): void {
     this.requestRegister();
-    const creds = payload;
 
-    if (!this.config.isBackend) {
-      this.receiveRegister();
-      this.toastr.success("You've been registered successfully");
-      this.router.navigate([this.ROUTES.LOGIN]);
-      return;
-    }
-
-    const email = creds.email || '';
-    const password = creds.password || '';
-    if (email.length > 0 && password.length > 0) {
-      this.http
-        .post(`${this.api}/signup`, creds, { responseType: 'text' })
-        .pipe(take(1))
-        .subscribe({
-          next: () => {
-            this.toastr.success("You've been registered successfully");
-            this.router.navigate([this.ROUTES.LOGIN]);
-          },
-          error: (err: unknown) => {
-            this.registerError(
-              this.extractErrorMessage(err, 'Something was wrong. Try again'),
-            );
-          },
-        });
-      return;
-    }
-
-    this.registerError('Something was wrong. Try again');
+    this.http
+      .post(`/api/v1/patients/register`, payload)
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          this.toastr.success('Registrado correctamente. Ahora inicia sesión.');
+          this.router.navigate([this.ROUTES.LOGIN]);
+        },
+        error: (err: unknown) => {
+          this.registerError(
+            this.extractErrorMessage(err, 'Error al registrar. Intenta de nuevo.'),
+          );
+        },
+      });
   }
 
   public requestRegister(): void {

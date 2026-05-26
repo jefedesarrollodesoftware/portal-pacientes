@@ -1,31 +1,32 @@
-<form class="form" [formGroup]="form" (ngSubmit)="login()">
-  <mat-form-field class="form__input">
-    <input
-      matInput
-      placeholder="Email Address"
-      type="email"
-      formControlName="email"
-    />
+<form [formGroup]="form" (ngSubmit)="login()" class="login-form">
+  <mat-form-field appearance="outline" class="login-form__field">
+    <mat-label>Tipo de Documento</mat-label>
+    <mat-select formControlName="document_type_code">
+      <mat-option *ngFor="let doc of documentTypes" [value]="doc.code">
+        {{ doc.name }}
+      </mat-option>
+    </mat-select>
+    <mat-error *ngIf="form.get('document_type_code')?.hasError('required')">Selecciona un tipo de documento</mat-error>
   </mat-form-field>
 
-  <mat-form-field class="form__input">
-    <input
-      matInput
-      placeholder="Password"
-      type="password"
-      formControlName="password"
-    />
+  <mat-form-field appearance="outline" class="login-form__field">
+    <mat-label>N° Documento</mat-label>
+    <input matInput formControlName="document_number" placeholder="1234567890" />
+    <mat-icon matIconPrefix>badge</mat-icon>
+    <mat-error *ngIf="form.get('document_number')?.hasError('required')">El número de documento es obligatorio</mat-error>
   </mat-form-field>
 
-  <div class="form-actions">
-    <button
-      class="form-actions__login"
-      mat-raised-button
-      color="primary"
-      type="submit"
-    >
-      Login
+  <mat-form-field appearance="outline" class="login-form__field">
+    <mat-label>Contraseña</mat-label>
+    <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" placeholder="••••••••" />
+    <mat-icon matIconPrefix>lock</mat-icon>
+    <button matIconSuffix type="button" (click)="hidePassword = !hidePassword" tabindex="-1">
+      <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
     </button>
-    <button class="form-actions__forget" mat-button>Forget password</button>
-  </div>
+    <mat-error *ngIf="form.get('password')?.hasError('required')">La contraseña es obligatoria</mat-error>
+  </mat-form-field>
+
+  <button mat-flat-button color="primary" class="login-form__btn" type="submit" [disabled]="form.invalid">
+    Iniciar Sesión
+  </button>
 </form>
