@@ -1,0 +1,88 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Consulta de Pacientes</mat-card-title>
+    <mat-card-subtitle>Busca un paciente por tipo y número de documento</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <form [formGroup]="searchForm" (ngSubmit)="onSearch()" class="search-form" *ngIf="!searched || patient">
+      <mat-form-field appearance="outline">
+        <mat-label>Tipo de Documento</mat-label>
+        <mat-select formControlName="document_type_code">
+          <mat-option *ngFor="let doc of documentTypes" [value]="doc.code">
+            {{ doc.name }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="searchForm.get('document_type_code')?.hasError('required')">
+          Selecciona un tipo de documento.
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Número de Documento</mat-label>
+        <input matInput formControlName="document_number" placeholder="1234567890" />
+        <mat-error *ngIf="searchForm.get('document_number')?.hasError('required')">
+          Ingresa el número de documento.
+        </mat-error>
+      </mat-form-field>
+
+      <div class="search-actions">
+        <button mat-raised-button color="primary" type="submit" [disabled]="searchForm.invalid || loading">
+          <mat-icon>search</mat-icon>
+          Consultar
+        </button>
+        <button mat-stroked-button type="button" (click)="newSearch()" *ngIf="searched">
+          <mat-icon>refresh</mat-icon>
+          Nueva Búsqueda
+        </button>
+      </div>
+    </form>
+
+    <div class="loading-shade" *ngIf="loading">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <div class="result-card" *ngIf="patient && !loading">
+      <mat-divider></mat-divider>
+      <div class="patient-summary">
+        <div class="summary-header">
+          <mat-icon class="patient-icon">person</mat-icon>
+          <div>
+            <h3>{{ patient.first_name }} {{ patient.last_name }}</h3>
+            <p class="document-info">{{ patient.document_type_code }} {{ patient.document_number }}</p>
+          </div>
+        </div>
+        <div class="summary-details">
+          <div class="detail-row">
+            <span class="label">Email</span>
+            <span class="value">{{ patient.email }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Celular</span>
+            <span class="value">{{ patient.cellphone }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Estado</span>
+            <span class="value">
+              <mat-slide-toggle [checked]="patient.active" disabled></mat-slide-toggle>
+            </span>
+          </div>
+        </div>
+        <button mat-raised-button color="accent" (click)="viewDetail()">
+          <mat-icon>visibility</mat-icon>
+          Ver Detalle Completo
+        </button>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="searched && !patient && !loading">
+      <mat-icon>person_search</mat-icon>
+      <p>No se encontró ningún paciente con esos datos.</p>
+    </div>
+
+    <div class="empty-state initial" *ngIf="!searched && !loading">
+      <mat-icon>search</mat-icon>
+      <p>Ingresa tipo y número de documento para consultar un paciente.</p>
+    </div>
+  </mat-card-content>
+</mat-card>

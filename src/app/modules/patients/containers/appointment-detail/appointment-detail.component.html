@@ -1,0 +1,56 @@
+<div class="detail-container">
+  <div class="loading-shade" *ngIf="loading">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+
+  <mat-card *ngIf="appointment && !loading">
+    <mat-card-header>
+      <mat-card-title>Detalle de Cita</mat-card-title>
+      <mat-card-subtitle>
+        <span class="status-badge" [ngClass]="getStatusClass(appointment.status)">
+          {{ getStatusLabel(appointment.status) }}
+        </span>
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <span class="label">Fecha</span>
+          <span class="value">{{ appointment.appointment_date | date:'dd/MM/yyyy' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Hora</span>
+          <span class="value">{{ appointment.appointment_time }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Tipo</span>
+          <span class="value">{{ appointment.type }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Doctor</span>
+          <span class="value">{{ appointment.doctor || '-' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Ubicación</span>
+          <span class="value">{{ appointment.location || '-' }}</span>
+        </div>
+        <div class="detail-item" *ngIf="appointment.patient_name">
+          <span class="label">Paciente</span>
+          <span class="value">{{ appointment.patient_name }}</span>
+        </div>
+        <div class="detail-item full-width" *ngIf="appointment.notes">
+          <span class="label">Notas</span>
+          <span class="value">{{ appointment.notes }}</span>
+        </div>
+      </div>
+    </mat-card-content>
+
+    <mat-card-actions>
+      <button mat-raised-button [routerLink]="'/patients/appointments'">
+        <mat-icon>arrow_back</mat-icon>
+        Volver a Citas
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>

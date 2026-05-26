@@ -1,0 +1,78 @@
+<div class="detail-container">
+  <div class="loading-shade" *ngIf="loading">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+
+  <mat-card *ngIf="patient && !loading">
+    <mat-card-header>
+      <mat-card-title>Detalle del Paciente</mat-card-title>
+      <mat-card-subtitle>{{ patient.first_name }} {{ patient.last_name }}</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <span class="label">Tipo Documento</span>
+          <span class="value">{{ patient.document_type_code }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Número Documento</span>
+          <span class="value">{{ patient.document_number }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Nombres</span>
+          <span class="value">{{ patient.first_name }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Apellidos</span>
+          <span class="value">{{ patient.last_name }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Email</span>
+          <span class="value">{{ patient.email }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Celular</span>
+          <span class="value">{{ patient.cellphone_code ? '+' + patient.cellphone_code + ' ' : '' }}{{ patient.cellphone }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Fecha Nacimiento</span>
+          <span class="value">{{ patient.date_birth || '-' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Género</span>
+          <span class="value">{{ patient.gender_code || '-' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Estado Civil</span>
+          <span class="value">{{ patient.civil_status_code || '-' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Dirección</span>
+          <span class="value">{{ patient.address || '-' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Activo</span>
+          <span class="value">
+            <mat-slide-toggle [checked]="patient.active" disabled></mat-slide-toggle>
+          </span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Fuente</span>
+          <span class="value">{{ patient.source }}</span>
+        </div>
+      </div>
+    </mat-card-content>
+
+    <mat-card-actions>
+      <button mat-raised-button color="primary" [routerLink]="'/patients/appointments'">
+        <mat-icon>calendar_today</mat-icon>
+        Ver Citas
+      </button>
+      <button mat-raised-button [routerLink]="'/patients/list'">
+        <mat-icon>arrow_back</mat-icon>
+        Volver
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>

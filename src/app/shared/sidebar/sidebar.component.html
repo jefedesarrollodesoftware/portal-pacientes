@@ -1,0 +1,13 @@
+<mat-list class="sidebar">
+  <div
+    class="mat-tree-item sidebar-top-item"
+    *ngFor="let item of sidebarItems"
+    [routerLink]="item.route"
+    routerLinkActive="active"
+  >
+    <div>
+      <mat-icon>{{ item.icon }}</mat-icon>
+      <p>{{ item.name }}</p>
+    </div>
+  </div>
+</mat-list>

@@ -1,0 +1,154 @@
+@use "sass:map";
+@use "@angular/material" as mat;
+@use "app/styles/variables" as *;
+@use "palettes" as *;
+@use "header" as *;
+@use "sidebar" as *;
+@use "footer" as *;
+@use "settings" as *;
+@use "scrollbar" as *;
+
+@function mat-palette(
+  $base-palette,
+  $default: 500,
+  $lighter: 100,
+  $darker: 700,
+  $text: $default
+) {
+  @return mat.m2-define-palette($base-palette, $default, $lighter, $darker, $text);
+}
+
+@function mat-light-theme($primary, $accent: null, $warn: null) {
+  @if $warn == null {
+    $warn: mat.m2-define-palette(mat.$m2-red-palette);
+  }
+
+  $theme: mat.m2-define-light-theme(
+    (
+      color: (
+        primary: $primary,
+        accent: $accent,
+        warn: $warn
+      )
+    )
+  );
+  $color-config: mat.m2-get-color-config($theme);
+
+  @if $color-config != null {
+    @return map.merge($theme, $color-config);
+  }
+
+  @return $theme;
+}
+
+@mixin angular-material-theme($theme) {
+  @include mat.all-component-themes($theme);
+}
+
+@function ama-light-theme($primary, $accent, $warn, $success, $info, $primary-light) {
+  @return map.merge(
+    mat-light-theme($primary, $accent, $warn),
+    (success: $success, info: $info, primary-light: $primary-light)
+  );
+}
+
+/***********************************/
+/**        BLUE THEME            **/
+/**********************************/
+
+$blue-theme-primary: mat-palette($ama-blue);
+$blue-theme-primary-light: mat-palette($ama-light-blue);
+$blue-theme-accent: mat-palette($ama-yellow);
+$blue-theme-warn: mat-palette($ama-pink);
+$blue-theme-success: mat-palette($ama-green);
+$blue-theme-info: mat-palette($ama-violet);
+
+$blue-theme: ama-light-theme(
+  $blue-theme-primary,
+  $blue-theme-accent,
+  $blue-theme-warn,
+  $blue-theme-success,
+  $blue-theme-info,
+  $blue-theme-primary-light
+);
+
+@mixin blueTheme() {
+  .blueTheme {
+    @include header();
+    @include sidebar($blue);
+    @include footer($blue);
+    @include settings($blue);
+  }
+}
+
+/***********************************/
+/**        PINK THEME            **/
+/**********************************/
+
+$pink-theme-primary: mat-palette($ama-pink);
+$pink-theme-primary-light: mat-palette($ama-light-blue);
+$pink-theme-accent: mat-palette($ama-yellow);
+$pink-theme-warn: mat-palette($ama-blue);
+$pink-theme-success: mat-palette($ama-green);
+$pink-theme-info: mat-palette($ama-violet);
+
+$pink-theme: ama-light-theme(
+  $pink-theme-primary,
+  $pink-theme-accent,
+  $pink-theme-warn,
+  $pink-theme-success,
+  $pink-theme-info,
+  $pink-theme-primary-light
+);
+
+@mixin pinkTheme() {
+  .pinkTheme {
+    @include angular-material-theme($pink-theme);
+    @include header();
+    @include sidebar($pink);
+    @include footer($pink);
+    @include settings($pink);
+  }
+}
+
+/***********************************/
+/**       GREEN THEME            **/
+/**********************************/
+
+$green-theme-primary: mat-palette($ama-green);
+$green-theme-primary-light: mat-palette($ama-light-blue);
+$green-theme-accent: mat-palette($ama-yellow);
+$green-theme-warn: mat-palette($ama-pink);
+$green-theme-success: mat-palette($ama-blue);
+$green-theme-info: mat-palette($ama-violet);
+
+$green-theme: ama-light-theme(
+  $green-theme-primary,
+  $green-theme-accent,
+  $green-theme-warn,
+  $green-theme-success,
+  $green-theme-info,
+  $green-theme-primary-light
+);
+
+@mixin greenTheme() {
+  .greenTheme {
+    @include angular-material-theme($green-theme);
+    @include header();
+    @include sidebar($green);
+    @include footer($green);
+    @include settings($green);
+  }
+}
+
+/***********************************/
+/**          DARK MODE           **/
+/**********************************/
+
+@mixin darkMode() {
+  .darkMode {
+    @include header-dark();
+    @include sidebar-dark();
+    @include scrollbar-dark();
+  }
+}

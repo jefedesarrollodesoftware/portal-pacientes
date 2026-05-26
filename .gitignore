@@ -1,0 +1,67 @@
+# ─── Dependencias y paquetes ─────────────────────────────────────────────────
+# Directorios de dependencias de Node.js, Python, PHP, Java, etc.
+node_modules/
+vendor/
+__pycache__/
+target/
+build/
+*.jar
+*.war
+
+# ─── Archivos compilados / binarios ──────────────────────────────────────────
+# Código compilado y artefactos de build que se regeneran siempre.
+dist/
+*.class
+*.pyc
+*.pyo
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.dylib
+
+# ─── Archivos de entorno y configuración local ──────────────────────────────
+# Información sensible (claves, tokens) y configuraciones locales del
+# desarrollador que no deben versionarse.
+.env
+.env.local
+.env.*.local
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ─── Cachés y directorios temporales ────────────────────────────────────────
+# Archivos generados por herramientas, transpiladores, editores y frameworks.
+.angular/cache/
+.cache/
+.tmp/
+*.tsbuildinfo
+.eslintcache
+.stylelintcache
+
+# ─── System Operativo ───────────────────────────────────────────────────────
+# Archivos propios del sistema de archivos del SO, sin relevancia para el
+# código fuente.
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ─── IDEs y editores ────────────────────────────────────────────────────────
+# Configuraciones locales del editor de cada desarrollador.
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.~lock.*
+
+# ─── Angular / TypeScript ───────────────────────────────────────────────────
+# Archivos específicos del ecosistema Angular/TypeScript.
+/out-tsc/
+*.js.map
