@@ -1,19 +1,10 @@
 <form [formGroup]="form" (ngSubmit)="login()" class="login-form">
   <mat-form-field appearance="outline" class="login-form__field">
-    <mat-label>Tipo de Documento</mat-label>
-    <mat-select formControlName="document_type_code">
-      <mat-option *ngFor="let doc of documentTypes" [value]="doc.code">
-        {{ doc.name }}
-      </mat-option>
-    </mat-select>
-    <mat-error *ngIf="form.get('document_type_code')?.hasError('required')">Selecciona un tipo de documento</mat-error>
-  </mat-form-field>
-
-  <mat-form-field appearance="outline" class="login-form__field">
-    <mat-label>N° Documento</mat-label>
-    <input matInput formControlName="document_number" placeholder="1234567890" />
-    <mat-icon matIconPrefix>badge</mat-icon>
-    <mat-error *ngIf="form.get('document_number')?.hasError('required')">El número de documento es obligatorio</mat-error>
+    <mat-label>Correo Electrónico</mat-label>
+    <input matInput formControlName="email" placeholder="paciente@correo.com" type="email" />
+    <mat-icon matIconPrefix>email</mat-icon>
+    <mat-error *ngIf="form.get('email')?.hasError('required')">El correo electrónico es obligatorio</mat-error>
+    <mat-error *ngIf="form.get('email')?.hasError('email')">Ingresa un correo válido</mat-error>
   </mat-form-field>
 
   <mat-form-field appearance="outline" class="login-form__field">
@@ -26,7 +17,12 @@
     <mat-error *ngIf="form.get('password')?.hasError('required')">La contraseña es obligatoria</mat-error>
   </mat-form-field>
 
-  <button mat-flat-button color="primary" class="login-form__btn" type="submit" [disabled]="form.invalid">
-    Iniciar Sesión
+  <div *ngIf="authService.errorMessage" class="login-form__error">
+    <mat-icon>report</mat-icon>
+    <span>{{ authService.errorMessage }}</span>
+  </div>
+
+  <button mat-flat-button color="primary" class="login-form__btn" type="submit" [disabled]="form.invalid || authService.isFetching">
+    {{ authService.isFetching ? 'Iniciando sesión...' : 'Iniciar Sesión' }}
   </button>
 </form>

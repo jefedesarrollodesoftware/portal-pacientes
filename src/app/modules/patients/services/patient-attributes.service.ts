@@ -16,12 +16,21 @@ export class PatientAttributesService {
     @Inject(APP_RUNTIME_CONFIG) private config: AppRuntimeConfig,
   ) {}
 
-  getAll(): Observable<ApiResponse<PatientAttributesGrouped>> {
-    const params = new HttpParams().set('company_id', this.config.companyId.toString());
+  getAll(companyId?: number): Observable<ApiResponse<PatientAttributesGrouped>> {
+    let params = new HttpParams();
+    const id = companyId ?? this.config.companyId;
+    if (id) {
+      params = params.set('company_id', id.toString());
+    }
     return this.http.get<ApiResponse<PatientAttributesGrouped>>(this.baseUrl, { params });
   }
 
-  getByType(type: string): Observable<ApiResponse<PatientAttribute[]>> {
-    return this.http.get<ApiResponse<PatientAttribute[]>>(`${this.baseUrl}/${type}`);
+  getByType(type: string, companyId?: number): Observable<ApiResponse<PatientAttribute[]>> {
+    let params = new HttpParams();
+    const id = companyId ?? this.config.companyId;
+    if (id) {
+      params = params.set('company_id', id.toString());
+    }
+    return this.http.get<ApiResponse<PatientAttribute[]>>(`${this.baseUrl}/${type}`, { params });
   }
 }

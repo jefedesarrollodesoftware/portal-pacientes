@@ -1,6 +1,6 @@
 {
   "/api": {
-    "target": "https://portal-pacientes.local",
+    "target": "https://admin-portal-pacientes.local",
     "secure": false,
     "changeOrigin": true,
     "logLevel": "debug"

@@ -6,7 +6,7 @@
 
 | Propiedad | Valor |
 |---|---|
-| **Base URL** | `https://portal-pacientes.local/api/v1` |
+| **Base URL** | `https://admin-portal-pacientes.local/api/v1` |
 | **Formato de respuesta** | JSON |
 | **Autenticación** | Bearer Token (Laravel Sanctum) o API Key |
 | **Encoding** | UTF-8 |
@@ -64,10 +64,11 @@ interface ApiResponse<T = any> {
 
 ```typescript
 interface LoginRequest {
-  email: string;          // required, formato email
-  password: string;       // required, mínimo 1 carácter
-  device_name?: string;   // opcional, max 120 chars, default "b2b-client"
-  abilities?: string[];   // opcional, cada elemento max 120 chars, default ["*"]
+  tipo_documento: string;    // required, código del tipo de documento (ej: "CC", "NIT")
+  numero_documento: string;  // required, número de documento
+  contraseña: string;        // required, mínimo 1 carácter
+  device_name?: string;      // opcional, max 120 chars, default "b2b-client"
+  abilities?: string[];      // opcional, cada elemento max 120 chars, default ["*"]
 }
 ```
 
@@ -75,8 +76,9 @@ interface LoginRequest {
 
 ```json
 {
-  "email": "admin@example.com",
-  "password": "secreta123",
+  "tipo_documento": "CC",
+  "numero_documento": "1234567890",
+  "contraseña": "secreta123",
   "device_name": "web-angular-app"
 }
 ```
@@ -117,8 +119,8 @@ interface LoginResponse {
   "status": false,
   "message": "Error de validacion.",
   "data": {
-    "email": ["El email es obligatorio."],
-    "password": ["La contrasena es obligatoria."]
+    "tipo_documento": ["El tipo de documento es obligatorio."],
+    "contraseña": ["La contrasena es obligatoria."]
   }
 }
 ```
@@ -854,8 +856,9 @@ interface ApiResponse<T = any> {
 // Autenticación
 // ===================================================
 interface LoginRequest {
-  email: string;
-  password: string;
+  tipo_documento: string;
+  numero_documento: string;
+  contraseña: string;
   device_name?: string;
   abilities?: string[];
 }
@@ -1028,7 +1031,7 @@ Los endpoints sin autenticación de sesión (`/auth/token`, `/patients/register`
 // environments/environment.ts
 export const environment = {
   production: false,
-  apiUrl: 'https://portal-pacientes.local/api/v1',
+  apiUrl: 'https://admin-portal-pacientes.local/api/v1',
   apiKey: '3f7a2b1c-8d4e-5f69-a0b1-c2d3e4f5a6b7', // misma que APP_API_KEY en .env
 };
 ```
@@ -1066,7 +1069,7 @@ export class ApiInterceptor implements HttpInterceptor {
 
 ### 9.2 Flujo de inicio de sesión
 
-1. El usuario ingresa email + password en un formulario de login.
+1. El usuario ingresa tipo de documento + número de documento + contraseña en un formulario de login.
 2. Se llama a `POST /api/v1/auth/token` (con `X-API-Key`).
 3. Si es exitoso, se almacena el `token` en `localStorage`/`sessionStorage`. Las siguientes peticiones incluirán `Authorization: Bearer {token}` además de `X-API-Key`.
 4. Se redirige al dashboard.

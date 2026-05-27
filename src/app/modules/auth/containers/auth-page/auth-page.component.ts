@@ -9,8 +9,8 @@ import { routes } from '../../../../consts';
 import {
   AuthService,
   LoginCredentials,
-  RegisterCredentials,
 } from '../../../../shared/services/auth.service';
+import { RegisterPatientRequest } from '../../../patients/models';
 import { LoginFormComponent } from '../../components/login-form/login-form.component';
 import { SignFormComponent } from '../../components/sign-form/sign-form.component';
 
@@ -47,7 +47,7 @@ export class AuthPageComponent {
     this.authService.loginUser(creds);
   }
 
-  public sendSignForm(creds: RegisterCredentials): void {
+  public sendSignForm(creds: RegisterPatientRequest): void {
     this.authService.registerUser(creds);
   }
 }

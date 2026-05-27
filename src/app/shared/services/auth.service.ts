@@ -6,34 +6,14 @@ import { map, Observable, of, take } from 'rxjs';
 import { APP_RUNTIME_CONFIG, AppRuntimeConfig } from '../../app.config';
 import { AUTH_TOKEN_STORAGE_KEY, AUTH_USER_STORAGE_KEY, routes } from '../../consts';
 import { Users } from '../models/users.model';
-
-type JwtPayload = {
-  exp?: number;
-  user?: Record<string, unknown>;
-  [key: string]: unknown;
-};
+import { ApiResponse, RegisterPatientRequest } from '../../modules/patients/models';
+import { LoginResponse, User as ApiUser } from '../../modules/auth/models';
 
 export type LoginCredentials = {
-  document_type_code: string;
-  document_number: string;
-  password: string;
-};
-
-export type RegisterCredentials = {
-  document_type_code: string;
-  document_number: string;
-  document_expedition_date: string;
-  first_name: string;
-  last_name: string;
-  date_birth: string;
-  gender_code: string;
-  civil_status_code: string;
-  cellphone: string;
   email: string;
-  address: string;
   password: string;
-  password_confirmation: string;
-  company_id: number;
+  device_name?: string;
+  abilities?: string[];
 };
 
 export type ChangePasswordPayload = {
@@ -47,7 +27,7 @@ export type ChangePasswordPayload = {
 })
 export class AuthService {
   public config: AppRuntimeConfig;
-  public api = '/api/auth';
+  public api = '/api/v1/auth';
   public ROUTES: typeof routes = routes;
 
   constructor(
@@ -76,25 +56,6 @@ export class AuthService {
 
   set errorMessage(val: string) {
     this._errorMessage = val;
-  }
-
-  private decodeJwtPayload(token: string): JwtPayload | null {
-    try {
-      const payload = token.split('.')[1];
-      if (!payload) {
-        return null;
-      }
-
-      const normalized = payload.replace(/-/g, '+').replace(/_/g, '/');
-      const padding = normalized.length % 4;
-      const base64 =
-        padding === 0 ? normalized : normalized + '='.repeat(4 - padding);
-      const decoded = atob(base64);
-
-      return JSON.parse(decoded) as JwtPayload;
-    } catch {
-      return null;
-    }
   }
 
   private extractErrorMessage(error: unknown, fallback: string): string {
@@ -148,93 +109,64 @@ export class AuthService {
     return fallback;
   }
 
-  private toUser(data: unknown): Users {
-    const source =
-      data && typeof data === 'object'
-        ? (data as Record<string, unknown>)
-        : {};
-
+  private toUser(data: Record<string, unknown>): Users {
     return {
-      id: typeof source['id'] === 'string' ? source['id'] : '',
-      firstName: typeof source['firstName'] === 'string' ? source['firstName'] : '',
-      lastName: typeof source['lastName'] === 'string' ? source['lastName'] : '',
-      phoneNumber: typeof source['phoneNumber'] === 'string' ? source['phoneNumber'] : '',
-      email: typeof source['email'] === 'string' ? source['email'] : '',
-      role: typeof source['role'] === 'string' ? source['role'] : 'user',
-      disabled: Boolean(source['disabled']),
-      password: typeof source['password'] === 'string' ? source['password'] : '',
-      emailVerified: Boolean(source['emailVerified']),
-      emailVerificationToken:
-        typeof source['emailVerificationToken'] === 'string'
-          ? source['emailVerificationToken']
-          : '',
+      id: typeof data['id'] === 'number' ? String(data['id']) : typeof data['id'] === 'string' ? data['id'] : '',
+      firstName: typeof data['first_name'] === 'string' ? data['first_name'] : typeof data['firstName'] === 'string' ? data['firstName'] as string : '',
+      lastName: typeof data['last_name'] === 'string' ? data['last_name'] : typeof data['lastName'] === 'string' ? data['lastName'] as string : '',
+      phoneNumber: typeof data['cellphone'] === 'string' ? data['cellphone'] : typeof data['phoneNumber'] === 'string' ? data['phoneNumber'] as string : '',
+      email: typeof data['email'] === 'string' ? data['email'] : '',
+      role: typeof data['role'] === 'string' ? data['role'] : 'user',
+      disabled: Boolean(data['inactivated_at'] ?? data['disabled']),
+      password: '',
+      emailVerified: Boolean(data['email_verified_at'] ?? data['emailVerified']),
+      emailVerificationToken: '',
       emailVerificationTokenExpiresAt: null,
-      passwordResetToken:
-        typeof source['passwordResetToken'] === 'string'
-          ? source['passwordResetToken']
-          : '',
+      passwordResetToken: '',
       passwordResetTokenExpiresAt: null,
-      provider: typeof source['provider'] === 'string' ? source['provider'] : 'local',
-      avatar: Array.isArray(source['avatar']) ? (source['avatar'] as Users['avatar']) : [],
+      provider: 'local',
+      avatar: [],
       createdBy: null,
       updatedBy: null,
     };
   }
 
   public isAuthenticated(): boolean {
-    const token = localStorage.getItem(AUTH_TOKEN_STORAGE_KEY);
-
-    if (!token) {
-      return false;
-    }
-
-    // We check if app runs with backend mode
-    if (!this.config.isBackend) {
-      return true;
-    }
-
-    const data = this.decodeJwtPayload(token);
-    if (!data) {
-      return false;
-    }
-
-    const exp = data.exp;
-    if (typeof exp !== 'number') {
-      return false;
-    }
-
-    const date = new Date().getTime() / 1000;
-    return date < exp;
+    return !!localStorage.getItem(AUTH_TOKEN_STORAGE_KEY);
   }
 
   public loginUser(creds: LoginCredentials): void {
     this.requestLogin();
 
+    const payload = {
+      email: creds.email,
+      password: creds.password,
+      device_name: creds.device_name || 'b2b-client',
+      ...(creds.abilities ? { abilities: creds.abilities } : {}),
+    };
+
     this.http
-      .post(`/api/v1/auth/token`, {
-        email: creds.document_number,
-        password: creds.password,
-        device_name: 'web-angular-app',
-      })
+      .post<ApiResponse<LoginResponse>>(`${this.api}/token`, payload)
       .pipe(take(1))
       .subscribe({
-        next: (res: any) => {
-          const token = res?.data?.token || res?.token || '';
-          if (token) {
-            this.receiveToken(token);
+        next: (res) => {
+          if (res.status && res.data?.token) {
+            this.receiveToken(res.data);
           }
         },
-        error: () => {
-          this.toastr.error('Credenciales inválidas. Intenta de nuevo.');
+        error: (err: HttpErrorResponse) => {
+          this.loginError(
+            this.extractErrorMessage(err, 'Credenciales inválidas. Intenta de nuevo.'),
+          );
         },
       });
   }
 
-  public registerUser(payload: RegisterCredentials): void {
+  public registerUser(payload: RegisterPatientRequest): void {
     this.requestRegister();
 
     this.http
-      .post(`/api/v1/patients/register`, payload)
+      .post<ApiResponse<unknown>>(`/api/v1/patients/register`, payload)
       .pipe(take(1))
       .subscribe({
         next: () => {
@@ -263,25 +195,19 @@ export class AuthService {
     this.errorMessage = payload;
   }
 
-  public receiveToken(token: string): void {
-    let user: Record<string, unknown>;
-    if (this.config.isBackend) {
-      const payload = this.decodeJwtPayload(token);
-      user = (payload?.user as Record<string, unknown>) || {};
-    } else {
-      user = { email: this.config.auth.email };
-    }
-
+  public receiveToken(tokenOrData: string | LoginResponse): void {
+    const token = typeof tokenOrData === 'string' ? tokenOrData : tokenOrData.token;
+    const user: Record<string, unknown> = { email: '' };
     localStorage.setItem(AUTH_TOKEN_STORAGE_KEY, token);
     localStorage.setItem(AUTH_USER_STORAGE_KEY, JSON.stringify(user));
     this.receiveLogin();
   }
 
   public logoutUser(): void {
-    localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
-    localStorage.removeItem(AUTH_USER_STORAGE_KEY);
-    document.cookie = 'token=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-    this.router.navigate([this.ROUTES.LOGIN]);
+    this.http.delete(`${this.api}/token`).pipe(take(1)).subscribe({
+      complete: () => this.clearSession(),
+      error: () => this.clearSession(),
+    });
   }
 
   public loginError(payload: string): void {
@@ -299,14 +225,21 @@ export class AuthService {
     this.isFetching = true;
   }
 
+  public clearSession(): void {
+    localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
+    localStorage.removeItem(AUTH_USER_STORAGE_KEY);
+    document.cookie = 'token=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    this.router.navigate([this.ROUTES.LOGIN]);
+  }
+
   public getCurrentUserInfo(): Observable<Users> {
     if (!this.config.isBackend) {
       return of(this.toUser(JSON.parse(localStorage.getItem(AUTH_USER_STORAGE_KEY) || '{}')));
     }
 
     return this.http
-      .get<unknown>(`${this.api}/me`)
-      .pipe(map((user: unknown) => this.toUser(user)));
+      .get<ApiResponse<ApiUser>>(`${this.api}/me`)
+      .pipe(map((res) => this.toUser(res.data as unknown as Record<string, unknown>)));
   }
 
   public changePassword(
@@ -316,29 +249,21 @@ export class AuthService {
       return of({ success: true });
     }
 
-    return this.http.put<Record<string, unknown>>(
-      `${this.api}/password-update`,
-      data,
+    return this.http.post<Record<string, unknown>>(
+      `/api/v1/patients/update-password`,
+      {
+        id_password: data.currentPassword,
+        new_password: data.newPassword,
+        new_password_confirmation: data.confirmPassword,
+      },
     );
   }
 
-  public verifyEmail(token: string): void {
+  public verifyEmail(_token: string): void {
     if (!this.config.isBackend) {
       this.toastr.success("You've been verified your email");
       this.router.navigate([this.ROUTES.LOGIN]);
       return;
     }
-
-    this.http.put(`${this.api}/verify-email`, { token }).pipe(take(1)).subscribe({
-      next: () => {
-        this.toastr.success("You've been verified your email");
-        this.router.navigate([this.ROUTES.LOGIN]);
-      },
-      error: (err: unknown) => {
-        this.registerError(
-          this.extractErrorMessage(err, 'Something was wrong. Try again'),
-        );
-      },
-    });
   }
 }

@@ -1,28 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, take } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 
 import { AUTH_TOKEN_STORAGE_KEY, AUTH_USER_STORAGE_KEY, routes } from '../../../consts';
-
-export interface PortalLoginRequest {
-  email: string;
-  password: string;
-  device_name?: string;
-}
-
-export interface PortalLoginResponse {
-  token: string;
-  token_type: string;
-  expires_at: string | null;
-}
-
-interface ApiResponseWrapper {
-  status: boolean;
-  message: string;
-  data: PortalLoginResponse;
-}
+import { LoginRequest, LoginResponse } from '../models';
+import { ApiResponse } from '../../patients/models';
 
 @Injectable({
   providedIn: 'root',
@@ -37,13 +21,13 @@ export class PortalAuthService {
     private toastr: ToastrService,
   ) {}
 
-  login(credentials: PortalLoginRequest): Observable<ApiResponseWrapper> {
-    const payload: PortalLoginRequest = {
+  login(credentials: LoginRequest): Observable<ApiResponse<LoginResponse>> {
+    const payload: LoginRequest = {
       ...credentials,
       device_name: credentials.device_name || 'b2b-client',
     };
 
-    return this.http.post<ApiResponseWrapper>(this.loginUrl, payload).pipe(
+    return this.http.post<ApiResponse<LoginResponse>>(this.loginUrl, payload).pipe(
       tap({
         next: (res) => {
           if (res.status && res.data?.token) {
@@ -64,7 +48,7 @@ export class PortalAuthService {
   }
 
   logout(): void {
-    this.http.delete(this.loginUrl).subscribe({
+    this.http.delete<ApiResponse<null>>(this.loginUrl).pipe(take(1)).subscribe({
       complete: () => this.clearSession(),
       error: () => this.clearSession(),
     });

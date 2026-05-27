@@ -19,76 +19,10 @@
   </div>
 
   <mat-form-field appearance="outline" class="sign-form__field">
-    <mat-label>Fecha de Expedición del Documento</mat-label>
-    <input matInput [matDatepicker]="expPicker" formControlName="document_expedition_date" placeholder="DD/MM/AAAA" />
-    <mat-datepicker-toggle matIconSuffix [for]="expPicker"></mat-datepicker-toggle>
-    <mat-datepicker #expPicker></mat-datepicker>
-  </mat-form-field>
-
-  <div class="sign-form__row">
-    <mat-form-field appearance="outline" class="sign-form__field">
-      <mat-label>Nombres</mat-label>
-      <input matInput formControlName="first_name" placeholder="Carlos" />
-      <mat-error *ngIf="form.get('first_name')?.hasError('required')">Obligatorio</mat-error>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline" class="sign-form__field">
-      <mat-label>Apellidos</mat-label>
-      <input matInput formControlName="last_name" placeholder="García" />
-      <mat-error *ngIf="form.get('last_name')?.hasError('required')">Obligatorio</mat-error>
-    </mat-form-field>
-  </div>
-
-  <div class="sign-form__row">
-    <mat-form-field appearance="outline" class="sign-form__field">
-      <mat-label>Fecha de Nacimiento</mat-label>
-      <input matInput [matDatepicker]="birthPicker" formControlName="date_birth" placeholder="DD/MM/AAAA" />
-      <mat-datepicker-toggle matIconSuffix [for]="birthPicker"></mat-datepicker-toggle>
-      <mat-datepicker #birthPicker></mat-datepicker>
-      <mat-error *ngIf="form.get('date_birth')?.hasError('required')">Obligatorio</mat-error>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline" class="sign-form__field">
-      <mat-label>Género</mat-label>
-      <mat-select formControlName="gender_code">
-        <mat-option *ngFor="let g of genders" [value]="g.code">
-          {{ g.name }}
-        </mat-option>
-      </mat-select>
-      <mat-error *ngIf="form.get('gender_code')?.hasError('required')">Selecciona un género</mat-error>
-    </mat-form-field>
-  </div>
-
-  <mat-form-field appearance="outline" class="sign-form__field">
-    <mat-label>Estado Civil</mat-label>
-    <mat-select formControlName="civil_status_code">
-      <mat-option *ngFor="let cs of civilStatuses" [value]="cs.code">
-        {{ cs.name }}
-      </mat-option>
-    </mat-select>
-    <mat-error *ngIf="form.get('civil_status_code')?.hasError('required')">Selecciona un estado civil</mat-error>
-  </mat-form-field>
-
-  <div class="sign-form__row">
-    <mat-form-field appearance="outline" class="sign-form__field">
-      <mat-label>Teléfono Celular</mat-label>
-      <input matInput formControlName="cellphone" placeholder="3001234567" type="tel" />
-      <mat-icon matIconPrefix>phone</mat-icon>
-      <mat-error *ngIf="form.get('cellphone')?.hasError('required')">Obligatorio</mat-error>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline" class="sign-form__field">
-      <mat-label>Correo Electrónico</mat-label>
-      <input matInput formControlName="email" placeholder="paciente@correo.com" type="email" />
-      <mat-icon matIconPrefix>email</mat-icon>
-      <mat-error *ngIf="form.get('email')?.hasError('required')">Obligatorio</mat-error>
-      <mat-error *ngIf="form.get('email')?.hasError('email')">Correo inválido</mat-error>
-    </mat-form-field>
-  </div>
-
-  <mat-form-field appearance="outline" class="sign-form__field">
-    <mat-label>Dirección</mat-label>
-    <input matInput formControlName="address" placeholder="Cra 1 # 2-3" />
+    <mat-label>Correo Electrónico (opcional)</mat-label>
+    <input matInput formControlName="email" placeholder="paciente@correo.com" type="email" />
+    <mat-icon matIconPrefix>email</mat-icon>
+    <mat-error *ngIf="form.get('email')?.hasError('email')">Correo inválido</mat-error>
   </mat-form-field>
 
   <div class="sign-form__row">

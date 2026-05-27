@@ -14,8 +14,17 @@ export const httpInterceptor: HttpInterceptorFn = (req, next) => {
   }
 
   req = req.clone({
-    headers: req.headers.set('X-API-Key', config.apiKey),
+    setHeaders: {
+      'X-API-Key': config.apiKey,
+      'Accept': 'application/json',
+    },
   });
+
+  if (req.method !== 'GET' && !req.headers.has('Content-Type')) {
+    req = req.clone({
+      headers: req.headers.set('Content-Type', 'application/json'),
+    });
+  }
 
   const token = localStorage.getItem(AUTH_TOKEN_STORAGE_KEY);
   if (token) {
