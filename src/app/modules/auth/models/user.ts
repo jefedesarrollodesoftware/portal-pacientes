@@ -14,8 +14,9 @@ export interface User {
 }
 
 export interface LoginRequest {
-  email: string;
-  password: string;
+  tipo_documento: string;
+  numero_documento: string;
+  contraseña: string;
   device_name?: string;
   abilities?: string[];
 }

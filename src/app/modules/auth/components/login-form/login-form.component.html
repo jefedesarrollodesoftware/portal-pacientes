@@ -1,20 +1,29 @@
 <form [formGroup]="form" (ngSubmit)="login()" class="login-form">
   <mat-form-field appearance="outline" class="login-form__field">
-    <mat-label>Correo Electrónico</mat-label>
-    <input matInput formControlName="email" placeholder="paciente@correo.com" type="email" />
-    <mat-icon matIconPrefix>email</mat-icon>
-    <mat-error *ngIf="form.get('email')?.hasError('required')">El correo electrónico es obligatorio</mat-error>
-    <mat-error *ngIf="form.get('email')?.hasError('email')">Ingresa un correo válido</mat-error>
+    <mat-label>Tipo de Documento</mat-label>
+    <select matNativeControl formControlName="tipo_documento">
+      <option *ngFor="let doc of documentTypes" [value]="doc.code">
+        {{ doc.name }}
+      </option>
+    </select>
+    <mat-error *ngIf="form.get('tipo_documento')?.hasError('required')">Selecciona un tipo de documento</mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="login-form__field">
+    <mat-label>N° Documento</mat-label>
+    <input matInput formControlName="numero_documento" placeholder="1234567890" />
+    <mat-icon matIconPrefix>badge</mat-icon>
+    <mat-error *ngIf="form.get('numero_documento')?.hasError('required')">El número de documento es obligatorio</mat-error>
   </mat-form-field>
 
   <mat-form-field appearance="outline" class="login-form__field">
     <mat-label>Contraseña</mat-label>
-    <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" placeholder="••••••••" />
+    <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="contraseña" placeholder="••••••••" />
     <mat-icon matIconPrefix>lock</mat-icon>
     <button matIconSuffix type="button" (click)="hidePassword = !hidePassword" tabindex="-1">
       <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
     </button>
-    <mat-error *ngIf="form.get('password')?.hasError('required')">La contraseña es obligatoria</mat-error>
+    <mat-error *ngIf="form.get('contraseña')?.hasError('required')">La contraseña es obligatoria</mat-error>
   </mat-form-field>
 
   <div *ngIf="authService.errorMessage" class="login-form__error">

@@ -10,8 +10,9 @@ import { ApiResponse, RegisterPatientRequest } from '../../modules/patients/mode
 import { LoginResponse, User as ApiUser } from '../../modules/auth/models';
 
 export type LoginCredentials = {
-  email: string;
-  password: string;
+  tipo_documento: string;
+  numero_documento: string;
+  contraseña: string;
   device_name?: string;
   abilities?: string[];
 };
@@ -139,8 +140,9 @@ export class AuthService {
     this.requestLogin();
 
     const payload = {
-      email: creds.email,
-      password: creds.password,
+      tipo_documento: creds.tipo_documento,
+      numero_documento: creds.numero_documento,
+      contraseña: creds.contraseña,
       device_name: creds.device_name || 'b2b-client',
       ...(creds.abilities ? { abilities: creds.abilities } : {}),
     };
@@ -151,7 +153,7 @@ export class AuthService {
       .subscribe({
         next: (res) => {
           if (res.status && res.data?.token) {
-            this.receiveToken(res.data);
+            this.receiveToken(res.data, { numero_documento: creds.numero_documento });
           }
         },
         error: (err: HttpErrorResponse) => {
@@ -164,9 +166,10 @@ export class AuthService {
 
   public registerUser(payload: RegisterPatientRequest): void {
     this.requestRegister();
+    const body = { ...payload, company_id: this.config.companyId };
 
     this.http
-      .post<ApiResponse<unknown>>(`/api/v1/patients/register`, payload)
+      .post<ApiResponse<unknown>>(`/api/v1/patients/register`, body)
       .pipe(take(1))
       .subscribe({
         next: () => {
@@ -195,9 +198,9 @@ export class AuthService {
     this.errorMessage = payload;
   }
 
-  public receiveToken(tokenOrData: string | LoginResponse): void {
+  public receiveToken(tokenOrData: string | LoginResponse, userData?: Record<string, unknown>): void {
     const token = typeof tokenOrData === 'string' ? tokenOrData : tokenOrData.token;
-    const user: Record<string, unknown> = { email: '' };
+    const user = userData || {};
     localStorage.setItem(AUTH_TOKEN_STORAGE_KEY, token);
     localStorage.setItem(AUTH_USER_STORAGE_KEY, JSON.stringify(user));
     this.receiveLogin();

@@ -51,9 +51,21 @@ export type PatientAttributesGrouped = Record<string, PatientAttribute[]>;
 export interface RegisterPatientRequest {
   document_type_code: string;
   document_number: string;
-  email?: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  cellphone: string;
   password: string;
   password_confirmation: string;
+  cellphone_code?: string;
+  document_expedition_date?: string;
+  date_birth?: string;
+  gender_code?: string;
+  civil_status_code?: string;
+  address?: string;
+  city_code?: string;
+  state_code?: string;
+  country_code?: string;
 }
 
 export interface RegisterPatientResponse {

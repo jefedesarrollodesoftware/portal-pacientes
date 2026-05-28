@@ -65,3 +65,4 @@ Thumbs.db
 # Archivos específicos del ecosistema Angular/TypeScript.
 /out-tsc/
 *.js.map
+.kilo/plans/1779979679793-gentle-knight.md

@@ -3,7 +3,6 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators, AbstractContro
 import { CommonModule } from '@angular/common';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../../../shared/services/auth.service';
@@ -11,14 +10,6 @@ import { PatientAttributesService } from '../../../patients/services/patient-att
 import { PatientAttribute, RegisterPatientRequest } from '../../../patients/models';
 
 export type SignFormValue = RegisterPatientRequest;
-
-const FALLBACK_DOC_TYPES: PatientAttribute[] = [
-  { id: 1, code: 'CC', name: 'Cédula de Ciudadanía', short: 'CC', value: 'CC', description: 'Documento de identidad colombiano', order: 1, icon: null },
-  { id: 2, code: 'CE', name: 'Cédula de Extranjería', short: 'CE', value: 'CE', description: null, order: 2, icon: null },
-  { id: 3, code: 'NIT', name: 'NIT', short: 'NIT', value: 'NIT', description: null, order: 3, icon: null },
-  { id: 4, code: 'PPT', name: 'Permiso por Protección Temporal', short: 'PPT', value: 'PPT', description: null, order: 4, icon: null },
-  { id: 5, code: 'Pasaporte', name: 'Pasaporte', short: 'Pasaporte', value: 'Pasaporte', description: null, order: 5, icon: null },
-];
 
 @Component({
   selector: 'app-sign-form',
@@ -30,14 +21,15 @@ const FALLBACK_DOC_TYPES: PatientAttribute[] = [
     ReactiveFormsModule,
     MatInputModule,
     MatFormFieldModule,
-    MatSelectModule,
     MatButtonModule,
     MatIconModule,
   ],
 })
 export class SignFormComponent implements OnInit {
   form!: FormGroup;
-  documentTypes: PatientAttribute[] = FALLBACK_DOC_TYPES;
+  documentTypes: PatientAttribute[] = [];
+  genders: PatientAttribute[] = [];
+  civilStatuses: PatientAttribute[] = [];
   hidePassword = true;
   hideConfirm = true;
   submitting = false;
@@ -49,7 +41,7 @@ export class SignFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.buildForm();
-    this.loadDocumentTypes();
+    this.loadCatalogs();
   }
 
   private buildForm(): void {
@@ -57,7 +49,15 @@ export class SignFormComponent implements OnInit {
       {
         document_type_code: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
         document_number: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(45)] }),
-        email: new FormControl('', { nonNullable: false, validators: [Validators.email] }),
+        first_name: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(120)] }),
+        last_name: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(120)] }),
+        cellphone: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(45)] }),
+        cellphone_code: new FormControl('', { validators: [Validators.maxLength(10)] }),
+        email: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.email, Validators.maxLength(191)] }),
+        date_birth: new FormControl(''),
+        gender_code: new FormControl(''),
+        civil_status_code: new FormControl(''),
+        address: new FormControl('', { validators: [Validators.maxLength(300)] }),
         password: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(6)] }),
         password_confirmation: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
       },
@@ -75,11 +75,19 @@ export class SignFormComponent implements OnInit {
     return null;
   };
 
-  private loadDocumentTypes(): void {
-    this.patientAttributesService.getAll().subscribe({
-      next: (res) => {
-        this.documentTypes = res.data['tipo-documento'] || FALLBACK_DOC_TYPES;
-      },
+  private loadCatalogs(): void {
+    this.patientAttributesService.getByType('tipo-documento').subscribe({
+      next: (res) => { this.documentTypes = res.data; },
+      error: () => {},
+    });
+
+    this.patientAttributesService.getByType('sexo').subscribe({
+      next: (res) => { this.genders = res.data; },
+      error: () => {},
+    });
+
+    this.patientAttributesService.getByType('estado-civil').subscribe({
+      next: (res) => { this.civilStatuses = res.data; },
       error: () => {},
     });
   }
@@ -95,10 +103,20 @@ export class SignFormComponent implements OnInit {
     const payload: SignFormValue = {
       document_type_code: raw.document_type_code,
       document_number: raw.document_number,
-      email: raw.email || undefined,
+      first_name: raw.first_name,
+      last_name: raw.last_name,
+      cellphone: raw.cellphone,
+      email: raw.email,
       password: raw.password,
       password_confirmation: raw.password_confirmation,
     };
+
+    if (raw.cellphone_code) payload.cellphone_code = raw.cellphone_code;
+    if (raw.date_birth) payload.date_birth = raw.date_birth;
+    if (raw.gender_code) payload.gender_code = raw.gender_code;
+    if (raw.civil_status_code) payload.civil_status_code = raw.civil_status_code;
+    if (raw.address) payload.address = raw.address;
+
     this.sendSignForm.emit(payload);
   }
 

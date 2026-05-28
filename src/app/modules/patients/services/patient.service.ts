@@ -1,6 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+
+import { APP_RUNTIME_CONFIG, AppRuntimeConfig } from '../../../app.config';
 
 import {
   ApiResponse,
@@ -23,10 +25,14 @@ import {
 export class PatientService {
   private readonly baseUrl = '/api/v1/patients';
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    @Inject(APP_RUNTIME_CONFIG) private config: AppRuntimeConfig,
+  ) {}
 
   register(patient: RegisterPatientRequest): Observable<ApiResponse<RegisterPatientResponse>> {
-    return this.http.post<ApiResponse<RegisterPatientResponse>>(`${this.baseUrl}/register`, patient);
+    const body = { ...patient, company_id: this.config.companyId };
+    return this.http.post<ApiResponse<RegisterPatientResponse>>(`${this.baseUrl}/register`, body);
   }
 
   create(patient: CreatePatientRequest): Observable<ApiResponse<CreatePatientResponse>> {

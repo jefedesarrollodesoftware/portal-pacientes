@@ -38,14 +38,8 @@ export class PatientRegisterComponent implements OnInit {
   registerForm: FormGroup;
   submitting = false;
   documentTypes: PatientAttribute[] = [];
-
-  private readonly FALLBACK_DOC_TYPES: PatientAttribute[] = [
-    { id: 1, code: 'CC', name: 'Cédula de Ciudadanía', short: 'CC', value: 'CC', description: null, order: 1, icon: null },
-    { id: 2, code: 'CE', name: 'Cédula de Extranjería', short: 'CE', value: 'CE', description: null, order: 2, icon: null },
-    { id: 3, code: 'NIT', name: 'NIT', short: 'NIT', value: 'NIT', description: null, order: 3, icon: null },
-    { id: 4, code: 'PPT', name: 'Permiso por Protección Temporal', short: 'PPT', value: 'PPT', description: null, order: 4, icon: null },
-    { id: 5, code: 'Pasaporte', name: 'Pasaporte', short: 'Pasaporte', value: 'Pasaporte', description: null, order: 5, icon: null },
-  ];
+  genders: PatientAttribute[] = [];
+  civilStatuses: PatientAttribute[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -57,7 +51,7 @@ export class PatientRegisterComponent implements OnInit {
 
   ngOnInit(): void {
     this.buildForm();
-    this.loadDocumentTypes();
+    this.loadCatalogs();
   }
 
   private buildForm(): void {
@@ -65,7 +59,15 @@ export class PatientRegisterComponent implements OnInit {
       {
         document_type_code: ['', Validators.required],
         document_number: ['', [Validators.required, Validators.maxLength(45)]],
-        email: ['', [Validators.email, Validators.maxLength(191)]],
+        first_name: ['', [Validators.required, Validators.maxLength(120)]],
+        last_name: ['', [Validators.required, Validators.maxLength(120)]],
+        cellphone: ['', [Validators.required, Validators.maxLength(45)]],
+        cellphone_code: ['', [Validators.maxLength(10)]],
+        email: ['', [Validators.required, Validators.email, Validators.maxLength(191)]],
+        date_birth: [''],
+        gender_code: [''],
+        civil_status_code: [''],
+        address: ['', Validators.maxLength(300)],
         password: ['', [Validators.required, Validators.minLength(6)]],
         password_confirmation: ['', Validators.required],
       },
@@ -83,14 +85,20 @@ export class PatientRegisterComponent implements OnInit {
     return null;
   }
 
-  private loadDocumentTypes(): void {
-    this.patientAttributesService.getAll().subscribe({
-      next: (res) => {
-        this.documentTypes = res.data['tipo-documento'] || this.FALLBACK_DOC_TYPES;
-      },
-      error: () => {
-        this.documentTypes = this.FALLBACK_DOC_TYPES;
-      },
+  private loadCatalogs(): void {
+    this.patientAttributesService.getByType('tipo-documento').subscribe({
+      next: (res) => { this.documentTypes = res.data; },
+      error: () => { this.documentTypes = []; },
+    });
+
+    this.patientAttributesService.getByType('sexo').subscribe({
+      next: (res) => { this.genders = res.data; },
+      error: () => { this.genders = []; },
+    });
+
+    this.patientAttributesService.getByType('estado-civil').subscribe({
+      next: (res) => { this.civilStatuses = res.data; },
+      error: () => { this.civilStatuses = []; },
     });
   }
 

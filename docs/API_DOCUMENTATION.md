@@ -228,11 +228,24 @@ interface User {
 
 ```typescript
 interface RegisterPatientRequest {
-  document_type_code: string;   // required, ej: "CC", "NIT"
-  document_number: string;      // required, ej: "1234567890"
-  email?: string;               // opcional, formato email
-  password: string;             // required, min 6 caracteres
-  password_confirmation: string; // required, debe coincidir con password
+  document_type_code: string;        // required, max 20, ej: "CC", "NIT"
+  document_number: string;           // required, max 45, ej: "1234567890"
+  first_name: string;                // required, max 120
+  last_name: string;                 // required, max 120
+  email: string;                     // required, email, max 191, unique
+  cellphone: string;                 // required, max 45, unique
+  password: string;                  // required, min 6 caracteres
+  password_confirmation: string;     // required, debe coincidir con password
+  cellphone_code?: string;           // opcional, max 10, ej: "57"
+  document_expedition_date?: string; // opcional, formato fecha ISO (Y-m-d)
+  date_birth?: string;               // opcional, formato fecha ISO (Y-m-d)
+  gender_code?: string;              // opcional, max 20
+  civil_status_code?: string;        // opcional, max 20
+  address?: string;                  // opcional, max 300
+  city_code?: string;                // opcional, max 20
+  state_code?: string;               // opcional, max 20
+  country_code?: string;             // opcional, max 20
+  company_id?: number;               // opcional, debe existir en companies
 }
 ```
 
@@ -244,9 +257,15 @@ interface RegisterPatientRequest {
 {
   "document_type_code": "CC",
   "document_number": "1234567890",
+  "first_name": "Juan",
+  "last_name": "Pérez",
   "email": "paciente@mail.com",
+  "cellphone": "3001234567",
+  "cellphone_code": "57",
   "password": "secreta123",
-  "password_confirmation": "secreta123"
+  "password_confirmation": "secreta123",
+  "date_birth": "1990-01-15",
+  "gender_code": "M"
 }
 ```
 
@@ -816,10 +835,10 @@ Se devuelve cuando no se envía la cabecera `X-API-Key` o su valor no coincide c
 ```json
 {
   "status": false,
-  "message": "Errores de validación:\n- El email es obligatorio.\n- La contraseña es obligatoria.",
+  "message": "Errores de validación:\n- El nombre es obligatorio.\n- El email es obligatorio.",
   "data": {
-    "email": ["El email es obligatorio."],
-    "password": ["La contrasena es obligatoria."]
+    "first_name": ["El nombre es obligatorio."],
+    "email": ["El email es obligatorio."]
   }
 }
 ```
@@ -960,9 +979,22 @@ interface UpdatePatientRequest {
 interface RegisterPatientRequest {
   document_type_code: string;
   document_number: string;
-  email?: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  cellphone: string;
   password: string;
   password_confirmation: string;
+  cellphone_code?: string;
+  document_expedition_date?: string;
+  date_birth?: string;
+  gender_code?: string;
+  civil_status_code?: string;
+  address?: string;
+  city_code?: string;
+  state_code?: string;
+  country_code?: string;
+  company_id?: number;
 }
 
 interface UpdatePasswordRequest {
@@ -1121,13 +1153,18 @@ Mapear las validaciones del backend:
 
 | Campo | Regla Angular |
 |---|---|
+| Campo | Regla Angular |
+|---|---|---|
+| `tipo_documento` | `Validators.required` (login) |
+| `numero_documento` | `Validators.required` (login) |
+| `contraseña` | `Validators.required` (login) |
 | `document_type_code` | `Validators.required` |
 | `document_number` | `Validators.required` |
 | `first_name` | `Validators.required`, `Validators.maxLength(120)` |
 | `last_name` | `Validators.required`, `Validators.maxLength(120)` |
 | `email` | `Validators.required`, `Validators.email`, `Validators.maxLength(191)` |
 | `cellphone` | `Validators.required`, `Validators.maxLength(45)` |
-| `password` | `Validators.minLength(8)` (creación manual) o `Validators.minLength(6)` (registro) |
+| `password` | `Validators.minLength(6)` (registro) o `Validators.minLength(8)` (creación manual) |
 | `password_confirmation` | Debe coincidir con `password` (custom validator) |
 
 ### 10.3 Manejo de errores del backend

@@ -10,11 +10,11 @@
 
         <mat-form-field appearance="outline">
           <mat-label>Tipo de Documento</mat-label>
-          <mat-select formControlName="document_type_code">
-            <mat-option *ngFor="let doc of documentTypes" [value]="doc.code">
+          <select matNativeControl formControlName="document_type_code">
+            <option *ngFor="let doc of documentTypes" [value]="doc.code">
               {{ doc.name }}
-            </mat-option>
-          </mat-select>
+            </option>
+          </select>
           <mat-error *ngIf="registerForm.get('document_type_code')?.hasError('required')">
             El tipo de documento es obligatorio.
           </mat-error>
@@ -32,10 +32,85 @@
         </mat-form-field>
 
         <mat-form-field appearance="outline">
+          <mat-label>Nombres</mat-label>
+          <input matInput formControlName="first_name" placeholder="Juan" />
+          <mat-error *ngIf="registerForm.get('first_name')?.hasError('required')">
+            El nombre es obligatorio.
+          </mat-error>
+          <mat-error *ngIf="registerForm.get('first_name')?.hasError('maxlength')">
+            Máximo 120 caracteres.
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Apellidos</mat-label>
+          <input matInput formControlName="last_name" placeholder="Pérez" />
+          <mat-error *ngIf="registerForm.get('last_name')?.hasError('required')">
+            Los apellidos son obligatorios.
+          </mat-error>
+          <mat-error *ngIf="registerForm.get('last_name')?.hasError('maxlength')">
+            Máximo 120 caracteres.
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Celular</mat-label>
+          <input matInput formControlName="cellphone" placeholder="3001234567" />
+          <mat-error *ngIf="registerForm.get('cellphone')?.hasError('required')">
+            El celular es obligatorio.
+          </mat-error>
+          <mat-error *ngIf="registerForm.get('cellphone')?.hasError('maxlength')">
+            Máximo 45 caracteres.
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Código de Celular (opcional)</mat-label>
+          <input matInput formControlName="cellphone_code" placeholder="57" />
+          <mat-error *ngIf="registerForm.get('cellphone_code')?.hasError('maxlength')">
+            Máximo 10 caracteres.
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
           <mat-label>Correo Electrónico</mat-label>
           <input matInput formControlName="email" type="email" placeholder="paciente@mail.com" />
+          <mat-error *ngIf="registerForm.get('email')?.hasError('required')">
+            El correo electrónico es obligatorio.
+          </mat-error>
           <mat-error *ngIf="registerForm.get('email')?.hasError('email')">
             Ingresa un correo válido.
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Fecha de Nacimiento (opcional)</mat-label>
+          <input matInput formControlName="date_birth" type="date" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Género (opcional)</mat-label>
+          <select matNativeControl formControlName="gender_code">
+            <option *ngFor="let g of genders" [value]="g.code">
+              {{ g.name }}
+            </option>
+          </select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Estado Civil (opcional)</mat-label>
+          <select matNativeControl formControlName="civil_status_code">
+            <option *ngFor="let cs of civilStatuses" [value]="cs.code">
+              {{ cs.name }}
+            </option>
+          </select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Dirección (opcional)</mat-label>
+          <input matInput formControlName="address" placeholder="Calle 123 #45-67" />
+          <mat-error *ngIf="registerForm.get('address')?.hasError('maxlength')">
+            Máximo 300 caracteres.
           </mat-error>
         </mat-form-field>
 

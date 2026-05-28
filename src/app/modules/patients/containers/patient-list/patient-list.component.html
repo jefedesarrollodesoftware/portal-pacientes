@@ -8,11 +8,11 @@
     <form [formGroup]="searchForm" (ngSubmit)="onSearch()" class="search-form" *ngIf="!searched || patient">
       <mat-form-field appearance="outline">
         <mat-label>Tipo de Documento</mat-label>
-        <mat-select formControlName="document_type_code">
-          <mat-option *ngFor="let doc of documentTypes" [value]="doc.code">
+        <select matNativeControl formControlName="document_type_code">
+          <option *ngFor="let doc of documentTypes" [value]="doc.code">
             {{ doc.name }}
-          </mat-option>
-        </mat-select>
+          </option>
+        </select>
         <mat-error *ngIf="searchForm.get('document_type_code')?.hasError('required')">
           Selecciona un tipo de documento.
         </mat-error>

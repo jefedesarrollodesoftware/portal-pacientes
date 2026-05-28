@@ -41,9 +41,9 @@ export class PatientListComponent {
   }
 
   private loadDocumentTypes(): void {
-    this.patientAttributesService.getAll().subscribe({
+    this.patientAttributesService.getByType('tipo-documento').subscribe({
       next: (res) => {
-        this.documentTypes = res.data['tipo-documento'] || [];
+        this.documentTypes = res.data;
       },
       error: () => {
         this.toastr.error('No se pudieron cargar los tipos de documento.');

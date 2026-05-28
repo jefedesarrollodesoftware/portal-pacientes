@@ -34,7 +34,7 @@ export class PortalAuthService {
             localStorage.setItem(AUTH_TOKEN_STORAGE_KEY, res.data.token);
             localStorage.setItem(
               AUTH_USER_STORAGE_KEY,
-              JSON.stringify({ email: credentials.email }),
+              JSON.stringify({ numero_documento: credentials.numero_documento }),
             );
             this.toastr.success('Inicio de sesión exitoso.');
             this.router.navigate([this.ROUTES.DASHBOARD]);
