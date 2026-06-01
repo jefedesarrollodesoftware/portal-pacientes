@@ -1,10 +1,6 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { AuthService, LoginCredentials } from '../../../../shared/services/auth.service';
 import { PatientAttributesService } from '../../../patients/services/patient-attributes.service';
 import { PatientAttribute } from '../../../patients/models';
@@ -16,7 +12,7 @@ export type LoginFormValue = LoginCredentials;
   templateUrl: './login-form.component.html',
   styleUrls: ['./login-form.component.scss'],
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatInputModule, MatFormFieldModule, MatButtonModule, MatIconModule],
+  imports: [CommonModule, ReactiveFormsModule],
 })
 export class LoginFormComponent implements OnInit {
   @Output() sendLoginForm = new EventEmitter<LoginFormValue>();
@@ -26,7 +22,6 @@ export class LoginFormComponent implements OnInit {
     contraseña: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
   });
   documentTypes: PatientAttribute[] = [];
-  hidePassword = true;
 
   constructor(
     public authService: AuthService,
@@ -50,5 +45,14 @@ export class LoginFormComponent implements OnInit {
     if (this.form.valid) {
       this.sendLoginForm.emit(this.form.getRawValue());
     }
+  }
+
+  public isInvalid(controlName: string): boolean {
+    const control = this.form.get(controlName);
+    return !!control && control.invalid && (control.touched || control.dirty);
+  }
+
+  public hasError(controlName: string, errorName: string): boolean {
+    return !!this.form.get(controlName)?.hasError(errorName) && this.isInvalid(controlName);
   }
 }

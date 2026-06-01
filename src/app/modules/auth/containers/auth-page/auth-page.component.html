@@ -1,49 +1,98 @@
-<div class="medical-auth">
-  <div class="medical-auth__brand">
-    <div class="medical-auth__brand-content">
-      <div class="medical-auth__brand-icon">
-        <mat-icon>local_hospital</mat-icon>
+<div class="auth-shell">
+  <section class="auth-hero d-none d-lg-flex">
+    <div class="auth-hero__content">
+      <div class="auth-hero__icon">
+        <i class="fas fa-hospital"></i>
       </div>
-      <h1 class="medical-auth__brand-title">Portal del Paciente</h1>
-      <p class="medical-auth__brand-subtitle">
-        Gestiona tus citas médicas, consulta resultados y mantén tu historial
-        clínico al día.
+      <div class="auth-hero__badge">
+        <i class="fas fa-shield-heart"></i>
+        <span>Atención digital segura</span>
+      </div>
+      <h1 class="auth-hero__title">Portal del Paciente</h1>
+      <p class="auth-hero__text">
+        Gestiona tus citas médicas, consulta resultados y mantén tu historial clínico al día desde cualquier dispositivo.
       </p>
-      <div class="medical-auth__brand-features">
-        <div class="medical-auth__feature">
-          <mat-icon class="medical-auth__feature-icon">calendar_today</mat-icon>
-          <span>Agenda y administra tus citas</span>
+
+      <div class="auth-hero__features">
+        <div class="auth-hero__feature">
+          <i class="fas fa-calendar-check"></i>
+          <span>Agenda y administra tus citas sin fricción.</span>
         </div>
-        <div class="medical-auth__feature">
-          <mat-icon class="medical-auth__feature-icon">assignment</mat-icon>
-          <span>Consulta tu historial clínico</span>
+        <div class="auth-hero__feature">
+          <i class="fas fa-file-medical"></i>
+          <span>Consulta tu historial clínico en una interfaz clara.</span>
+        </div>
+        <div class="auth-hero__feature">
+          <i class="fas fa-lock"></i>
+          <span>Acceso protegido con un diseño pensado para móviles y web.</span>
         </div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <div class="medical-auth__form">
-    <mat-tab-group class="medical-auth__tabs" mat-stretch-tabs animationDuration="300ms">
-      <mat-tab label="Iniciar Sesión">
-        <div class="medical-auth__tab-content">
-          <h2 class="medical-auth__tab-title">Bienvenido de nuevo</h2>
-          <p class="medical-auth__tab-desc">Ingresa tus credenciales para acceder al portal.</p>
-          <app-login-form
-            (sendLoginForm)="sendLoginForm($event)"
-          ></app-login-form>
-          <p class="medical-auth__switch-text">
-            ¿No tienes cuenta?
-            <a [routerLink]="routers.PATIENTS_REGISTER">Regístrate aquí</a>
-          </p>
+  <section class="auth-panel">
+    <div class="auth-panel__surface">
+      <div class="auth-card card">
+        <div class="auth-card__body">
+          <div class="auth-mobile-brand d-lg-none">
+            <div class="auth-mobile-brand__label">
+              <i class="fas fa-hospital"></i>
+              <span>Portal del Paciente</span>
+            </div>
+            <h2>Accede desde celular o web</h2>
+            <p>Una experiencia más limpia, rápida y adaptada a BS5.</p>
+          </div>
+
+          <ul class="nav nav-tabs nav-fill auth-tabs mb-4" id="authTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link"
+                [class.active]="activeTab === 'login'"
+                id="login-tab"
+                type="button"
+                role="tab"
+                [attr.aria-selected]="activeTab === 'login'"
+                (click)="openTab('login')"
+              >
+                Iniciar Sesión
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link"
+                [class.active]="activeTab === 'register'"
+                id="register-tab"
+                type="button"
+                role="tab"
+                [attr.aria-selected]="activeTab === 'register'"
+                (click)="openTab('register')"
+              >
+                Registrarse
+              </button>
+            </li>
+          </ul>
+
+          <div *ngIf="activeTab === 'login'" class="auth-pane" role="tabpanel" aria-labelledby="login-tab">
+            <h2 class="auth-section-title">Bienvenido de nuevo</h2>
+            <p class="auth-section-subtitle">Ingresa tus credenciales para acceder al portal.</p>
+            <div class="mt-4">
+              <app-login-form (sendLoginForm)="sendLoginForm($event)"></app-login-form>
+            </div>
+            <p class="auth-form-note text-center mt-4 mb-0">
+              ¿No tienes cuenta?
+              <a href="#" class="auth-form-link" (click)="$event.preventDefault(); openTab('register')">Regístrate aquí</a>
+            </p>
+          </div>
+
+          <div *ngIf="activeTab === 'register'" class="auth-pane" role="tabpanel" aria-labelledby="register-tab">
+            <h2 class="auth-section-title">Crear cuenta</h2>
+            <p class="auth-section-subtitle">Completa tus datos para registrarte en el portal.</p>
+            <div class="mt-4">
+              <app-sign-form (sendSignForm)="sendSignForm($event)"></app-sign-form>
+            </div>
+          </div>
         </div>
-      </mat-tab>
-      <mat-tab label="Registrarse">
-        <div class="medical-auth__tab-content">
-          <h2 class="medical-auth__tab-title">Crear cuenta</h2>
-          <p class="medical-auth__tab-desc">Completa tus datos para registrarte en el portal.</p>
-          <app-sign-form (sendSignForm)="sendSignForm($event)"></app-sign-form>
-        </div>
-      </mat-tab>
-    </mat-tab-group>
-  </div>
+      </div>
+    </div>
+  </section>
 </div>

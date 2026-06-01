@@ -1,13 +1,11 @@
-<mat-list class="sidebar">
-  <div
-    class="mat-tree-item sidebar-top-item"
+<div class="list-group list-group-flush text-white">
+  <a
+    class="list-group-item list-group-item-action bg-transparent text-white"
     *ngFor="let item of sidebarItems"
     [routerLink]="item.route"
     routerLinkActive="active"
   >
-    <div>
-      <mat-icon>{{ item.icon }}</mat-icon>
-      <p>{{ item.name }}</p>
-    </div>
-  </div>
-</mat-list>
+    <i class="fas fa-{{ item.icon }}"></i>
+    <span>{{ item.name }}</span>
+  </a>
+</div>

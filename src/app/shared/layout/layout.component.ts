@@ -1,18 +1,18 @@
 import {
   ChangeDetectorRef,
   Component,
+  ElementRef,
   OnDestroy,
   ViewChild,
 } from '@angular/core';
 import { MediaMatcher } from '@angular/cdk/layout';
-import { MatSidenav } from '@angular/material/sidenav';
 import { SharedService } from '../services/shared.service';
-import { MatSidenavModule } from '@angular/material/sidenav';
 import { RouterModule } from '@angular/router';
 import { HeaderComponent } from '../header/containers/header/header.component';
 import { SidebarComponent } from '../sidebar/sidebar.component';
-import { FooterComponent } from '../footer/footer.component';
 import { CommonModule } from '@angular/common';
+
+declare var bootstrap: any;
 
 @Component({
   selector: 'app-layout',
@@ -21,33 +21,37 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [
     CommonModule,
-    MatSidenavModule,
     RouterModule,
     HeaderComponent,
     SidebarComponent,
-    FooterComponent,
   ],
 })
 export class LayoutComponent implements OnDestroy {
-  @ViewChild('sidenav') sidenav: MatSidenav;
-  public isShowSidebar: boolean;
+  @ViewChild('offcanvasEl') offcanvasEl: ElementRef;
   public mobileQuery: MediaQueryList;
   private mobileQueryListener: () => void;
+  private bsOffcanvas: any;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private media: MediaMatcher,
     private service: SharedService,
   ) {
-    this.mobileQuery = media.matchMedia('(max-width: 1024px)');
+    this.mobileQuery = media.matchMedia('(max-width: 991.98px)');
     this.mobileQueryListener = () => changeDetectorRef.detectChanges();
     this.mobileQuery.addListener(this.mobileQueryListener);
-    this.isShowSidebar = !this.mobileQuery.matches;
   }
 
   public ngOnDestroy(): void {
     this.mobileQuery.removeListener(this.mobileQueryListener);
-    this.sidenav?.close();
+    this.bsOffcanvas?.hide();
+  }
+
+  public toggleMobileSidebar(): void {
+    if (!this.bsOffcanvas && this.offcanvasEl) {
+      this.bsOffcanvas = new bootstrap.Offcanvas(this.offcanvasEl.nativeElement);
+    }
+    this.bsOffcanvas?.toggle();
   }
 
   public isBlueTheme: boolean = true;

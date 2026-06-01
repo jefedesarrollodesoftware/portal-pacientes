@@ -12,6 +12,7 @@
 @use "app/styles/footer" as *;
 @use "app/styles/themes" as *;
 @use "app/styles/scrollbar" as *;
+@use "app/styles/bs5-auth-theme" as *;
 
 // Compatibility layer for legacy theme API used across old styles.
 $dark-primary-text: rgba(black, 0.87);

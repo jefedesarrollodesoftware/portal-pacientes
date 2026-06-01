@@ -1,16 +1,13 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Users } from '../../../models/users.model';
-
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatMenuModule } from '@angular/material/menu';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-user',
   templateUrl: './user.component.html',
-  styleUrls: ['./user.component.scss'],
+  styleUrls: [],
   standalone: true,
-  imports: [MatButtonModule, MatIconModule, MatMenuModule],
+  imports: [CommonModule],
 })
 export class UserComponent {
   @Input() user: Users;
@@ -18,10 +15,6 @@ export class UserComponent {
 
   public signOutEmit(): void {
     this.signOut.emit();
-  }
-
-  firstUserLetter() {
-    return (this.user?.firstName || this.user?.email || 'P')[0].toUpperCase();
   }
 
   avatar() {

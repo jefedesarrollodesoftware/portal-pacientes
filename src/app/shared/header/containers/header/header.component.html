@@ -1,22 +1,14 @@
-<mat-toolbar class="header" color="primary">
-  <div class="header__title">
-    <button
-      class="header__title-button"
-      mat-mini-fab
-      (click)="openMenu()"
-      color="primary"
-    >
-      @if (!isMenuOpened) {
-        <mat-icon class="header__title-button-icon">menu</mat-icon>
-      }
-      @if (isMenuOpened) {
-        <mat-icon class="header__title-button-icon">arrow_back</mat-icon>
-      }
-    </button>
-    <h6 class="header__title-text">Portal Pacientes</h6>
-  </div>
+<nav class="navbar navbar-expand navbar-dark bg-primary shadow-sm fixed-top px-3">
+  <button class="btn btn-link text-white d-lg-none me-2 p-0 border-0" type="button" (click)="onToggleSidebar()">
+    <i class="fas fa-bars"></i>
+  </button>
 
-  <div class="header-toolbar">
+  <a class="navbar-brand d-flex align-items-center" routerLink="/dashboard">
+    <i class="fas fa-hospital me-2"></i>
+    <span class="fw-bold d-none d-sm-inline">Portal Pacientes</span>
+  </a>
+
+  <div class="ms-auto d-flex align-items-center">
     <app-user [user]="user$ | async" (signOut)="signOut()"></app-user>
   </div>
-</mat-toolbar>
+</nav>
