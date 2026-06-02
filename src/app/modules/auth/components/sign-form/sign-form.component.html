@@ -65,6 +65,18 @@
 
   <div class="row g-3 mb-3">
     <div class="col-12 col-md-6">
+      <label for="cellphoneCode" class="form-label">Código Celular (opcional)</label>
+      <input
+        id="cellphoneCode"
+        type="text"
+        class="form-control"
+        formControlName="cellphone_code"
+        placeholder="57"
+        [class.is-invalid]="isInvalid('cellphone_code')"
+      />
+      <div class="invalid-feedback" *ngIf="hasError('cellphone_code', 'maxlength')">Máx. 10 caracteres</div>
+    </div>
+    <div class="col-12 col-md-6">
       <label for="cellphone" class="form-label">Celular</label>
       <input
         id="cellphone"
@@ -77,18 +89,6 @@
       />
       <div class="invalid-feedback d-block" *ngIf="hasError('cellphone', 'required')">Obligatorio</div>
       <div class="invalid-feedback d-block" *ngIf="hasError('cellphone', 'maxlength')">Máx. 45 caracteres</div>
-    </div>
-    <div class="col-12 col-md-6">
-      <label for="cellphoneCode" class="form-label">Código Celular (opcional)</label>
-      <input
-        id="cellphoneCode"
-        type="text"
-        class="form-control"
-        formControlName="cellphone_code"
-        placeholder="57"
-        [class.is-invalid]="isInvalid('cellphone_code')"
-      />
-      <div class="invalid-feedback" *ngIf="hasError('cellphone_code', 'maxlength')">Máx. 10 caracteres</div>
     </div>
   </div>
 
