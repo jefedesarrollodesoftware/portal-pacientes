@@ -1,6 +1,7 @@
 # ─── Dependencias y paquetes ─────────────────────────────────────────────────
 # Directorios de dependencias de Node.js, Python, PHP, Java, etc.
 node_modules/
+package-lock.json
 vendor/
 __pycache__/
 target/

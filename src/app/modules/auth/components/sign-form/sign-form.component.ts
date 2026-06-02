@@ -1,10 +1,6 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../../../shared/services/auth.service';
 import { PatientAttributesService } from '../../../patients/services/patient-attributes.service';
 import { PatientAttribute, RegisterPatientRequest } from '../../../patients/models';
@@ -19,10 +15,6 @@ export type SignFormValue = RegisterPatientRequest;
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    MatInputModule,
-    MatFormFieldModule,
-    MatButtonModule,
-    MatIconModule,
   ],
 })
 export class SignFormComponent implements OnInit {
@@ -30,8 +22,6 @@ export class SignFormComponent implements OnInit {
   documentTypes: PatientAttribute[] = [];
   genders: PatientAttribute[] = [];
   civilStatuses: PatientAttribute[] = [];
-  hidePassword = true;
-  hideConfirm = true;
   submitting = false;
 
   constructor(
@@ -66,12 +56,33 @@ export class SignFormComponent implements OnInit {
   }
 
   private passwordsMatchValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
-    const password = control.get('password')?.value;
-    const confirmation = control.get('password_confirmation')?.value;
-    if (password && confirmation && password !== confirmation) {
-      control.get('password_confirmation')?.setErrors({ mismatch: true });
+    const passwordControl = control.get('password');
+    const confirmationControl = control.get('password_confirmation');
+
+    if (!passwordControl || !confirmationControl) {
+      return null;
+    }
+
+    const password = passwordControl.value;
+    const confirmation = confirmationControl.value;
+
+    if (!password || !confirmation) {
+      return null;
+    }
+
+    const hasMismatch = password !== confirmation;
+    const existingErrors = confirmationControl.errors ?? {};
+
+    if (hasMismatch) {
+      confirmationControl.setErrors({ ...existingErrors, mismatch: true });
       return { mismatch: true };
     }
+
+    if (existingErrors['mismatch']) {
+      const { mismatch, ...otherErrors } = existingErrors;
+      confirmationControl.setErrors(Object.keys(otherErrors).length ? otherErrors : null);
+    }
+
     return null;
   };
 
@@ -118,6 +129,15 @@ export class SignFormComponent implements OnInit {
     if (raw.address) payload.address = raw.address;
 
     this.sendSignForm.emit(payload);
+  }
+
+  public isInvalid(controlName: string): boolean {
+    const control = this.form.get(controlName);
+    return !!control && control.invalid && (control.touched || control.dirty);
+  }
+
+  public hasError(controlName: string, errorName: string): boolean {
+    return !!this.form.get(controlName)?.hasError(errorName) && this.isInvalid(controlName);
   }
 
   @Output() sendSignForm = new EventEmitter<SignFormValue>();

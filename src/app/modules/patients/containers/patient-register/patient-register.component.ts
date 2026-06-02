@@ -5,11 +5,9 @@ import { ToastrService } from 'ngx-toastr';
 import { HttpErrorResponse } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 
-import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 
 import { PatientService } from '../../services/patient.service';
@@ -20,18 +18,11 @@ import { setBackendErrors } from '../../utils/form-error-handler';
 @Component({
   selector: 'app-patient-register',
   templateUrl: './patient-register.component.html',
-  styleUrls: ['./patient-register.component.scss'],
+  styleUrls: [],
   standalone: true,
   imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    RouterModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatIconModule,
-    MatButtonModule,
+    CommonModule, ReactiveFormsModule, RouterModule,
+    MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule,
   ],
 })
 export class PatientRegisterComponent implements OnInit {
@@ -88,17 +79,15 @@ export class PatientRegisterComponent implements OnInit {
   private loadCatalogs(): void {
     this.patientAttributesService.getByType('tipo-documento').subscribe({
       next: (res) => { this.documentTypes = res.data; },
-      error: () => { this.documentTypes = []; },
+      error: () => {},
     });
-
     this.patientAttributesService.getByType('sexo').subscribe({
       next: (res) => { this.genders = res.data; },
-      error: () => { this.genders = []; },
+      error: () => {},
     });
-
     this.patientAttributesService.getByType('estado-civil').subscribe({
       next: (res) => { this.civilStatuses = res.data; },
-      error: () => { this.civilStatuses = []; },
+      error: () => {},
     });
   }
 
@@ -107,18 +96,14 @@ export class PatientRegisterComponent implements OnInit {
       this.registerForm.markAllAsTouched();
       return;
     }
-
     this.submitting = true;
-    const payload = this.registerForm.value;
-
-    this.patientService.register(payload).subscribe({
+    this.patientService.register(this.registerForm.value).subscribe({
       next: (res) => {
         this.toastr.success(res.message || 'Paciente registrado correctamente.');
         this.router.navigate(['/login']);
       },
       error: (err: HttpErrorResponse) => {
         this.submitting = false;
-
         if (err.status === 422 && err.error?.data) {
           setBackendErrors(this.registerForm, err.error.data);
           this.toastr.error('Corrige los errores en el formulario.');

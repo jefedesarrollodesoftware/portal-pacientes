@@ -1,30 +1,46 @@
 <div
+  class="layout-wrapper"
   [class.blueTheme]="isBlueTheme"
   [class.pinkTheme]="isPinkTheme"
   [class.greenTheme]="isGreenTheme"
   [class.darkMode]="isDarkMode"
 >
-  <app-header
-    (isShowSidebar)="sidenav.toggle($event)"
-    [isMenuOpened]="isShowSidebar"
-  ></app-header>
+  <app-header (toggleSidebar)="toggleMobileSidebar()"></app-header>
 
-  <mat-sidenav-container class="layout">
-    <mat-sidenav
-      #sidenav
-      mode="side"
-      [(opened)]="isShowSidebar"
-      class="layout-sidebar"
-      [mode]="mobileQuery.matches ? 'over' : 'side'"
-      [fixedInViewport]="mobileQuery.matches"
-    >
+  <div class="d-flex layout-body">
+    <aside class="layout-sidebar d-none d-lg-flex flex-column bg-dark text-white shadow-sm">
+      <div class="sidebar-header d-flex align-items-center p-3 border-bottom border-secondary border-opacity-25">
+        <i class="fas fa-hospital text-info me-2"></i>
+        <span class="fw-bold">Portal Pacientes</span>
+      </div>
+      <div class="flex-grow-1 overflow-auto py-2">
+        <app-sidebar></app-sidebar>
+      </div>
+    </aside>
+
+    <main class="layout-main flex-grow-1 overflow-auto bg-light">
+      <div class="p-4">
+        <router-outlet></router-outlet>
+      </div>
+    </main>
+  </div>
+
+  <div
+    class="offcanvas offcanvas-start d-lg-none"
+    tabindex="-1"
+    id="mobileSidebar"
+    #offcanvasEl
+    aria-labelledby="mobileSidebarLabel"
+  >
+    <div class="offcanvas-header bg-dark text-white border-bottom border-secondary border-opacity-25">
+      <h5 class="offcanvas-title d-flex align-items-center" id="mobileSidebarLabel">
+        <i class="fas fa-hospital text-info me-2"></i>
+        Portal Pacientes
+      </h5>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body p-0 bg-dark">
       <app-sidebar></app-sidebar>
-    </mat-sidenav>
-
-    <mat-sidenav-content class="layout-content">
-      <router-outlet></router-outlet>
-
-      <app-footer></app-footer>
-    </mat-sidenav-content>
-  </mat-sidenav-container>
+    </div>
+  </div>
 </div>

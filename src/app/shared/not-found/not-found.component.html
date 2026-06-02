@@ -1,24 +1,10 @@
-<div class="not-found-page">
-  <div class="not-found-page__container">
-    <mat-card appearance="outlined" class="not-found-page__card">
-      <mat-card-content class="not-found-page__card-content">
-        <p class="not-found-page__status">404</p>
-        <h1 class="not-found-page__title">Page Not Found</h1>
-        <p class="not-found-page__subtitle">
-          Oops. Looks like this page no longer exists.
-        </p>
-
-        <div class="not-found-page__actions">
-          <button
-            class="not-found-page__action-button"
-            mat-raised-button
-            color="primary"
-            [routerLink]="routes.DASHBOARD"
-          >
-            Back To Dashboard
-          </button>
-        </div>
-      </mat-card-content>
-    </mat-card>
+<div class="d-flex align-items-center justify-content-center" style="min-height: 80vh">
+  <div class="text-center">
+    <h1 class="display-1 fw-bold text-primary mb-3">404</h1>
+    <h3 class="mb-2">Página no encontrada</h3>
+    <p class="text-muted mb-4">Oops. Parece que esta página ya no existe.</p>
+    <a class="btn btn-primary px-4" [routerLink]="routes.DASHBOARD">
+      Volver al Dashboard
+    </a>
   </div>
 </div>

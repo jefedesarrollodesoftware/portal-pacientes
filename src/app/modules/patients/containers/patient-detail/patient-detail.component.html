@@ -1,78 +1,37 @@
-<div class="detail-container">
-  <div class="loading-shade" *ngIf="loading">
-    <mat-spinner diameter="40"></mat-spinner>
-  </div>
-
-  <mat-card *ngIf="patient && !loading">
-    <mat-card-header>
-      <mat-card-title>Detalle del Paciente</mat-card-title>
-      <mat-card-subtitle>{{ patient.first_name }} {{ patient.last_name }}</mat-card-subtitle>
-    </mat-card-header>
-
-    <mat-card-content>
-      <div class="detail-grid">
-        <div class="detail-item">
-          <span class="label">Tipo Documento</span>
-          <span class="value">{{ patient.document_type_code }}</span>
+<div class="card shadow-sm" *ngIf="patient && !loading">
+  <div class="card-body p-4">
+    <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3 mb-4">
+      <div class="d-flex align-items-center gap-3">
+        <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width:64px;height:64px">
+          <i class="fas fa-user text-primary" style="font-size:24px"></i>
         </div>
-        <div class="detail-item">
-          <span class="label">Número Documento</span>
-          <span class="value">{{ patient.document_number }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="label">Nombres</span>
-          <span class="value">{{ patient.first_name }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="label">Apellidos</span>
-          <span class="value">{{ patient.last_name }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="label">Email</span>
-          <span class="value">{{ patient.email }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="label">Celular</span>
-          <span class="value">{{ patient.cellphone_code ? '+' + patient.cellphone_code + ' ' : '' }}{{ patient.cellphone }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="label">Fecha Nacimiento</span>
-          <span class="value">{{ patient.date_birth || '-' }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="label">Género</span>
-          <span class="value">{{ patient.gender_code || '-' }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="label">Estado Civil</span>
-          <span class="value">{{ patient.civil_status_code || '-' }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="label">Dirección</span>
-          <span class="value">{{ patient.address || '-' }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="label">Activo</span>
-          <span class="value">
-            <mat-slide-toggle [checked]="patient.active" disabled></mat-slide-toggle>
-          </span>
-        </div>
-        <div class="detail-item">
-          <span class="label">Fuente</span>
-          <span class="value">{{ patient.source }}</span>
+        <div>
+          <h4 class="mb-1">{{ patient.first_name }} {{ patient.last_name }}</h4>
+          <p class="text-muted small mb-0">{{ patient.document_type_code }} {{ patient.document_number }}</p>
         </div>
       </div>
-    </mat-card-content>
+      <span class="badge" [class.bg-success]="patient.active" [class.bg-secondary]="!patient.active">{{ patient.active ? 'Activo' : 'Inactivo' }}</span>
+    </div>
 
-    <mat-card-actions>
-      <button mat-raised-button color="primary" [routerLink]="'/patients/appointments'">
-        <mat-icon>calendar_today</mat-icon>
-        Ver Citas
-      </button>
-      <button mat-raised-button [routerLink]="'/patients/list'">
-        <mat-icon>arrow_back</mat-icon>
-        Volver
-      </button>
-    </mat-card-actions>
-  </mat-card>
+    <div class="row g-3">
+      <div class="col-sm-6"><small class="text-muted d-block">Tipo Documento</small><span>{{ patient.document_type_code }}</span></div>
+      <div class="col-sm-6"><small class="text-muted d-block">Número Documento</small><span>{{ patient.document_number }}</span></div>
+      <div class="col-sm-6"><small class="text-muted d-block">Email</small><span>{{ patient.email }}</span></div>
+      <div class="col-sm-6"><small class="text-muted d-block">Celular</small><span>{{ patient.cellphone_code ? '+' + patient.cellphone_code + ' ' : '' }}{{ patient.cellphone }}</span></div>
+      <div class="col-sm-6"><small class="text-muted d-block">Fecha Nacimiento</small><span>{{ patient.date_birth || '-' }}</span></div>
+      <div class="col-sm-6"><small class="text-muted d-block">Género</small><span>{{ patient.gender_code || '-' }}</span></div>
+      <div class="col-sm-6"><small class="text-muted d-block">Estado Civil</small><span>{{ patient.civil_status_code || '-' }}</span></div>
+      <div class="col-sm-6"><small class="text-muted d-block">Dirección</small><span>{{ patient.address || '-' }}</span></div>
+      <div class="col-12"><small class="text-muted d-block">Fuente</small><span>{{ patient.source }}</span></div>
+    </div>
+
+    <div class="d-flex gap-2 mt-4 pt-3 border-top">
+      <a class="btn btn-primary" [routerLink]="'/patients/appointments'"><i class="fas fa-calendar-days me-1"></i>Ver Citas</a>
+      <a class="btn btn-outline-secondary" [routerLink]="'/patients/list'"><i class="fas fa-arrow-left me-1"></i>Volver</a>
+    </div>
+  </div>
+</div>
+
+<div class="text-center py-5" *ngIf="loading">
+  <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando...</span></div>
 </div>
