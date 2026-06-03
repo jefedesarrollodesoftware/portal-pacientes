@@ -23,7 +23,7 @@ Accept: application/json
 Content-Type: application/json   (solo en POST)
 ```
 
-#### Peticiones públicas (sin sesión: auth/token, patients/register, patient-attributes)
+#### Peticiones públicas (sin sesión: auth/token, patients/register, patient-attributes, patients/check-existence, patients/send-code, patients/verify-code)
 
 ```
 X-API-Key: {api_key}
@@ -215,13 +215,20 @@ interface User {
 
 ## 3. Endpoints de Pacientes
 
-### 3.1 Registro público de paciente (autoregistro)
+### 3.1 Inicio de registro público de paciente (autoregistro) — Paso 1
+
+Este es el primer paso del registro. El sistema:
+1. Valida que el paciente **exista en Gomedisys** (consulta externa).
+2. Valida que el paciente **no exista en la base de datos local**.
+3. Valida que `email` y `cellphone` no estén ya registrados por otro paciente.
+4. Envía códigos de verificación de 6 dígitos al correo y al teléfono.
+5. Retorna un `session_token` para usar en el paso 2.
 
 | Propiedad | Valor |
 |---|---|
 | **Método** | `POST` |
 | **URL** | `/api/v1/patients/register` |
-| **Autenticación** | No (pero si hay sesión, asigna empresa) |
+| **Autenticación** | API Key (`X-API-Key`) |
 | **Throttle** | `patients` |
 
 #### Cuerpo de la petición
@@ -232,15 +239,19 @@ interface RegisterPatientRequest {
   document_number: string;           // required, max 45, ej: "1234567890"
   first_name: string;                // required, max 120
   last_name: string;                 // required, max 120
-  email: string;                     // required, email, max 191, unique
-  cellphone: string;                 // required, max 45, unique
+  email: string;                     // required, email, max 191
+  cellphone: string;                 // required, max 45
   password: string;                  // required, min 6 caracteres
   password_confirmation: string;     // required, debe coincidir con password
   cellphone_code?: string;           // opcional, max 10, ej: "57"
   document_expedition_date?: string; // opcional, formato fecha ISO (Y-m-d)
   date_birth?: string;               // opcional, formato fecha ISO (Y-m-d)
   gender_code?: string;              // opcional, max 20
+  gender_identity_code?: string;     // opcional, max 20
   civil_status_code?: string;        // opcional, max 20
+  scholarship_code?: string;         // opcional, max 20
+  political_division_code?: string;  // opcional, max 20
+  residence_zone_code?: string;      // opcional, max 20
   address?: string;                  // opcional, max 300
   city_code?: string;                // opcional, max 20
   state_code?: string;               // opcional, max 20
@@ -274,9 +285,77 @@ interface RegisterPatientRequest {
 ```json
 {
   "status": true,
+  "message": "Códigos de verificación enviados. Confirme su registro usando el session_token.",
+  "data": {
+    "session_token": "550e8400-e29b-41d4-a716-446655440000",
+    "expires_at": "2026-06-09T12:00:00.000000Z",
+    "channels": {
+      "email": true,
+      "cellphone": true
+    }
+  }
+}
+```
+
+```typescript
+interface InitiateRegistrationResponse {
+  session_token: string;   // UUID, expira en 10 minutos
+  expires_at: string;      // ISO 8601
+  channels: {
+    email: boolean;        // true si se envió código al email
+    cellphone: boolean;    // true si se envió código al celular
+  };
+}
+```
+
+#### Respuesta de error
+
+| Código | Condición |
+|---|---|
+| `422` | Validación fallida / email o teléfono ya registrados / paciente ya existe |
+| `500` | Error interno (API Gomedisys no disponible, etc.) |
+
+---
+
+### 3.2 Confirmar registro de paciente (autoregistro) — Paso 2
+
+Confirma el registro usando los códigos recibidos por email y SMS junto con el `session_token` del paso 1. Si ambos códigos son correctos, se crea el paciente en la base de datos.
+
+| Propiedad | Valor |
+|---|---|
+| **Método** | `POST` |
+| **URL** | `/api/v1/patients/confirm-registration` |
+| **Autenticación** | API Key (`X-API-Key`) |
+| **Throttle** | `patients` |
+
+#### Cuerpo de la petición
+
+```typescript
+interface ConfirmRegistrationRequest {
+  session_token: string;    // required, UUID obtenido en /register
+  email_code: string;       // required, código de 6 dígitos recibido por email
+  cellphone_code: string;   // required, código de 6 dígitos recibido por SMS
+}
+```
+
+**Ejemplo:**
+
+```json
+{
+  "session_token": "550e8400-e29b-41d4-a716-446655440000",
+  "email_code": "482913",
+  "cellphone_code": "719284"
+}
+```
+
+#### Respuesta exitosa — `200 OK`
+
+```json
+{
+  "status": true,
   "message": "Paciente registrado correctamente.",
   "data": {
-    "patient": { /* objeto Patient (ver modelo abajo) */ },
+    "patient": { /* objeto Patient */ },
     "account_state": {
       "active": true,
       "password_set": true
@@ -287,7 +366,7 @@ interface RegisterPatientRequest {
 ```
 
 ```typescript
-interface RegisterPatientResponse {
+interface ConfirmRegistrationResponse {
   patient: Patient;
   account_state: {
     active: boolean;
@@ -301,12 +380,12 @@ interface RegisterPatientResponse {
 
 | Código | Condición |
 |---|---|
-| `422` | Validación fallida |
-| `500` | Error interno (API Gomedisys no disponible, etc.) |
+| `422` | Código inválido / sesión expirada |
+| `500` | Error interno |
 
 ---
 
-### 3.2 Creación manual de paciente
+### 3.3 Creación manual de paciente
 
 | Propiedad | Valor |
 |---|---|
@@ -329,7 +408,11 @@ interface CreatePatientRequest {
   document_expedition_date?: string; // opcional, formato fecha ISO (Y-m-d)
   date_birth?: string;              // opcional, formato fecha ISO (Y-m-d)
   gender_code?: string;             // opcional, max 20
+  gender_identity_code?: string;    // opcional, max 20
   civil_status_code?: string;       // opcional, max 20
+  scholarship_code?: string;        // opcional, max 20
+  political_division_code?: string; // opcional, max 20
+  residence_zone_code?: string;     // opcional, max 20
   address?: string;                 // opcional, max 300
   city_code?: string;               // opcional, max 20
   state_code?: string;              // opcional, max 20
@@ -395,7 +478,7 @@ interface CreatePatientResponse {
 
 ---
 
-### 3.3 Consultar paciente por tipo y número de documento
+### 3.4 Consultar paciente por tipo y número de documento
 
 | Propiedad | Valor |
 |---|---|
@@ -440,7 +523,7 @@ interface ShowPatientResponse {
 
 ---
 
-### 3.4 Actualizar datos de paciente
+### 3.5 Actualizar datos de paciente
 
 | Propiedad | Valor |
 |---|---|
@@ -453,7 +536,7 @@ interface ShowPatientResponse {
 
 ```typescript
 interface UpdatePatientRequest {
-  id: number;                       // required, must exist in patients table
+  id: number;                        // required, must exist in patients table
   document_type_code: string;        // required, max 20
   document_number: string;           // required, max 45, unique compuesto
   first_name: string;                // required, max 120
@@ -464,7 +547,11 @@ interface UpdatePatientRequest {
   document_expedition_date?: string; // opcional, fecha
   date_birth?: string;               // opcional, fecha
   gender_code?: string;              // opcional, max 20
+  gender_identity_code?: string;     // opcional, max 20
   civil_status_code?: string;        // opcional, max 20
+  scholarship_code?: string;         // opcional, max 20
+  political_division_code?: string;  // opcional, max 20
+  residence_zone_code?: string;      // opcional, max 20
   address?: string;                  // opcional, max 300
   city_code?: string;                // opcional, max 20
   state_code?: string;               // opcional, max 20
@@ -486,7 +573,7 @@ Los campos `email` y `cellphone` tienen unicidad pero excluyen al paciente que s
 
 ---
 
-### 3.5 Cambiar contraseña de paciente
+### 3.6 Cambiar contraseña de paciente
 
 | Propiedad | Valor |
 |---|---|
@@ -527,7 +614,7 @@ interface UpdatePasswordRequest {
 
 ---
 
-### 3.6 Habilitar / Deshabilitar paciente
+### 3.7 Habilitar / Deshabilitar paciente
 
 | Propiedad | Valor |
 |---|---|
@@ -567,7 +654,83 @@ O si `active: false`:
 
 ---
 
-### 3.7 Sincronizar paciente desde Gomedisys
+### 3.8 Verificar existencia de paciente por tipo y número de documento
+
+Este endpoint permite al frontend Angular verificar si un paciente ya existe en el sistema mediante su tipo y número de documento.
+
+| Propiedad | Valor |
+|---|---|
+| **Método** | `POST` |
+| **URL** | `/api/v1/patients/check-existence` |
+| **Autenticación** | API Key (`X-API-Key`) |
+| **Throttle** | `patients` |
+
+#### Cuerpo de la petición
+
+```typescript
+interface CheckPatientExistenceRequest {
+  document_type_code: string;  // required, max 20, ej: "CC", "NIT"
+  document_number: string;     // required, max 45, ej: "1234567890"
+}
+```
+
+**Ejemplo:**
+```json
+{
+  "document_type_code": "CC",
+  "document_number": "1234567890"
+}
+```
+
+#### Respuesta exitosa — `200 OK`
+
+```json
+{
+  "status": true,
+  "message": "OK",
+  "data": {
+    "exists": true,
+    "patient": {
+      "id": 1,
+      "first_name": "Juan",
+      "last_name": "Pérez",
+      "email": "paciente@mail.com",
+      "cellphone": "3001234567",
+      "document_type_code": "CC",
+      "document_number": "1234567890"
+    }
+  }
+}
+```
+
+Cuando el paciente **no existe**:
+```json
+{
+  "status": true,
+  "message": "OK",
+  "data": {
+    "exists": false,
+    "patient": null
+  }
+}
+```
+
+```typescript
+interface CheckPatientExistenceResponse {
+  exists: boolean;
+  patient: Patient | null;
+}
+```
+
+#### Respuesta de error
+
+| Código | Condición |
+|---|---|
+| `422` | Validación fallida (document_type_code o document_number faltantes) |
+
+---
+
+### 3.9 Sincronizar paciente desde Gomedisys
 
 | Propiedad | Valor |
 |---|---|
@@ -629,6 +792,143 @@ interface SyncPatientResponse {
 
 ---
 
+### 3.10 Enviar código de verificación
+
+Este endpoint permite enviar un código de verificación de 6 dígitos al paciente, tanto por correo electrónico como por SMS, usando el tipo y número de documento como identificación.
+
+| Propiedad | Valor |
+|---|---|
+| **Método** | `POST` |
+| **URL** | `/api/v1/patients/send-code` |
+| **Autenticación** | API Key (`X-API-Key`) |
+| **Throttle** | `patients` |
+
+#### Cuerpo de la petición
+
+```typescript
+interface SendVerificationCodeRequest {
+  document_type_code: string;  // required, max 20, ej: "CC", "NIT"
+  document_number: string;     // required, max 45, ej: "1234567890"
+}
+```
+
+**Ejemplo:**
+```json
+{
+  "document_type_code": "CC",
+  "document_number": "1234567890"
+}
+```
+
+#### Respuesta exitosa — `200 OK`
+
+El sistema busca al paciente por tipo y número de documento. Si existe, envía el mismo código de 6 dígitos al correo electrónico y al número de celular registrados (salta los canales que el paciente no tenga configurados).
+
+```json
+{
+  "status": true,
+  "message": "Código de verificación enviado correctamente.",
+  "data": {
+    "patient_id": 1,
+    "channels": [
+      {
+        "channel": "email",
+        "recipient": "paciente@mail.com",
+        "expires_at": "2026-06-02T10:00:00.000000Z"
+      },
+      {
+        "channel": "cellphone",
+        "recipient": "3001234567",
+        "expires_at": "2026-06-02T10:00:00.000000Z"
+      }
+    ]
+  }
+}
+```
+
+> Ambos canales reciben el **mismo código**. Si el paciente solo tiene registrado uno de los dos medios, ese será el único canal utilizado.
+
+```typescript
+interface SendCodeChannel {
+  channel: string;     // "email" | "cellphone"
+  recipient: string;   // email o número de teléfono
+  expires_at: string;  // ISO 8601, expira en 10 minutos
+}
+
+interface SendVerificationCodeResponse {
+  patient_id: number;
+  channels: SendCodeChannel[];
+}
+```
+
+#### Respuesta de error
+
+| Código | Condición |
+|---|---|
+| `422` | Validación fallida (document_type_code o document_number faltantes) |
+| `404` | No se encontró un paciente con el tipo y número de documento proporcionados |
+
+---
+
+### 3.11 Verificar código de verificación
+
+Este endpoint verifica el código enviado al paciente, usando tipo y número de documento como identificación.
+
+| Propiedad | Valor |
+|---|---|
+| **Método** | `POST` |
+| **URL** | `/api/v1/patients/verify-code` |
+| **Autenticación** | API Key (`X-API-Key`) |
+| **Throttle** | `patients` |
+
+#### Cuerpo de la petición
+
+```typescript
+interface VerifyCodeRequest {
+  document_type_code: string;  // required, max 20, ej: "CC", "NIT"
+  document_number: string;     // required, max 45, ej: "1234567890"
+  code: string;                // required, código de 6 dígitos recibido
+}
+```
+
+**Ejemplo:**
+```json
+{
+  "document_type_code": "CC",
+  "document_number": "1234567890",
+  "code": "482913"
+}
+```
+
+#### Respuesta exitosa — `200 OK`
+
+```json
+{
+  "status": true,
+  "message": "Código verificado correctamente.",
+  "data": {
+    "verified": true,
+    "patient": { /* objeto Patient */ }
+  }
+}
+```
+
+```typescript
+interface VerifyCodeResponse {
+  verified: boolean;
+  patient: Patient;
+}
+```
+
+#### Respuesta de error
+
+| Código | Condición |
+|---|---|
+| `404` | No se encontró un paciente con el tipo y número de documento proporcionados |
+| `422` | Código inválido o expirado |
+
+---
+
 ## 4. Modelo de datos `Patient` (compartido en respuestas)
 
 ```typescript
@@ -642,7 +942,11 @@ interface Patient {
   last_name: string;
   date_birth: string | null;                // formato "Y-m-d"
   gender_code: string | null;
+  gender_identity_code: string | null;
   civil_status_code: string | null;
+  scholarship_code: string | null;
+  political_division_code: string | null;
+  residence_zone_code: string | null;
   email: string;
   cellphone_code: string | null;
   cellphone: string;
@@ -661,9 +965,66 @@ interface Patient {
 
 ---
 
-## 5. Endpoints de Atributos de Paciente
+## 5. Endpoints de Empresa
 
-### 5.1 Obtener todos los atributos agrupados por tipo
+### 5.1 Obtener datos de empresa
+
+| Propiedad | Valor |
+|---|---|
+| **Método** | `GET` |
+| **URL** | `/api/v1/companies/{company}` |
+| **Autenticación** | API Key (`X-API-Key`) |
+| **Parámetros URL** | `{company}` — ID numérico de la empresa |
+
+Este endpoint retorna la información de diseño y personalización de una empresa (logotipo, icono, colores), útil para que el frontend Angular aplique la tematización correspondiente antes de que el usuario inicie sesión.
+
+#### Respuesta exitosa — `200 OK`
+
+```json
+{
+  "status": true,
+  "message": "OK",
+  "data": {
+    "id": 1,
+    "name": "Mi Empresa",
+    "slug": "mi-empresa",
+    "icon": "iconos/empresa_1.png",
+    "icon_url": "https://admin-portal-pacientes.local/storage/iconos/empresa_1.png",
+    "logo": "logos/empresa_1.png",
+    "logo_url": "https://admin-portal-pacientes.local/storage/logos/empresa_1.png",
+    "primary_color": "#0047AB",
+    "secondary_color": "#FF6600",
+    "active": true
+  }
+}
+```
+
+```typescript
+interface CompanyResponse {
+  id: number;
+  name: string;
+  slug: string;
+  icon: string | null;
+  icon_url: string | null;
+  logo: string | null;
+  logo_url: string | null;
+  primary_color: string | null;
+  secondary_color: string | null;
+  active: boolean;
+}
+```
+
+#### Respuesta de error
+
+| Código | Condición |
+|---|---|
+| `404` | Empresa no encontrada (ID inválido) |
+
+---
+
+## 6. Endpoints de Atributos de Paciente
+
+### 6.1 Obtener todos los atributos agrupados por tipo
 
 | Propiedad | Valor |
 |---|---|
@@ -735,7 +1096,7 @@ type PatientAttributesResponse = Record<string, PatientAttribute[]>;
 
 ---
 
-### 5.2 Obtener atributos de un tipo específico
+### 6.2 Obtener atributos de un tipo específico
 
 | Propiedad | Valor |
 |---|---|
@@ -787,7 +1148,7 @@ type PatientAttributesResponse = Record<string, PatientAttribute[]>;
 | `404` | Tipo de atributo no encontrado (slug inválido o sin atributos) |
 | `500` | Error interno |
 
-### 5.3 Modelo `PatientAttribute`
+### 6.3 Modelo `PatientAttribute`
 
 ```typescript
 interface PatientAttribute {
@@ -804,9 +1165,9 @@ interface PatientAttribute {
 
 ---
 
-## 6. Manejo de errores comunes
+## 7. Manejo de errores comunes
 
-### 6.1 No autenticado — `401`
+### 7.1 No autenticado — `401`
 
 #### Token Sanctum faltante o inválido (rutas con `auth:sanctum`)
 
@@ -830,7 +1191,7 @@ El backend de Laravel devuelve este mensaje cuando el token falta, es inválido 
 
 Se devuelve cuando no se envía la cabecera `X-API-Key` o su valor no coincide con `APP_API_KEY` del backend.
 
-### 6.2 Error de validación — `422`
+### 7.2 Error de validación — `422`
 
 ```json
 {
@@ -845,7 +1206,7 @@ Se devuelve cuando no se envía la cabecera `X-API-Key` o su valor no coincide c
 
 El campo `data` contiene un objeto donde cada clave es el nombre del campo y el valor es un array de strings con los mensajes de error.
 
-### 6.3 Error del servidor — `500`
+### 7.3 Error del servidor — `500`
 
 ```json
 {
@@ -859,7 +1220,7 @@ El campo `data` contiene un objeto donde cada clave es el nombre del campo y el 
 
 ---
 
-## 7. Interfaces TypeScript completas
+## 8. Interfaces TypeScript completas
 
 ```typescript
 // ===================================================
@@ -937,6 +1298,55 @@ interface AccountState {
   password_set: boolean;
 }
 
+interface RegisterPatientRequest {
+  document_type_code: string;
+  document_number: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  cellphone: string;
+  password: string;
+  password_confirmation: string;
+  cellphone_code?: string;
+  document_expedition_date?: string;
+  date_birth?: string;
+  gender_code?: string;
+  gender_identity_code?: string;
+  civil_status_code?: string;
+  scholarship_code?: string;
+  political_division_code?: string;
+  residence_zone_code?: string;
+  address?: string;
+  city_code?: string;
+  state_code?: string;
+  country_code?: string;
+  company_id?: number;
+}
+
+interface ConfirmRegistrationRequest {
+  session_token: string;
+  email_code: string;
+  cellphone_code: string;
+}
+
+interface InitiateRegistrationResponse {
+  session_token: string;
+  expires_at: string;
+  channels: {
+    email: boolean;
+    cellphone: boolean;
+  };
+}
+
+interface ConfirmRegistrationResponse {
+  patient: Patient;
+  account_state: {
+    active: boolean;
+    password_set: boolean;
+  };
+  source: string;
+}
+
 interface CreatePatientRequest {
   document_type_code: string;
   document_number: string;
@@ -948,7 +1358,11 @@ interface CreatePatientRequest {
   document_expedition_date?: string;
   date_birth?: string;
   gender_code?: string;
+  gender_identity_code?: string;
   civil_status_code?: string;
+  scholarship_code?: string;
+  political_division_code?: string;
+  residence_zone_code?: string;
   address?: string;
   city_code?: string;
   state_code?: string;
@@ -969,32 +1383,15 @@ interface UpdatePatientRequest {
   document_expedition_date?: string;
   date_birth?: string;
   gender_code?: string;
+  gender_identity_code?: string;
   civil_status_code?: string;
+  scholarship_code?: string;
+  political_division_code?: string;
+  residence_zone_code?: string;
   address?: string;
   city_code?: string;
   state_code?: string;
   country_code?: string;
-}
-
-interface RegisterPatientRequest {
-  document_type_code: string;
-  document_number: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  cellphone: string;
-  password: string;
-  password_confirmation: string;
-  cellphone_code?: string;
-  document_expedition_date?: string;
-  date_birth?: string;
-  gender_code?: string;
-  civil_status_code?: string;
-  address?: string;
-  city_code?: string;
-  state_code?: string;
-  country_code?: string;
-  company_id?: number;
 }
 
 interface UpdatePasswordRequest {
@@ -1008,10 +1405,47 @@ interface DisableEnablePatientRequest {
   active: boolean;
 }
 
+interface CheckPatientExistenceRequest {
+  document_type_code: string;
+  document_number: string;
+}
+
+interface CheckPatientExistenceResponse {
+  exists: boolean;
+  patient: Patient | null;
+}
+
 interface SyncPatientRequest {
   keyWS: string;
   codeTypeDocPatient: string;
   documentPatient: string;
+}
+
+interface SendVerificationCodeRequest {
+  document_type_code: string;
+  document_number: string;
+}
+
+interface SendCodeChannel {
+  channel: string;
+  recipient: string;
+  expires_at: string;
+}
+
+interface SendVerificationCodeResponse {
+  patient_id: number;
+  channels: SendCodeChannel[];
+}
+
+interface VerifyCodeRequest {
+  document_type_code: string;
+  document_number: string;
+  code: string;
+}
+
+interface VerifyCodeResponse {
+  verified: boolean;
+  patient: Patient;
 }
 
 // ===================================================
@@ -1028,34 +1462,55 @@ interface PatientAttribute {
   icon: string | null;
 }
 
+// ===================================================
+// Empresa
+// ===================================================
+interface CompanyResponse {
+  id: number;
+  name: string;
+  slug: string;
+  icon: string | null;
+  icon_url: string | null;
+  logo: string | null;
+  logo_url: string | null;
+  primary_color: string | null;
+  secondary_color: string | null;
+  active: boolean;
+}
+
 // Respuesta de GET /patient-attributes (todos agrupados)
 type PatientAttributesGrouped = Record<string, PatientAttribute[]>;
 ```
 
 ---
 
-## 8. Tabla resumen de endpoints
+## 9. Tabla resumen de endpoints
 
 | # | Método | URL | Autenticación | Throttle | Descripción |
 |---|---|---|---|---|---|
 | 1 | `POST` | `/api/v1/auth/token` | API Key | `patient-auth` | Iniciar sesión |
 | 2 | `DELETE` | `/api/v1/auth/token` | Bearer Token | — | Cerrar sesión |
 | 3 | `GET` | `/api/v1/auth/me` | Bearer Token | — | Datos del usuario autenticado |
-| 4 | `POST` | `/api/v1/patients/register` | API Key | `patients` | Autoregistro de paciente |
-| 5 | `POST` | `/api/v1/patients` | Bearer Token | `patients` | Creación manual |
-| 6 | `GET` | `/api/v1/patients/{documentType}/{documentNumber}` | Bearer Token | `patients` | Consultar paciente |
-| 7 | `POST` | `/api/v1/patients/update` | Bearer Token | `patients` | Actualizar datos |
-| 8 | `POST` | `/api/v1/patients/update-password` | Bearer Token | `patients` | Cambiar contraseña |
-| 9 | `POST` | `/api/v1/patients/disable-enable` | Bearer Token | `patients` | Habilitar/deshabilitar |
-| 10 | `POST` | `/api/v1/patients/sync` | Bearer Token | `patients` | Sincronizar con Gomedisys |
-| 11 | `GET` | `/api/v1/patient-attributes` | API Key | — | Catálogos agrupados |
-| 12 | `GET` | `/api/v1/patient-attributes/{type}` | API Key | — | Catálogos por tipo |
+| 4 | `POST` | `/api/v1/patients/register` | API Key | `patients` | Iniciar autoregistro (paso 1: validar + enviar códigos) |
+| 5 | `POST` | `/api/v1/patients/confirm-registration` | API Key | `patients` | Confirmar autoregistro (paso 2: verificar códigos + crear) |
+| 6 | `POST` | `/api/v1/patients` | Bearer Token | `patients` | Creación manual |
+| 7 | `GET` | `/api/v1/patients/{documentType}/{documentNumber}` | Bearer Token | `patients` | Consultar paciente |
+| 8 | `POST` | `/api/v1/patients/update` | Bearer Token | `patients` | Actualizar datos |
+| 9 | `POST` | `/api/v1/patients/update-password` | Bearer Token | `patients` | Cambiar contraseña |
+| 10 | `POST` | `/api/v1/patients/disable-enable` | Bearer Token | `patients` | Habilitar/deshabilitar |
+| 11 | `POST` | `/api/v1/patients/sync` | Bearer Token | `patients` | Sincronizar con Gomedisys |
+| 12 | `POST` | `/api/v1/patients/check-existence` | API Key | `patients` | Verificar existencia por documento/email/teléfono |
+| 13 | `POST` | `/api/v1/patients/send-code` | API Key | `patients` | Enviar código de verificación a ambos canales |
+| 14 | `POST` | `/api/v1/patients/verify-code` | API Key | `patients` | Verificar código con tipo y número de documento |
+| 15 | `GET` | `/api/v1/companies/{company}` | API Key | — | Datos de empresa (logo, colores, icono) |
+| 16 | `GET` | `/api/v1/patient-attributes` | API Key | — | Catálogos agrupados |
+| 17 | `GET` | `/api/v1/patient-attributes/{type}` | API Key | — | Catálogos por tipo |
 
 ---
 
-## 9. Flujo de autenticación recomendado (Angular)
+## 10. Flujo de autenticación recomendado (Angular)
 
-### 9.1 API Key para endpoints públicos
+### 10.1 API Key para endpoints públicos
 
 Los endpoints sin autenticación de sesión (`/auth/token`, `/patients/register`, `/patient-attributes`) requieren la cabecera `X-API-Key`. Recomendamos configurarla en el `environment` de Angular:
 
@@ -1099,7 +1554,7 @@ export class ApiInterceptor implements HttpInterceptor {
 }
 ```
 
-### 9.2 Flujo de inicio de sesión
+### 10.2 Flujo de inicio de sesión
 
 1. El usuario ingresa tipo de documento + número de documento + contraseña en un formulario de login.
 2. Se llama a `POST /api/v1/auth/token` (con `X-API-Key`).
@@ -1110,9 +1565,9 @@ export class ApiInterceptor implements HttpInterceptor {
 
 ---
 
-## 10. Consideraciones para formularios reactivos en Angular
+## 11. Consideraciones para formularios reactivos en Angular
 
-### 10.1 Carga de catálogos en selects/dropdowns
+### 11.1 Carga de catálogos en selects/dropdowns
 
 Para poblar selects con valores de catálogo (tipo de documento, sexo, etc.), los catálogos requieren un `company_id` (empresa). Si el usuario no ha iniciado sesión, debes enviar el `company_id` como query parameter:
 
@@ -1147,7 +1602,7 @@ this.patientService.getPatientAttributes().subscribe({
 
 > **Nota:** Cuando se usa con `Authorization: Bearer` (usuario autenticado), el `company_id` se resuelve automáticamente desde la empresa del usuario. No es necesario enviar `company_id` en ese caso.
 
-### 10.2 Validaciones frontend
+### 11.2 Validaciones frontend
 
 Mapear las validaciones del backend:
 
@@ -1164,10 +1619,23 @@ Mapear las validaciones del backend:
 | `last_name` | `Validators.required`, `Validators.maxLength(120)` |
 | `email` | `Validators.required`, `Validators.email`, `Validators.maxLength(191)` |
 | `cellphone` | `Validators.required`, `Validators.maxLength(45)` |
+| `cellphone_code` | `Validators.maxLength(10)` |
+| `document_expedition_date` | Opcional, formato fecha |
+| `date_birth` | Opcional, formato fecha |
+| `gender_code` | Opcional |
+| `gender_identity_code` | Opcional |
+| `civil_status_code` | Opcional |
+| `scholarship_code` | Opcional |
+| `political_division_code` | Opcional |
+| `residence_zone_code` | Opcional |
+| `address` | `Validators.maxLength(300)` |
+| `city_code` | Opcional |
+| `state_code` | Opcional |
+| `country_code` | Opcional |
 | `password` | `Validators.minLength(6)` (registro) o `Validators.minLength(8)` (creación manual) |
 | `password_confirmation` | Debe coincidir con `password` (custom validator) |
 
-### 10.3 Manejo de errores del backend
+### 11.3 Manejo de errores del backend
 
 ```typescript
 // Servicio genérico
@@ -1198,7 +1666,7 @@ handleError(error: HttpErrorResponse): Observable<never> {
 
 ---
 
-## 11. Glosario de slugs de catálogos
+## 12. Glosario de slugs de catálogos
 
 Estos son los slugs disponibles para el endpoint `GET /api/v1/patient-attributes/{type}`:
 

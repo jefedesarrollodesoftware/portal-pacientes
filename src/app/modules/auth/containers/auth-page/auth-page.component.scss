@@ -5,10 +5,11 @@
 .auth-tabs {
   display: flex;
   gap: 0.5rem;
-  border-bottom: 1px solid #dbe3ef;
+  background: #f3f6fb;
+  border-radius: 0.75rem;
   list-style: none;
-  padding-left: 0;
-  padding-bottom: 0.5rem;
+  padding: 0.35rem;
+  margin-bottom: 1.5rem !important;
 
   .nav-item {
     margin-bottom: 0;
@@ -18,16 +19,17 @@
   .nav-link {
     width: 100%;
     border: 0;
-    border-radius: 0.85rem 0.85rem 0 0;
-    background: #f3f6fb;
-    color: #334155;
-    font-weight: 700;
-    padding: 0.8rem 0.9rem;
+    border-radius: 0.65rem;
+    background: transparent;
+    color: #64748b;
+    font-weight: 600;
+    padding: 0.65rem 0.9rem;
+    transition: all 0.15s ease;
 
     &.active {
       color: #ffffff;
-      background: #0b63ce;
-      box-shadow: none;
+      background: var(--primary-color, #0b63ce);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
     }
   }
 }

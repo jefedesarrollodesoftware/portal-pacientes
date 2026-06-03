@@ -1,10 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, inject } from '@angular/core';
+import { Component, DestroyRef, Inject, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Params, RouterModule } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { AuthService, LoginCredentials } from '../../../../shared/services/auth.service';
-import { RegisterPatientRequest } from '../../../patients/models';
+import { CompanyService } from '../../services/company.service';
+import { APP_RUNTIME_CONFIG, AppRuntimeConfig } from '../../../../app.config';
+import { CompanyResponse } from '../../../patients/models';
 import { LoginFormComponent } from '../../components/login-form/login-form.component';
 import { SignFormComponent } from '../../components/sign-form/sign-form.component';
 
@@ -15,12 +17,15 @@ import { SignFormComponent } from '../../components/sign-form/sign-form.componen
   standalone: true,
   imports: [CommonModule, RouterModule, LoginFormComponent, SignFormComponent],
 })
-export class AuthPageComponent {
+export class AuthPageComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   public activeTab: 'login' | 'register' = 'login';
+  public company: CompanyResponse | null = null;
 
   constructor(
     private authService: AuthService,
+    private companyService: CompanyService,
+    @Inject(APP_RUNTIME_CONFIG) private config: AppRuntimeConfig,
     private route: ActivatedRoute,
   ) {
     if (this.authService.isAuthenticated()) {
@@ -37,12 +42,41 @@ export class AuthPageComponent {
       });
   }
 
-  public sendLoginForm(creds: LoginCredentials): void {
-    this.authService.loginUser(creds);
+  ngOnInit(): void {
+    this.loadCompany();
   }
 
-  public sendSignForm(creds: RegisterPatientRequest): void {
-    this.authService.registerUser(creds);
+  private loadCompany(): void {
+    this.companyService.getCompany(this.config.companyId).subscribe({
+      next: (res) => {
+        this.company = res.data;
+        this.applyTheme(res.data);
+      },
+      error: () => {},
+    });
+  }
+
+  private applyTheme(company: CompanyResponse): void {
+    const root = document.documentElement;
+    if (company.primary_color) {
+      root.style.setProperty('--primary-color', company.primary_color);
+    }
+    if (company.secondary_color) {
+      root.style.setProperty('--secondary-color', company.secondary_color);
+    }
+    if (company.icon_url) {
+      let link = document.querySelector<HTMLLinkElement>('link[rel~="icon"]');
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'icon';
+        document.head.appendChild(link);
+      }
+      link.href = company.icon_url;
+    }
+  }
+
+  public sendLoginForm(creds: LoginCredentials): void {
+    this.authService.loginUser(creds);
   }
 
   public openTab(tab: 'login' | 'register'): void {

@@ -68,3 +68,4 @@ Thumbs.db
 *.js.map
 .kilo/plans/1779979679793-gentle-knight.md
 package-lock.json
+.kilo/

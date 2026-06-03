@@ -1,12 +1,13 @@
-<div class="auth-shell">
+<div class="auth-shell" [style.--company-primary]="company?.primary_color" [style.--company-secondary]="company?.secondary_color">
   <section class="auth-hero d-none d-lg-flex">
     <div class="auth-hero__content">
       <div class="auth-hero__icon">
-        <i class="fas fa-hospital"></i>
+        <img *ngIf="company?.logo_url" [src]="company!.logo_url" alt="Logo" class="auth-hero__logo" />
+        <i *ngIf="!company?.logo_url" class="fas fa-hospital"></i>
       </div>
-      <div class="auth-hero__badge">
+      <div class="auth-hero__badge" *ngIf="company?.name">
         <i class="fas fa-shield-heart"></i>
-        <span>Atención digital segura</span>
+        <span>{{ company!.name }}</span>
       </div>
       <h1 class="auth-hero__title">Portal del Paciente</h1>
       <p class="auth-hero__text">
@@ -32,8 +33,9 @@
         <div class="auth-card__body">
           <div class="auth-mobile-brand d-lg-none">
             <div class="auth-mobile-brand__label">
-              <i class="fas fa-hospital"></i>
-              <span>Portal del Paciente</span>
+              <img *ngIf="company?.logo_url" [src]="company!.logo_url" alt="Logo" class="auth-mobile-brand__logo" />
+              <i *ngIf="!company?.logo_url" class="fas fa-hospital"></i>
+              <span>{{ company?.name || 'Portal del Paciente' }}</span>
             </div>
           </div>
 
@@ -82,7 +84,7 @@
             <h2 class="auth-section-title">Crear cuenta</h2>
             <p class="auth-section-subtitle">Completa tus datos para registrarte en el portal.</p>
             <div class="mt-4">
-              <app-sign-form (sendSignForm)="sendSignForm($event)"></app-sign-form>
+              <app-sign-form></app-sign-form>
             </div>
           </div>
         </div>
