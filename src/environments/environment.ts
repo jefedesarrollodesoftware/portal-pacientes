@@ -7,7 +7,7 @@ export const environment = {
   hmr: false,
   backend: false,
   companyId: 1,
-  apiUrl: 'https://admin-portal-pacientes.local',
+  apiUrl: '',
   appApiKey:'3f7a2b1c-8d4e-5f69-a0b1-c2d3e4f5a6b7'
 };
 

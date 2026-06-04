@@ -30,14 +30,14 @@
               { "glob": "**/*", "input": "src/assets" }
             ],
             "styles": [
-              "node_modules/bootstrap/dist/css/bootstrap.min.css",
-              "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
+              "bootstrap/dist/css/bootstrap.min.css",
+              "@fortawesome/fontawesome-free/css/all.min.css",
               "src/styles.scss",
               "src/custom-theme.scss"
             ],
             "scripts": [
-              "node_modules/@popperjs/core/dist/umd/popper.min.js",
-              "node_modules/bootstrap/dist/js/bootstrap.min.js"
+              "@popperjs/core/dist/umd/popper.min.js",
+              "bootstrap/dist/js/bootstrap.min.js"
             ]
           },
           "configurations": {
