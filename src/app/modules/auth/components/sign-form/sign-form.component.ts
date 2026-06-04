@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { Subscription, interval } from 'rxjs';
 
 import { SearchableSelectComponent } from '../../../../shared/components/searchable-select/searchable-select.component';
 
@@ -26,7 +27,7 @@ import { setBackendErrors } from '../../../patients/utils/form-error-handler';
     SearchableSelectComponent,
   ],
 })
-export class SignFormComponent implements OnInit {
+export class SignFormComponent implements OnInit, OnDestroy {
   currentStep = 1;
 
   form!: FormGroup;
@@ -45,6 +46,9 @@ export class SignFormComponent implements OnInit {
   confirming = false;
   sessionData: InitiateRegistrationResponse | null = null;
   errorMessage = '';
+  remainingTime = '';
+  sessionExpired = false;
+  private timerSubscription?: Subscription;
 
   constructor(
     private patientAttributesService: PatientAttributesService,
@@ -57,6 +61,38 @@ export class SignFormComponent implements OnInit {
     this.buildForm();
     this.buildCodeForm();
     this.loadDocumentTypes();
+  }
+
+  ngOnDestroy(): void {
+    this.stopTimer();
+  }
+
+  private startTimer(): void {
+    this.stopTimer();
+    this.sessionExpired = false;
+    const expiresAt = new Date(this.sessionData!.expires_at).getTime();
+
+    this.timerSubscription = interval(1000).subscribe(() => {
+      const now = Date.now();
+      const diff = expiresAt - now;
+
+      if (diff <= 0) {
+        this.remainingTime = '00:00';
+        this.sessionExpired = true;
+        this.errorMessage = 'La sesión ha expirado. Debes iniciar el registro nuevamente.';
+        this.stopTimer();
+        return;
+      }
+
+      const minutes = Math.floor(diff / 60000);
+      const seconds = Math.floor((diff % 60000) / 1000);
+      this.remainingTime = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    });
+  }
+
+  private stopTimer(): void {
+    this.timerSubscription?.unsubscribe();
+    this.timerSubscription = undefined;
   }
 
   private buildForm(): void {
@@ -212,6 +248,8 @@ export class SignFormComponent implements OnInit {
         this.sessionData = res.data;
         this.currentStep = 3;
         this.codeForm.reset();
+        this.errorMessage = '';
+        this.startTimer();
         this.toastr.success('Códigos de verificación enviados a tu correo y celular.');
       },
       error: (err: HttpErrorResponse) => {
@@ -227,6 +265,11 @@ export class SignFormComponent implements OnInit {
   }
 
   confirmRegistration(): void {
+    if (this.sessionExpired) {
+      this.errorMessage = 'La sesión ha expirado. Debes iniciar el registro nuevamente.';
+      return;
+    }
+
     if (this.codeForm.invalid || !this.sessionData) {
       this.codeForm.markAllAsTouched();
       return;

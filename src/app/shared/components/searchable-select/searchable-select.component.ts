@@ -1,8 +1,6 @@
-import { Component, Input, forwardRef, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, Input, forwardRef, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-
-declare var bootstrap: any;
 
 @Component({
   selector: 'app-searchable-select',
@@ -18,38 +16,29 @@ declare var bootstrap: any;
     },
   ],
 })
-export class SearchableSelectComponent implements ControlValueAccessor, AfterViewInit, OnDestroy {
+export class SearchableSelectComponent implements ControlValueAccessor, OnDestroy {
   @Input() options: { code: string; name: string }[] = [];
   @Input() placeholder = 'Seleccione...';
   @Input() invalid = false;
   @Input() disabled = false;
 
-  @ViewChild('dropdownEl') dropdownEl!: ElementRef<HTMLElement>;
+  @ViewChild('triggerEl', { read: ElementRef }) triggerEl!: ElementRef<HTMLElement>;
+  @ViewChild('menuEl', { read: ElementRef }) menuEl!: ElementRef<HTMLElement>;
   @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
 
   searchText = '';
   filteredOptions: { code: string; name: string }[] = [];
   displayValue = '';
   value = '';
+  isOpen = false;
 
-  private bsDropdown: any;
   private onChange: (value: string) => void = () => {};
   private onTouched: () => void = () => {};
-
-  ngAfterViewInit(): void {
-    const dropdownEl = this.dropdownEl.nativeElement;
-    if (typeof bootstrap !== 'undefined') {
-      this.bsDropdown = new bootstrap.Dropdown(dropdownEl, {});
-      dropdownEl.addEventListener('hidden.bs.dropdown', () => this.onDropdownClose());
-      dropdownEl.addEventListener('shown.bs.dropdown', () => this.onDropdownOpen());
-    }
-  }
+  private closeHandler: ((event: MouseEvent) => void) | null = null;
+  private keyHandler: ((event: KeyboardEvent) => void) | null = null;
 
   ngOnDestroy(): void {
-    if (this.bsDropdown) {
-      this.bsDropdown.dispose();
-      this.bsDropdown = null;
-    }
+    this.removeListeners();
   }
 
   writeValue(value: string): void {
@@ -92,25 +81,63 @@ export class SearchableSelectComponent implements ControlValueAccessor, AfterVie
   onTriggerClick(): void {
     if (this.disabled) return;
     this.onTouched();
-    if (this.bsDropdown) {
-      const isShown = this.dropdownEl.nativeElement.classList.contains('show');
-      if (isShown) {
-        this.bsDropdown.hide();
-      } else {
-        this.bsDropdown.show();
-      }
+    if (this.isOpen) {
+      this.close();
+    } else {
+      this.open();
     }
   }
 
-  private onDropdownOpen(): void {
+  private open(): void {
+    const triggerRect = this.triggerEl.nativeElement.getBoundingClientRect();
+    const menu = this.menuEl.nativeElement;
+
+    Object.assign(menu.style, {
+      position: 'fixed',
+      top: `${triggerRect.bottom}px`,
+      left: `${triggerRect.left}px`,
+      width: `${triggerRect.width}px`,
+      margin: '0',
+      display: 'block',
+    });
+
+    this.isOpen = true;
     this.searchText = '';
     this.filteredOptions = [...this.options];
+
+    this.closeHandler = (event: MouseEvent) => {
+      if (!this.menuEl.nativeElement.contains(event.target as Node) &&
+          !this.triggerEl.nativeElement.contains(event.target as Node)) {
+        this.close();
+      }
+    };
+    document.addEventListener('click', this.closeHandler);
+
+    this.keyHandler = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') this.close();
+    };
+    document.addEventListener('keydown', this.keyHandler);
+
     setTimeout(() => this.searchInput?.nativeElement?.focus());
   }
 
-  private onDropdownClose(): void {
+  private close(): void {
+    this.removeListeners();
+    this.menuEl.nativeElement.style.display = '';
+    this.isOpen = false;
     this.searchText = '';
     this.filteredOptions = [...this.options];
+  }
+
+  private removeListeners(): void {
+    if (this.closeHandler) {
+      document.removeEventListener('click', this.closeHandler);
+      this.closeHandler = null;
+    }
+    if (this.keyHandler) {
+      document.removeEventListener('keydown', this.keyHandler);
+      this.keyHandler = null;
+    }
   }
 
   private filterOptions(): void {
@@ -121,11 +148,5 @@ export class SearchableSelectComponent implements ControlValueAccessor, AfterVie
   private updateDisplay(): void {
     const selected = this.options.find(o => o.code === this.value);
     this.displayValue = selected ? selected.name : '';
-  }
-
-  private close(): void {
-    if (this.bsDropdown) {
-      this.bsDropdown.hide();
-    }
   }
 }

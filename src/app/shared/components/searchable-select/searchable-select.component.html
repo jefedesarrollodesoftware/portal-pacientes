@@ -1,5 +1,6 @@
-<div class="searchable-select dropdown" #dropdownEl [class.is-invalid]="invalid">
+<div class="searchable-select dropdown" [class.is-invalid]="invalid">
   <button
+    #triggerEl
     class="searchable-select__trigger form-select text-start d-flex align-items-center"
     type="button"
     [disabled]="disabled"
@@ -10,7 +11,7 @@
     </span>
   </button>
 
-  <div class="dropdown-menu p-2">
+  <div #menuEl class="dropdown-menu p-2">
     <input
       #searchInput
       type="text"
@@ -18,7 +19,6 @@
       placeholder="Buscar..."
       [value]="searchText"
       (input)="onSearch($event)"
-      (click)="$event.stopPropagation()"
       autocomplete="off"
     />
     <ul class="list-unstyled mb-0 searchable-select__options">
@@ -26,7 +26,7 @@
         <button
           class="dropdown-item"
           [class.active]="isSelected(opt)"
-          (click)="selectOption(opt); $event.stopPropagation()"
+          (click)="selectOption(opt)"
           type="button"
         >
           {{ opt.name }}
