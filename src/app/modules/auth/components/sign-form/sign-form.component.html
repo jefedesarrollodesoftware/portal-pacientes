@@ -20,16 +20,13 @@
 <form *ngIf="currentStep === 1" class="auth-form" [formGroup]="form" (ngSubmit)="checkExistence()">
   <div class="row g-3 mb-3">
     <div class="col-12 col-md-6">
-      <label for="docType" class="form-label">Tipo de Documento</label>
-      <select
-        id="docType"
-        class="form-select"
+      <label class="form-label">Tipo de Documento</label>
+      <app-searchable-select
+        [options]="documentTypes"
         formControlName="document_type_code"
-        [class.is-invalid]="isInvalid('document_type_code')"
-      >
-        <option value="" disabled>Seleccione...</option>
-        <option *ngFor="let doc of documentTypes" [value]="doc.code">{{ doc.name }}</option>
-      </select>
+        placeholder="Seleccione..."
+        [invalid]="isInvalid('document_type_code')"
+      ></app-searchable-select>
       <div class="invalid-feedback" *ngIf="hasError('document_type_code', 'required')">Selecciona un tipo de documento</div>
     </div>
     <div class="col-12 col-md-6">
@@ -62,16 +59,13 @@
 <form *ngIf="currentStep === 2" class="auth-form" [formGroup]="form" (ngSubmit)="initiateRegistration()">
   <div class="row g-3 mb-3">
     <div class="col-12 col-md-6">
-      <label for="docType2" class="form-label">Tipo de Documento</label>
-      <select
-        id="docType2"
-        class="form-select"
+      <label class="form-label">Tipo de Documento</label>
+      <app-searchable-select
+        [options]="documentTypes"
         formControlName="document_type_code"
-        [class.is-invalid]="isInvalid('document_type_code')"
-      >
-        <option value="" disabled>Seleccione...</option>
-        <option *ngFor="let doc of documentTypes" [value]="doc.code">{{ doc.name }}</option>
-      </select>
+        placeholder="Seleccione..."
+        [invalid]="isInvalid('document_type_code')"
+      ></app-searchable-select>
       <div class="invalid-feedback" *ngIf="hasError('document_type_code', 'required')">Selecciona un tipo de documento</div>
     </div>
     <div class="col-12 col-md-6">
@@ -176,52 +170,64 @@
 
   <div class="row g-3 mb-3">
     <div class="col-12 col-md-6">
-      <label for="gender" class="form-label">Género</label>
-      <select id="gender" class="form-select" formControlName="gender_code">
-        <option value="">Seleccione...</option>
-        <option *ngFor="let g of genders" [value]="g.code">{{ g.name }}</option>
-      </select>
+      <label class="form-label">Sexo</label>
+      <app-searchable-select
+        [options]="genders"
+        formControlName="gender_code"
+        placeholder="Seleccione..."
+        [invalid]="isInvalid('gender_code')"
+      ></app-searchable-select>
     </div>
     <div class="col-12 col-md-6">
-      <label for="genderIdentity" class="form-label">Identidad de Género</label>
-      <select id="genderIdentity" class="form-select" formControlName="gender_identity_code">
-        <option value="">Seleccione...</option>
-        <option *ngFor="let gi of genderIdentities" [value]="gi.code">{{ gi.name }}</option>
-      </select>
-    </div>
-  </div>
-
-  <div class="row g-3 mb-3">
-    <div class="col-12 col-md-6">
-      <label for="civilStatus" class="form-label">Estado Civil</label>
-      <select id="civilStatus" class="form-select" formControlName="civil_status_code">
-        <option value="">Seleccione...</option>
-        <option *ngFor="let cs of civilStatuses" [value]="cs.code">{{ cs.name }}</option>
-      </select>
-    </div>
-    <div class="col-12 col-md-6">
-      <label for="scholarship" class="form-label">Nivel Escolar</label>
-      <select id="scholarship" class="form-select" formControlName="scholarship_code">
-        <option value="">Seleccione...</option>
-        <option *ngFor="let s of scholarships" [value]="s.code">{{ s.name }}</option>
-      </select>
+      <label class="form-label">Género</label>
+      <app-searchable-select
+        [options]="genderIdentities"
+        formControlName="gender_identity_code"
+        placeholder="Seleccione..."
+        [invalid]="isInvalid('gender_identity_code')"
+      ></app-searchable-select>
     </div>
   </div>
 
   <div class="row g-3 mb-3">
     <div class="col-12 col-md-6">
-      <label for="politicalDivision" class="form-label">División Política</label>
-      <select id="politicalDivision" class="form-select" formControlName="political_division_code">
-        <option value="">Seleccione...</option>
-        <option *ngFor="let pd of politicalDivisions" [value]="pd.code">{{ pd.name }}</option>
-      </select>
+      <label class="form-label">Estado Civil</label>
+      <app-searchable-select
+        [options]="civilStatuses"
+        formControlName="civil_status_code"
+        placeholder="Seleccione..."
+        [invalid]="isInvalid('civil_status_code')"
+      ></app-searchable-select>
     </div>
     <div class="col-12 col-md-6">
-      <label for="residenceZone" class="form-label">Zona de Residencia</label>
-      <select id="residenceZone" class="form-select" formControlName="residence_zone_code">
-        <option value="">Seleccione...</option>
-        <option *ngFor="let rz of residenceZones" [value]="rz.code">{{ rz.name }}</option>
-      </select>
+      <label class="form-label">Nivel Escolar</label>
+      <app-searchable-select
+        [options]="scholarships"
+        formControlName="scholarship_code"
+        placeholder="Seleccione..."
+        [invalid]="isInvalid('scholarship_code')"
+      ></app-searchable-select>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-3">
+    <div class="col-12 col-md-6">
+      <label class="form-label">División Política</label>
+      <app-searchable-select
+        [options]="politicalDivisions"
+        formControlName="political_division_code"
+        placeholder="Seleccione..."
+        [invalid]="isInvalid('political_division_code')"
+      ></app-searchable-select>
+    </div>
+    <div class="col-12 col-md-6">
+      <label class="form-label">Zona de Residencia</label>
+      <app-searchable-select
+        [options]="residenceZones"
+        formControlName="residence_zone_code"
+        placeholder="Seleccione..."
+        [invalid]="isInvalid('residence_zone_code')"
+      ></app-searchable-select>
     </div>
   </div>
 

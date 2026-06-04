@@ -5,6 +5,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 
+import { SearchableSelectComponent } from '../../../../shared/components/searchable-select/searchable-select.component';
+
 import { PatientAttributesService } from '../../../patients/services/patient-attributes.service';
 import { PatientService } from '../../../patients/services/patient.service';
 import {
@@ -21,6 +23,7 @@ import { setBackendErrors } from '../../../patients/utils/form-error-handler';
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    SearchableSelectComponent,
   ],
 })
 export class SignFormComponent implements OnInit {

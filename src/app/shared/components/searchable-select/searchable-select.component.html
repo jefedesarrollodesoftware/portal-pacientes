@@ -1,0 +1,40 @@
+<div class="searchable-select dropdown" #dropdownEl [class.is-invalid]="invalid">
+  <button
+    class="searchable-select__trigger form-select text-start d-flex align-items-center"
+    type="button"
+    [disabled]="disabled"
+    (click)="onTriggerClick()"
+  >
+    <span class="flex-grow-1 text-truncate" [class.text-muted]="!displayValue">
+      {{ displayValue || placeholder }}
+    </span>
+  </button>
+
+  <div class="dropdown-menu p-2">
+    <input
+      #searchInput
+      type="text"
+      class="form-control form-control-sm mb-2"
+      placeholder="Buscar..."
+      [value]="searchText"
+      (input)="onSearch($event)"
+      (click)="$event.stopPropagation()"
+      autocomplete="off"
+    />
+    <ul class="list-unstyled mb-0 searchable-select__options">
+      <li *ngFor="let opt of filteredOptions">
+        <button
+          class="dropdown-item"
+          [class.active]="isSelected(opt)"
+          (click)="selectOption(opt); $event.stopPropagation()"
+          type="button"
+        >
+          {{ opt.name }}
+        </button>
+      </li>
+      <li *ngIf="filteredOptions.length === 0">
+        <span class="dropdown-item-text text-muted small">Sin resultados</span>
+      </li>
+    </ul>
+  </div>
+</div>
