@@ -10,7 +10,7 @@ import { SharedService } from '../services/shared.service';
 import { RouterModule } from '@angular/router';
 import { HeaderComponent } from '../header/containers/header/header.component';
 import { SidebarComponent } from '../sidebar/sidebar.component';
-import { CommonModule } from '@angular/common';
+
 
 declare var bootstrap: any;
 
@@ -20,11 +20,10 @@ declare var bootstrap: any;
   styleUrls: ['./layout.component.scss'],
   standalone: true,
   imports: [
-    CommonModule,
     RouterModule,
     HeaderComponent,
-    SidebarComponent,
-  ],
+    SidebarComponent
+],
 })
 export class LayoutComponent implements OnDestroy {
   @ViewChild('offcanvasEl') offcanvasEl: ElementRef;

@@ -1,6 +1,6 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+
 import { AuthService, LoginCredentials } from '../../../../shared/services/auth.service';
 import { PatientAttributesService } from '../../../patients/services/patient-attributes.service';
 import { PatientAttribute } from '../../../patients/models';
@@ -12,7 +12,7 @@ export type LoginFormValue = LoginCredentials;
   templateUrl: './login-form.component.html',
   styleUrls: ['./login-form.component.scss'],
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [ReactiveFormsModule],
 })
 export class LoginFormComponent implements OnInit {
   @Output() sendLoginForm = new EventEmitter<LoginFormValue>();

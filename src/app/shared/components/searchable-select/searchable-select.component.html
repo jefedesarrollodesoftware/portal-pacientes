@@ -5,7 +5,7 @@
     type="button"
     [disabled]="disabled"
     (click)="onTriggerClick()"
-  >
+    >
     <span class="flex-grow-1 text-truncate" [class.text-muted]="!displayValue">
       {{ displayValue || placeholder }}
     </span>
@@ -20,21 +20,25 @@
       [value]="searchText"
       (input)="onSearch($event)"
       autocomplete="off"
-    />
+      />
     <ul class="list-unstyled mb-0 searchable-select__options">
-      <li *ngFor="let opt of filteredOptions">
-        <button
-          class="dropdown-item"
-          [class.active]="isSelected(opt)"
-          (click)="selectOption(opt)"
-          type="button"
-        >
-          {{ opt.name }}
-        </button>
-      </li>
-      <li *ngIf="filteredOptions.length === 0">
-        <span class="dropdown-item-text text-muted small">Sin resultados</span>
-      </li>
+      @for (opt of filteredOptions; track opt) {
+        <li>
+          <button
+            class="dropdown-item"
+            [class.active]="isSelected(opt)"
+            (click)="selectOption(opt)"
+            type="button"
+            >
+            {{ opt.name }}
+          </button>
+        </li>
+      }
+      @if (filteredOptions.length === 0) {
+        <li>
+          <span class="dropdown-item-text text-muted small">Sin resultados</span>
+        </li>
+      }
     </ul>
   </div>
 </div>

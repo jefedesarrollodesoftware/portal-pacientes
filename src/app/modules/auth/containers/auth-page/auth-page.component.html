@@ -2,13 +2,19 @@
   <section class="auth-hero d-none d-lg-flex">
     <div class="auth-hero__content">
       <div class="auth-hero__icon">
-        <img *ngIf="company?.logo_url" [src]="company!.logo_url" alt="Logo" class="auth-hero__logo" />
-        <i *ngIf="!company?.logo_url" class="fas fa-hospital"></i>
+        @if (company?.logo_url) {
+          <img [src]="company!.logo_url" alt="Logo" class="auth-hero__logo" />
+        }
+        @if (!company?.logo_url) {
+          <i class="fas fa-hospital"></i>
+        }
       </div>
-      <div class="auth-hero__badge" *ngIf="company?.name">
-        <i class="fas fa-shield-heart"></i>
-        <span>{{ company!.name }}</span>
-      </div>
+      @if (company?.name) {
+        <div class="auth-hero__badge">
+          <i class="fas fa-shield-heart"></i>
+          <span>{{ company!.name }}</span>
+        </div>
+      }
       <h1 class="auth-hero__title">Portal del Paciente</h1>
       <p class="auth-hero__text">
         Gestiona tus citas médicas, consulta resultados y mantén tu historial clínico al día desde cualquier dispositivo.
@@ -33,8 +39,12 @@
         <div class="auth-card__body">
           <div class="auth-mobile-brand d-lg-none">
             <div class="auth-mobile-brand__label">
-              <img *ngIf="company?.logo_url" [src]="company!.logo_url" alt="Logo" class="auth-mobile-brand__logo" />
-              <i *ngIf="!company?.logo_url" class="fas fa-hospital"></i>
+              @if (company?.logo_url) {
+                <img [src]="company!.logo_url" alt="Logo" class="auth-mobile-brand__logo" />
+              }
+              @if (!company?.logo_url) {
+                <i class="fas fa-hospital"></i>
+              }
               <span>{{ company?.name || 'Portal del Paciente' }}</span>
             </div>
           </div>
@@ -49,7 +59,7 @@
                 role="tab"
                 [attr.aria-selected]="activeTab === 'login'"
                 (click)="openTab('login')"
-              >
+                >
                 Iniciar Sesión
               </button>
             </li>
@@ -62,31 +72,35 @@
                 role="tab"
                 [attr.aria-selected]="activeTab === 'register'"
                 (click)="openTab('register')"
-              >
+                >
                 Registrarse
               </button>
             </li>
           </ul>
 
-          <div *ngIf="activeTab === 'login'" class="auth-pane" role="tabpanel" aria-labelledby="login-tab">
-            <h2 class="auth-section-title">Bienvenido de nuevo</h2>
-            <p class="auth-section-subtitle">Ingresa tus credenciales para acceder al portal.</p>
-            <div class="mt-4">
-              <app-login-form (sendLoginForm)="sendLoginForm($event)"></app-login-form>
+          @if (activeTab === 'login') {
+            <div class="auth-pane" role="tabpanel" aria-labelledby="login-tab">
+              <h2 class="auth-section-title">Bienvenido de nuevo</h2>
+              <p class="auth-section-subtitle">Ingresa tus credenciales para acceder al portal.</p>
+              <div class="mt-4">
+                <app-login-form (sendLoginForm)="sendLoginForm($event)"></app-login-form>
+              </div>
+              <p class="auth-form-note text-center mt-4 mb-0">
+                ¿No tienes cuenta?
+                <a href="#" class="auth-form-link" (click)="$event.preventDefault(); openTab('register')">Regístrate aquí</a>
+              </p>
             </div>
-            <p class="auth-form-note text-center mt-4 mb-0">
-              ¿No tienes cuenta?
-              <a href="#" class="auth-form-link" (click)="$event.preventDefault(); openTab('register')">Regístrate aquí</a>
-            </p>
-          </div>
+          }
 
-          <div *ngIf="activeTab === 'register'" class="auth-pane" role="tabpanel" aria-labelledby="register-tab">
-            <h2 class="auth-section-title">Crear cuenta</h2>
-            <p class="auth-section-subtitle">Completa tus datos para registrarte en el portal.</p>
-            <div class="mt-4">
-              <app-sign-form></app-sign-form>
+          @if (activeTab === 'register') {
+            <div class="auth-pane" role="tabpanel" aria-labelledby="register-tab">
+              <h2 class="auth-section-title">Crear cuenta</h2>
+              <p class="auth-section-subtitle">Completa tus datos para registrarte en el portal.</p>
+              <div class="mt-4">
+                <app-sign-form></app-sign-form>
+              </div>
             </div>
-          </div>
+          }
         </div>
       </div>
     </div>

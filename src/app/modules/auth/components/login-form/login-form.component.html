@@ -6,13 +6,17 @@
       class="form-select"
       formControlName="tipo_documento"
       [class.is-invalid]="isInvalid('tipo_documento')"
-    >
+      >
       <option value="" disabled>Seleccione...</option>
-      <option *ngFor="let doc of documentTypes" [value]="doc.code">{{ doc.name }}</option>
+      @for (doc of documentTypes; track doc) {
+        <option [value]="doc.code">{{ doc.name }}</option>
+      }
     </select>
-    <div class="invalid-feedback" *ngIf="hasError('tipo_documento', 'required')">
-      Selecciona un tipo de documento
-    </div>
+    @if (hasError('tipo_documento', 'required')) {
+      <div class="invalid-feedback">
+        Selecciona un tipo de documento
+      </div>
+    }
   </div>
 
   <div class="mb-3">
@@ -25,38 +29,48 @@
       placeholder="1234567890"
       autocomplete="username"
       [class.is-invalid]="isInvalid('numero_documento')"
-    />
-    <div class="invalid-feedback d-block" *ngIf="hasError('numero_documento', 'required')">
-      El número de documento es obligatorio
+      />
+      @if (hasError('numero_documento', 'required')) {
+        <div class="invalid-feedback d-block">
+          El número de documento es obligatorio
+        </div>
+      }
+      @if (hasError('numero_documento', 'maxlength')) {
+        <div class="invalid-feedback d-block">
+          Máx. 45 caracteres
+        </div>
+      }
     </div>
-    <div class="invalid-feedback d-block" *ngIf="hasError('numero_documento', 'maxlength')">
-      Máx. 45 caracteres
-    </div>
-  </div>
 
-  <div class="mb-3">
-    <label for="loginPassword" class="form-label">Contraseña</label>
-    <input
-      id="loginPassword"
-      class="form-control"
-      type="password"
-      formControlName="contraseña"
-      placeholder="••••••••"
-      autocomplete="current-password"
-      [class.is-invalid]="isInvalid('contraseña')"
-    />
-    <div class="invalid-feedback d-block" *ngIf="hasError('contraseña', 'required')">
-      La contraseña es obligatoria
-    </div>
-  </div>
+    <div class="mb-3">
+      <label for="loginPassword" class="form-label">Contraseña</label>
+      <input
+        id="loginPassword"
+        class="form-control"
+        type="password"
+        formControlName="contraseña"
+        placeholder="••••••••"
+        autocomplete="current-password"
+        [class.is-invalid]="isInvalid('contraseña')"
+        />
+        @if (hasError('contraseña', 'required')) {
+          <div class="invalid-feedback d-block">
+            La contraseña es obligatoria
+          </div>
+        }
+      </div>
 
-  <div *ngIf="authService.errorMessage" class="alert alert-danger d-flex align-items-center gap-2 py-2 px-3 mb-3" role="alert">
-    <i class="fas fa-circle-exclamation"></i>
-    <span>{{ authService.errorMessage }}</span>
-  </div>
+      @if (authService.errorMessage) {
+        <div class="alert alert-danger d-flex align-items-center gap-2 py-2 px-3 mb-3" role="alert">
+          <i class="fas fa-circle-exclamation"></i>
+          <span>{{ authService.errorMessage }}</span>
+        </div>
+      }
 
-  <button class="btn btn-primary w-100" type="submit" [disabled]="form.invalid || authService.isFetching">
-    <span *ngIf="authService.isFetching" class="spinner-border spinner-border-sm me-2" role="status"></span>
-    {{ authService.isFetching ? 'Iniciando sesión...' : 'Iniciar Sesión' }}
-  </button>
-</form>
+      <button class="btn btn-primary w-100" type="submit" [disabled]="form.invalid || authService.isFetching">
+        @if (authService.isFetching) {
+          <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+        }
+        {{ authService.isFetching ? 'Iniciando sesión...' : 'Iniciar Sesión' }}
+      </button>
+    </form>

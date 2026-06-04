@@ -15,40 +15,48 @@
       </mat-form-field>
     </div>
 
-    <div class="text-center py-5" *ngIf="loading">
-      <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando...</span></div>
-    </div>
+    @if (loading) {
+      <div class="text-center py-5">
+        <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando...</span></div>
+      </div>
+    }
 
-    <div class="table-responsive" *ngIf="!loading && appointments.length">
-      <table class="table table-hover align-middle mb-0">
-        <thead class="table-light">
-          <tr>
-            <th>Fecha</th>
-            <th>Hora</th>
-            <th>Tipo</th>
-            <th>Doctor</th>
-            <th>Estado</th>
-            <th class="text-end">Acción</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let a of appointments" (click)="viewDetail(a.id)" style="cursor:pointer" role="button">
-            <td>{{ a.appointment_date | date:'dd/MM/yyyy' }}</td>
-            <td>{{ a.appointment_time }}</td>
-            <td>{{ a.type }}</td>
-            <td>{{ a.doctor || '-' }}</td>
-            <td><span class="badge" [ngClass]="{'bg-warning text-dark': a.status === 'pending', 'bg-info': a.status === 'confirmed', 'bg-success': a.status === 'completed', 'bg-danger': a.status === 'cancelled'}">{{ getStatusLabel(a.status) }}</span></td>
-            <td class="text-end">
-              <button class="btn btn-sm btn-outline-primary" (click)="$event.stopPropagation(); viewDetail(a.id)"><i class="fas fa-eye"></i></button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    @if (!loading && appointments.length) {
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Fecha</th>
+              <th>Hora</th>
+              <th>Tipo</th>
+              <th>Doctor</th>
+              <th>Estado</th>
+              <th class="text-end">Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (a of appointments; track a) {
+              <tr (click)="viewDetail(a.id)" style="cursor:pointer" role="button">
+                <td>{{ a.appointment_date | date:'dd/MM/yyyy' }}</td>
+                <td>{{ a.appointment_time }}</td>
+                <td>{{ a.type }}</td>
+                <td>{{ a.doctor || '-' }}</td>
+                <td><span class="badge" [ngClass]="{'bg-warning text-dark': a.status === 'pending', 'bg-info': a.status === 'confirmed', 'bg-success': a.status === 'completed', 'bg-danger': a.status === 'cancelled'}">{{ getStatusLabel(a.status) }}</span></td>
+                <td class="text-end">
+                  <button class="btn btn-sm btn-outline-primary" (click)="$event.stopPropagation(); viewDetail(a.id)"><i class="fas fa-eye"></i></button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
 
-    <div class="text-center py-5" *ngIf="!loading && !appointments.length">
-      <i class="fas fa-calendar-xmark text-muted d-block mb-2" style="font-size:48px"></i>
-      <p class="text-muted">No se encontraron citas.</p>
-    </div>
+    @if (!loading && !appointments.length) {
+      <div class="text-center py-5">
+        <i class="fas fa-calendar-xmark text-muted d-block mb-2" style="font-size:48px"></i>
+        <p class="text-muted">No se encontraron citas.</p>
+      </div>
+    }
   </div>
 </div>

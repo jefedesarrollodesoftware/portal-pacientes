@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, DestroyRef, Inject, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Params, RouterModule } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -15,7 +15,7 @@ import { SignFormComponent } from '../../components/sign-form/sign-form.componen
   templateUrl: './auth-page.component.html',
   styleUrls: ['./auth-page.component.scss'],
   standalone: true,
-  imports: [CommonModule, RouterModule, LoginFormComponent, SignFormComponent],
+  imports: [RouterModule, LoginFormComponent, SignFormComponent],
 })
 export class AuthPageComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);

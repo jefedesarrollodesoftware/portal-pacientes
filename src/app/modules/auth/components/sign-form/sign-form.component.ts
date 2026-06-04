@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
@@ -22,10 +22,9 @@ import { setBackendErrors } from '../../../patients/utils/form-error-handler';
   styleUrls: ['./sign-form.component.scss'],
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
-    SearchableSelectComponent,
-  ],
+    SearchableSelectComponent
+],
 })
 export class SignFormComponent implements OnInit, OnDestroy {
   currentStep = 1;
