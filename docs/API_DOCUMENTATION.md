@@ -405,6 +405,7 @@ interface CreatePatientRequest {
   email: string;                    // required, email, max 191, unique
   cellphone: string;                // required, max 45, unique
   cellphone_code?: string;          // opcional, max 10, ej: "57"
+  company_id?: number;              // opcional, ID de empresa a la que pertenece el paciente
   document_expedition_date?: string; // opcional, formato fecha ISO (Y-m-d)
   date_birth?: string;              // opcional, formato fecha ISO (Y-m-d)
   gender_code?: string;             // opcional, max 20
@@ -433,6 +434,7 @@ interface CreatePatientRequest {
   "email": "juan@example.com",
   "cellphone": "3001234567",
   "cellphone_code": "57",
+  "company_id": 1,
   "date_birth": "1990-01-15",
   "gender_code": "M",
   "civil_status_code": "S",
@@ -488,6 +490,9 @@ interface CreatePatientResponse {
 | **Throttle** | `patients` |
 
 **Ejemplo:** `GET /api/v1/patients/CC/1234567890`
+**Ejemplo con company_id:** `GET /api/v1/patients/CC/1234567890?company_id=1`
+
+> El parámetro opcional `company_id` permite filtrar la búsqueda del paciente dentro de una empresa específica.
 
 #### Respuesta exitosa — `200 OK`
 
@@ -671,6 +676,7 @@ Este endpoint permite al frontend Angular verificar si un paciente ya existe en 
 interface CheckPatientExistenceRequest {
   document_type_code: string;  // required, max 20, ej: "CC", "NIT"
   document_number: string;     // required, max 45, ej: "1234567890"
+  company_id?: number;         // opcional, filtra por empresa
 }
 ```
 
@@ -678,7 +684,8 @@ interface CheckPatientExistenceRequest {
 ```json
 {
   "document_type_code": "CC",
-  "document_number": "1234567890"
+  "document_number": "1234567890",
+  "company_id": 1
 }
 ```
 
@@ -809,6 +816,7 @@ Este endpoint permite enviar un código de verificación de 6 dígitos al pacien
 interface SendVerificationCodeRequest {
   document_type_code: string;  // required, max 20, ej: "CC", "NIT"
   document_number: string;     // required, max 45, ej: "1234567890"
+  company_id?: number;         // opcional, ID de empresa para personalizar la plantilla del correo (logo, colores, nombre)
 }
 ```
 
@@ -816,7 +824,8 @@ interface SendVerificationCodeRequest {
 ```json
 {
   "document_type_code": "CC",
-  "document_number": "1234567890"
+  "document_number": "1234567890",
+  "company_id": 1
 }
 ```
 
@@ -847,6 +856,8 @@ El sistema busca al paciente por tipo y número de documento. Si existe, envía 
 ```
 
 > Ambos canales reciben el **mismo código**. Si el paciente solo tiene registrado uno de los dos medios, ese será el único canal utilizado.
+> 
+> El correo electrónico se envía con una plantilla HTML personalizada que muestra el **logotipo, nombre y colores corporativos** de la empresa asociada al paciente. Si se envía `company_id`, se usa esa empresa para la plantilla; de lo contrario, se usa la empresa del paciente si tiene una, o la plantilla por defecto de Portal Pacientes.
 
 ```typescript
 interface SendCodeChannel {
@@ -888,6 +899,7 @@ interface VerifyCodeRequest {
   document_type_code: string;  // required, max 20, ej: "CC", "NIT"
   document_number: string;     // required, max 45, ej: "1234567890"
   code: string;                // required, código de 6 dígitos recibido
+  company_id?: number;         // opcional, filtra por empresa
 }
 ```
 
@@ -896,7 +908,8 @@ interface VerifyCodeRequest {
 {
   "document_type_code": "CC",
   "document_number": "1234567890",
-  "code": "482913"
+  "code": "482913",
+  "company_id": 1
 }
 ```
 
@@ -1355,6 +1368,7 @@ interface CreatePatientRequest {
   email: string;
   cellphone: string;
   cellphone_code?: string;
+  company_id?: number;
   document_expedition_date?: string;
   date_birth?: string;
   gender_code?: string;
@@ -1380,6 +1394,7 @@ interface UpdatePatientRequest {
   email: string;
   cellphone: string;
   cellphone_code?: string;
+  company_id?: number;
   document_expedition_date?: string;
   date_birth?: string;
   gender_code?: string;
@@ -1408,6 +1423,7 @@ interface DisableEnablePatientRequest {
 interface CheckPatientExistenceRequest {
   document_type_code: string;
   document_number: string;
+  company_id?: number;
 }
 
 interface CheckPatientExistenceResponse {
@@ -1424,6 +1440,7 @@ interface SyncPatientRequest {
 interface SendVerificationCodeRequest {
   document_type_code: string;
   document_number: string;
+  company_id?: number;
 }
 
 interface SendCodeChannel {
@@ -1441,6 +1458,7 @@ interface VerifyCodeRequest {
   document_type_code: string;
   document_number: string;
   code: string;
+  company_id?: number;
 }
 
 interface VerifyCodeResponse {

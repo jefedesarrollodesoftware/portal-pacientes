@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { APP_RUNTIME_CONFIG, AppRuntimeConfig } from '../../../app.config';
@@ -48,11 +48,17 @@ export class PatientService {
   }
 
   create(patient: CreatePatientRequest): Observable<ApiResponse<CreatePatientResponse>> {
-    return this.http.post<ApiResponse<CreatePatientResponse>>(this.baseUrl, patient);
+    const body = { ...patient, company_id: this.config.companyId };
+    return this.http.post<ApiResponse<CreatePatientResponse>>(this.baseUrl, body);
   }
 
-  getByDocument(docType: string, docNumber: string): Observable<ApiResponse<ShowPatientResponse>> {
-    return this.http.get<ApiResponse<ShowPatientResponse>>(`${this.baseUrl}/${docType}/${docNumber}`);
+  getByDocument(docType: string, docNumber: string, companyId?: number): Observable<ApiResponse<ShowPatientResponse>> {
+    let params = new HttpParams();
+    const id = companyId ?? this.config.companyId;
+    if (id) {
+      params = params.set('company_id', id.toString());
+    }
+    return this.http.get<ApiResponse<ShowPatientResponse>>(`${this.baseUrl}/${docType}/${docNumber}`, { params });
   }
 
   update(patient: UpdatePatientRequest): Observable<ApiResponse<Patient>> {
@@ -72,14 +78,17 @@ export class PatientService {
   }
 
   checkExistence(data: CheckPatientExistenceRequest): Observable<ApiResponse<CheckPatientExistenceResponse>> {
-    return this.http.post<ApiResponse<CheckPatientExistenceResponse>>(`${this.baseUrl}/check-existence`, data);
+    const body = { ...data, company_id: this.config.companyId };
+    return this.http.post<ApiResponse<CheckPatientExistenceResponse>>(`${this.baseUrl}/check-existence`, body);
   }
 
   sendVerificationCode(data: SendVerificationCodeRequest): Observable<ApiResponse<SendVerificationCodeResponse>> {
-    return this.http.post<ApiResponse<SendVerificationCodeResponse>>(`${this.baseUrl}/send-code`, data);
+    const body = { ...data, company_id: this.config.companyId };
+    return this.http.post<ApiResponse<SendVerificationCodeResponse>>(`${this.baseUrl}/send-code`, body);
   }
 
   verifyCode(data: VerifyCodeRequest): Observable<ApiResponse<VerifyCodeResponse>> {
-    return this.http.post<ApiResponse<VerifyCodeResponse>>(`${this.baseUrl}/verify-code`, data);
+    const body = { ...data, company_id: this.config.companyId };
+    return this.http.post<ApiResponse<VerifyCodeResponse>>(`${this.baseUrl}/verify-code`, body);
   }
 }

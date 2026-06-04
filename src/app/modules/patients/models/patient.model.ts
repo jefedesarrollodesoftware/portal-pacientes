@@ -106,6 +106,7 @@ export interface CreatePatientRequest {
   email: string;
   cellphone: string;
   cellphone_code?: string;
+  company_id?: number;
   document_expedition_date?: string;
   date_birth?: string;
   gender_code?: string;
@@ -184,6 +185,7 @@ export interface ShowPatientResponse {
 export interface CheckPatientExistenceRequest {
   document_type_code: string;
   document_number: string;
+  company_id?: number;
 }
 
 export interface CheckPatientExistenceResponse {
@@ -194,6 +196,7 @@ export interface CheckPatientExistenceResponse {
 export interface SendVerificationCodeRequest {
   document_type_code: string;
   document_number: string;
+  company_id?: number;
 }
 
 export interface SendCodeChannel {
@@ -211,6 +214,7 @@ export interface VerifyCodeRequest {
   document_type_code: string;
   document_number: string;
   code: string;
+  company_id?: number;
 }
 
 export interface VerifyCodeResponse {
