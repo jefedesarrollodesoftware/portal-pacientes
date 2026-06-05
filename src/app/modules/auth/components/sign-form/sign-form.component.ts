@@ -34,11 +34,7 @@ export class SignFormComponent implements OnInit, OnDestroy {
 
   documentTypes: PatientAttribute[] = [];
   genders: PatientAttribute[] = [];
-  genderIdentities: PatientAttribute[] = [];
   civilStatuses: PatientAttribute[] = [];
-  scholarships: PatientAttribute[] = [];
-  politicalDivisions: PatientAttribute[] = [];
-  residenceZones: PatientAttribute[] = [];
 
   checking = false;
   submitting = false;
@@ -107,11 +103,7 @@ export class SignFormComponent implements OnInit, OnDestroy {
         document_expedition_date: new FormControl(''),
         date_birth: new FormControl(''),
         gender_code: new FormControl(''),
-        gender_identity_code: new FormControl(''),
         civil_status_code: new FormControl(''),
-        scholarship_code: new FormControl(''),
-        political_division_code: new FormControl(''),
-        residence_zone_code: new FormControl(''),
         address: new FormControl('', { validators: [Validators.maxLength(300)] }),
         password: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(6)] }),
         password_confirmation: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
@@ -171,28 +163,8 @@ export class SignFormComponent implements OnInit, OnDestroy {
       error: () => {},
     });
 
-    this.patientAttributesService.getByType('genero').subscribe({
-      next: (res) => { this.genderIdentities = res.data; },
-      error: () => {},
-    });
-
     this.patientAttributesService.getByType('estado-civil').subscribe({
       next: (res) => { this.civilStatuses = res.data; },
-      error: () => {},
-    });
-
-    this.patientAttributesService.getByType('nivel-escolar').subscribe({
-      next: (res) => { this.scholarships = res.data; },
-      error: () => {},
-    });
-
-    this.patientAttributesService.getByType('division-politica').subscribe({
-      next: (res) => { this.politicalDivisions = res.data; },
-      error: () => {},
-    });
-
-    this.patientAttributesService.getByType('zona-residencia').subscribe({
-      next: (res) => { this.residenceZones = res.data; },
       error: () => {},
     });
   }

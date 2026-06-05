@@ -212,52 +212,12 @@
           ></app-searchable-select>
         </div>
         <div class="col-12 col-md-6">
-          <label class="form-label">Género</label>
-          <app-searchable-select
-            [options]="genderIdentities"
-            formControlName="gender_identity_code"
-            placeholder="Seleccione..."
-            [invalid]="isInvalid('gender_identity_code')"
-          ></app-searchable-select>
-        </div>
-      </div>
-      <div class="row g-3 mb-3">
-        <div class="col-12 col-md-6">
           <label class="form-label">Estado Civil</label>
           <app-searchable-select
             [options]="civilStatuses"
             formControlName="civil_status_code"
             placeholder="Seleccione..."
             [invalid]="isInvalid('civil_status_code')"
-          ></app-searchable-select>
-        </div>
-        <div class="col-12 col-md-6">
-          <label class="form-label">Nivel Escolar</label>
-          <app-searchable-select
-            [options]="scholarships"
-            formControlName="scholarship_code"
-            placeholder="Seleccione..."
-            [invalid]="isInvalid('scholarship_code')"
-          ></app-searchable-select>
-        </div>
-      </div>
-      <div class="row g-3 mb-3">
-        <div class="col-12 col-md-6">
-          <label class="form-label">División Política</label>
-          <app-searchable-select
-            [options]="politicalDivisions"
-            formControlName="political_division_code"
-            placeholder="Seleccione..."
-            [invalid]="isInvalid('political_division_code')"
-          ></app-searchable-select>
-        </div>
-        <div class="col-12 col-md-6">
-          <label class="form-label">Zona de Residencia</label>
-          <app-searchable-select
-            [options]="residenceZones"
-            formControlName="residence_zone_code"
-            placeholder="Seleccione..."
-            [invalid]="isInvalid('residence_zone_code')"
           ></app-searchable-select>
         </div>
       </div>
