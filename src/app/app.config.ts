@@ -17,7 +17,8 @@ export interface AppRuntimeConfig {
 }
 
 const buildRuntimeConfig = (): AppRuntimeConfig => {
-  const baseURLApi = (environment as any).apiUrl ?? '';
+  const apiUrl = (environment as any).apiUrl ?? '';
+  const baseURLApi = environment.production ? apiUrl : '';
   const hostApi = baseURLApi;
   const portApi = '';
 

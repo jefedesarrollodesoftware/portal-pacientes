@@ -71,7 +71,6 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "proxyConfig": "proxy.conf.json",
             "allowedHosts": [
               "admin-portal-pacientes.local",
               "portal-pacientes.local"
