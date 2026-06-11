@@ -43,8 +43,6 @@ export class PatientRegisterComponent implements OnInit {
   genderIdentities: PatientAttribute[] = [];
   civilStatuses: PatientAttribute[] = [];
   scholarships: PatientAttribute[] = [];
-  politicalDivisions: PatientAttribute[] = [];
-  residenceZones: PatientAttribute[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -63,7 +61,7 @@ export class PatientRegisterComponent implements OnInit {
   private buildCheckForm(): void {
     this.registerForm = this.fb.group(
       {
-        document_type_code: ['', Validators.required],
+        document_type_id: [null, Validators.required],
         document_number: ['', [Validators.required, Validators.maxLength(45)]],
         first_name: ['', [Validators.required, Validators.maxLength(120)]],
         last_name: ['', [Validators.required, Validators.maxLength(120)]],
@@ -72,12 +70,10 @@ export class PatientRegisterComponent implements OnInit {
         email: ['', [Validators.required, Validators.email, Validators.maxLength(191)]],
         document_expedition_date: [''],
         date_birth: [''],
-        gender_code: [''],
-        gender_identity_code: [''],
-        civil_status_code: [''],
-        scholarship_code: [''],
-        political_division_code: [''],
-        residence_zone_code: [''],
+        gender_id: [null],
+        gender_identity_id: [null],
+        civil_status_id: [null],
+        scholarship_id: [null],
         address: ['', Validators.maxLength(300)],
         password: ['', [Validators.required, Validators.minLength(6)]],
         password_confirmation: ['', Validators.required],
@@ -127,25 +123,17 @@ export class PatientRegisterComponent implements OnInit {
       next: (res) => { this.scholarships = res.data; },
       error: () => {},
     });
-    this.patientAttributesService.getByType('division-politica').subscribe({
-      next: (res) => { this.politicalDivisions = res.data; },
-      error: () => {},
-    });
-    this.patientAttributesService.getByType('zona-residencia').subscribe({
-      next: (res) => { this.residenceZones = res.data; },
-      error: () => {},
-    });
   }
 
   checkExistence(): void {
-    if (this.registerForm.get('document_type_code')?.invalid || this.registerForm.get('document_number')?.invalid) {
-      this.registerForm.get('document_type_code')?.markAsTouched();
+    if (this.registerForm.get('document_type_id')?.invalid || this.registerForm.get('document_number')?.invalid) {
+      this.registerForm.get('document_type_id')?.markAsTouched();
       this.registerForm.get('document_number')?.markAsTouched();
       return;
     }
     this.checking = true;
     this.patientService.checkExistence({
-      document_type_code: this.registerForm.get('document_type_code')!.value,
+      document_type_id: this.registerForm.get('document_type_id')!.value,
       document_number: this.registerForm.get('document_number')!.value,
     }).subscribe({
       next: (res) => {

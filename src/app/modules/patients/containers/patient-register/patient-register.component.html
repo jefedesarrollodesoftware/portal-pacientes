@@ -11,13 +11,13 @@
           <div class="col-12 col-md-6">
             <mat-form-field appearance="outline" class="d-block">
               <mat-label>Tipo de Documento</mat-label>
-              <select matNativeControl formControlName="document_type_code">
+              <select matNativeControl formControlName="document_type_id">
                 <option value="" disabled>Seleccione...</option>
                 @for (doc of documentTypes; track doc) {
-                  <option [value]="doc.code">{{ doc.name }}</option>
+                  <option [value]="doc.id">{{ doc.name }}</option>
                 }
               </select>
-              @if (registerForm.get('document_type_code')?.hasError('required')) {
+              @if (registerForm.get('document_type_id')?.hasError('required')) {
                 <mat-error>El tipo de documento es obligatorio.</mat-error>
               }
             </mat-form-field>
@@ -35,7 +35,7 @@
             </mat-form-field>
           </div>
         </div>
-        <button class="btn btn-primary w-100 py-2" type="submit" [disabled]="registerForm.get('document_type_code')?.invalid || registerForm.get('document_number')?.invalid || checking">
+        <button class="btn btn-primary w-100 py-2" type="submit" [disabled]="registerForm.get('document_type_id')?.invalid || registerForm.get('document_number')?.invalid || checking">
           @if (checking) {
             <span class="spinner-border spinner-border-sm me-2" role="status"></span>
           }
@@ -54,13 +54,13 @@
           <div class="col-12 col-md-6">
             <mat-form-field appearance="outline" class="d-block">
               <mat-label>Tipo de Documento</mat-label>
-              <select matNativeControl formControlName="document_type_code">
+              <select matNativeControl formControlName="document_type_id">
                 <option value="" disabled>Seleccione...</option>
                 @for (doc of documentTypes; track doc) {
-                  <option [value]="doc.code">{{ doc.name }}</option>
+                  <option [value]="doc.id">{{ doc.name }}</option>
                 }
               </select>
-              @if (registerForm.get('document_type_code')?.hasError('required')) {
+              @if (registerForm.get('document_type_id')?.hasError('required')) {
                 <mat-error>El tipo de documento es obligatorio.</mat-error>
               }
             </mat-form-field>
@@ -160,10 +160,10 @@
           <div class="col-12 col-md-6">
             <mat-form-field appearance="outline" class="d-block">
               <mat-label>Género</mat-label>
-              <select matNativeControl formControlName="gender_code">
+              <select matNativeControl formControlName="gender_id">
                 <option value="">Seleccione...</option>
                 @for (g of genders; track g) {
-                  <option [value]="g.code">{{ g.name }}</option>
+                  <option [value]="g.id">{{ g.name }}</option>
                 }
               </select>
             </mat-form-field>
@@ -171,10 +171,10 @@
           <div class="col-12 col-md-6">
             <mat-form-field appearance="outline" class="d-block">
               <mat-label>Identidad de Género</mat-label>
-              <select matNativeControl formControlName="gender_identity_code">
+              <select matNativeControl formControlName="gender_identity_id">
                 <option value="">Seleccione...</option>
                 @for (gi of genderIdentities; track gi) {
-                  <option [value]="gi.code">{{ gi.name }}</option>
+                  <option [value]="gi.id">{{ gi.name }}</option>
                 }
               </select>
             </mat-form-field>
@@ -184,10 +184,10 @@
           <div class="col-12 col-md-6">
             <mat-form-field appearance="outline" class="d-block">
               <mat-label>Estado Civil</mat-label>
-              <select matNativeControl formControlName="civil_status_code">
+              <select matNativeControl formControlName="civil_status_id">
                 <option value="">Seleccione...</option>
                 @for (cs of civilStatuses; track cs) {
-                  <option [value]="cs.code">{{ cs.name }}</option>
+                  <option [value]="cs.id">{{ cs.name }}</option>
                 }
               </select>
             </mat-form-field>
@@ -195,39 +195,16 @@
           <div class="col-12 col-md-6">
             <mat-form-field appearance="outline" class="d-block">
               <mat-label>Nivel Escolar</mat-label>
-              <select matNativeControl formControlName="scholarship_code">
+              <select matNativeControl formControlName="scholarship_id">
                 <option value="">Seleccione...</option>
                 @for (s of scholarships; track s) {
-                  <option [value]="s.code">{{ s.name }}</option>
+                  <option [value]="s.id">{{ s.name }}</option>
                 }
               </select>
             </mat-form-field>
           </div>
         </div>
-        <div class="row g-3 mb-2">
-          <div class="col-12 col-md-6">
-            <mat-form-field appearance="outline" class="d-block">
-              <mat-label>División Política</mat-label>
-              <select matNativeControl formControlName="political_division_code">
-                <option value="">Seleccione...</option>
-                @for (pd of politicalDivisions; track pd) {
-                  <option [value]="pd.code">{{ pd.name }}</option>
-                }
-              </select>
-            </mat-form-field>
-          </div>
-          <div class="col-12 col-md-6">
-            <mat-form-field appearance="outline" class="d-block">
-              <mat-label>Zona de Residencia</mat-label>
-              <select matNativeControl formControlName="residence_zone_code">
-                <option value="">Seleccione...</option>
-                @for (rz of residenceZones; track rz) {
-                  <option [value]="rz.code">{{ rz.name }}</option>
-                }
-              </select>
-            </mat-form-field>
-          </div>
-        </div>
+
         <div class="row g-3 mb-3">
           <div class="col-12">
             <mat-form-field appearance="outline" class="d-block">

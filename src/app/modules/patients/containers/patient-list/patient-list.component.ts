@@ -21,6 +21,7 @@ export class PatientListComponent {
   loading = false;
   patient: Patient | null = null;
   documentTypes: PatientAttribute[] = [];
+  lastDocTypeCode = '';
 
   constructor(
     private fb: FormBuilder,
@@ -62,6 +63,7 @@ export class PatientListComponent {
     this.patient = null;
 
     const { document_type_code, document_number } = this.searchForm.value;
+    this.lastDocTypeCode = document_type_code;
 
     this.patientService.getByDocument(document_type_code, document_number).subscribe({
       next: (res) => {
@@ -80,10 +82,10 @@ export class PatientListComponent {
   }
 
   viewDetail(): void {
-    if (this.patient) {
+    if (this.patient && this.lastDocTypeCode) {
       this.router.navigate([
         routes.PATIENTS_DETAIL,
-        this.patient.document_type_code,
+        this.lastDocTypeCode,
         this.patient.document_number,
       ]);
     }

@@ -14,6 +14,7 @@ import { Patient } from '../../models';
 export class PatientDetailComponent implements OnInit {
   patient: Patient | null = null;
   loading = false;
+  docType = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -22,10 +23,10 @@ export class PatientDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const docType = this.route.snapshot.paramMap.get('docType');
+    this.docType = this.route.snapshot.paramMap.get('docType') ?? '';
     const docNumber = this.route.snapshot.paramMap.get('docNumber');
-    if (docType && docNumber) {
-      this.loadPatient(docType, docNumber);
+    if (this.docType && docNumber) {
+      this.loadPatient(this.docType, docNumber);
     }
   }
 

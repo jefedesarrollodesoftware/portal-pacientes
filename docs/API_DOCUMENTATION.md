@@ -23,7 +23,7 @@ Accept: application/json
 Content-Type: application/json   (solo en POST)
 ```
 
-#### Peticiones públicas (sin sesión: auth/token, patients/register, patient-attributes, patients/check-existence, patients/send-code, patients/verify-code)
+#### Peticiones públicas (sin sesión: auth/token, patients/register, patient-attributes, patients/check-existence)
 
 ```
 X-API-Key: {api_key}
@@ -57,7 +57,7 @@ interface ApiResponse<T = any> {
 |---|---|
 | **Método** | `POST` |
 | **URL** | `/api/v1/auth/token` |
-| **Autenticación** | No |
+| **Autenticación** | API Key (`X-API-Key`) |
 | **Throttle** | `patient-auth` |
 
 #### Cuerpo de la petición
@@ -235,7 +235,7 @@ Este es el primer paso del registro. El sistema:
 
 ```typescript
 interface RegisterPatientRequest {
-  document_type_code: string;        // required, max 20, ej: "CC", "NIT"
+  document_type_id: number;          // required, debe existir en attributes_patients
   document_number: string;           // required, max 45, ej: "1234567890"
   first_name: string;                // required, max 120
   last_name: string;                 // required, max 120
@@ -246,16 +246,11 @@ interface RegisterPatientRequest {
   cellphone_code?: string;           // opcional, max 10, ej: "57"
   document_expedition_date?: string; // opcional, formato fecha ISO (Y-m-d)
   date_birth?: string;               // opcional, formato fecha ISO (Y-m-d)
-  gender_code?: string;              // opcional, max 20
-  gender_identity_code?: string;     // opcional, max 20
-  civil_status_code?: string;        // opcional, max 20
-  scholarship_code?: string;         // opcional, max 20
-  political_division_code?: string;  // opcional, max 20
-  residence_zone_code?: string;      // opcional, max 20
+  gender_id?: number;                // opcional, debe existir en attributes_patients
+  gender_identity_id?: number;       // opcional, debe existir en attributes_patients
+  civil_status_id?: number;          // opcional, debe existir en attributes_patients
+  scholarship_id?: number;           // opcional, debe existir en attributes_patients
   address?: string;                  // opcional, max 300
-  city_code?: string;                // opcional, max 20
-  state_code?: string;               // opcional, max 20
-  country_code?: string;             // opcional, max 20
   company_id?: number;               // opcional, debe existir en companies
 }
 ```
@@ -266,7 +261,7 @@ interface RegisterPatientRequest {
 
 ```json
 {
-  "document_type_code": "CC",
+  "document_type_id": 12,
   "document_number": "1234567890",
   "first_name": "Juan",
   "last_name": "Pérez",
@@ -276,7 +271,7 @@ interface RegisterPatientRequest {
   "password": "secreta123",
   "password_confirmation": "secreta123",
   "date_birth": "1990-01-15",
-  "gender_code": "M"
+  "gender_id": 21
 }
 ```
 
@@ -398,8 +393,8 @@ interface ConfirmRegistrationResponse {
 
 ```typescript
 interface CreatePatientRequest {
-  document_type_code: string;       // required, max 20
-  document_number: string;          // required, max 45, unique compuesto con document_type_code
+  document_type_id: number;         // required, debe existir en attributes_patients
+  document_number: string;          // required, max 45, unique compuesto con document_type_id
   first_name: string;               // required, max 120
   last_name: string;                // required, max 120
   email: string;                    // required, email, max 191, unique
@@ -408,18 +403,13 @@ interface CreatePatientRequest {
   company_id?: number;              // opcional, ID de empresa a la que pertenece el paciente
   document_expedition_date?: string; // opcional, formato fecha ISO (Y-m-d)
   date_birth?: string;              // opcional, formato fecha ISO (Y-m-d)
-  gender_code?: string;             // opcional, max 20
-  gender_identity_code?: string;    // opcional, max 20
-  civil_status_code?: string;       // opcional, max 20
-  scholarship_code?: string;        // opcional, max 20
-  political_division_code?: string; // opcional, max 20
-  residence_zone_code?: string;     // opcional, max 20
+  gender_id?: number;               // opcional, debe existir en attributes_patients
+  gender_identity_id?: number;      // opcional, debe existir en attributes_patients
+  civil_status_id?: number;         // opcional, debe existir en attributes_patients
+  scholarship_id?: number;          // opcional, debe existir en attributes_patients
   address?: string;                 // opcional, max 300
-  city_code?: string;               // opcional, max 20
-  state_code?: string;              // opcional, max 20
-  country_code?: string;            // opcional, max 20
-  password?: string;                // opcional, min 8, requiere password_confirmation
-  password_confirmation?: string;   // requerido si password está presente
+  password?: string;                // opcional, min 8, requiere confirmación si se envía
+  password_confirmation?: string;   // opcional, debe coincidir con password
 }
 ```
 
@@ -427,7 +417,7 @@ interface CreatePatientRequest {
 
 ```json
 {
-  "document_type_code": "CC",
+  "document_type_id": 12,
   "document_number": "987654321",
   "first_name": "Juan",
   "last_name": "Pérez",
@@ -436,12 +426,9 @@ interface CreatePatientRequest {
   "cellphone_code": "57",
   "company_id": 1,
   "date_birth": "1990-01-15",
-  "gender_code": "M",
-  "civil_status_code": "S",
+  "gender_id": 21,
+  "civil_status_id": 1,
   "address": "Calle 123 #45-67",
-  "city_code": "05001",
-  "state_code": "05",
-  "country_code": "CO",
   "password": "MiClaveSegura8",
   "password_confirmation": "MiClaveSegura8"
 }
@@ -542,7 +529,7 @@ interface ShowPatientResponse {
 ```typescript
 interface UpdatePatientRequest {
   id: number;                        // required, must exist in patients table
-  document_type_code: string;        // required, max 20
+  document_type_id: number;          // required, debe existir en attributes_patients
   document_number: string;           // required, max 45, unique compuesto
   first_name: string;                // required, max 120
   last_name: string;                 // required, max 120
@@ -551,16 +538,11 @@ interface UpdatePatientRequest {
   cellphone_code?: string;           // opcional, max 10
   document_expedition_date?: string; // opcional, fecha
   date_birth?: string;               // opcional, fecha
-  gender_code?: string;              // opcional, max 20
-  gender_identity_code?: string;     // opcional, max 20
-  civil_status_code?: string;        // opcional, max 20
-  scholarship_code?: string;         // opcional, max 20
-  political_division_code?: string;  // opcional, max 20
-  residence_zone_code?: string;      // opcional, max 20
+  gender_id?: number;                // opcional, debe existir en attributes_patients
+  gender_identity_id?: number;       // opcional, debe existir en attributes_patients
+  civil_status_id?: number;          // opcional, debe existir en attributes_patients
+  scholarship_id?: number;           // opcional, debe existir en attributes_patients
   address?: string;                  // opcional, max 300
-  city_code?: string;                // opcional, max 20
-  state_code?: string;               // opcional, max 20
-  country_code?: string;             // opcional, max 20
 }
 ```
 
@@ -674,7 +656,7 @@ Este endpoint permite al frontend Angular verificar si un paciente ya existe en 
 
 ```typescript
 interface CheckPatientExistenceRequest {
-  document_type_code: string;  // required, max 20, ej: "CC", "NIT"
+  document_type_id: number;    // required, debe existir en attributes_patients
   document_number: string;     // required, max 45, ej: "1234567890"
   company_id?: number;         // opcional, filtra por empresa
 }
@@ -683,7 +665,7 @@ interface CheckPatientExistenceRequest {
 **Ejemplo:**
 ```json
 {
-  "document_type_code": "CC",
+  "document_type_id": 12,
   "document_number": "1234567890",
   "company_id": 1
 }
@@ -703,7 +685,7 @@ interface CheckPatientExistenceRequest {
       "last_name": "Pérez",
       "email": "paciente@mail.com",
       "cellphone": "3001234567",
-      "document_type_code": "CC",
+      "document_type_id": 12,
       "document_number": "1234567890"
     }
   }
@@ -733,7 +715,7 @@ interface CheckPatientExistenceResponse {
 
 | Código | Condición |
 |---|---|
-| `422` | Validación fallida (document_type_code o document_number faltantes) |
+| `422` | Validación fallida (document_type_id o document_number faltantes) |
 
 ---
 
@@ -751,7 +733,7 @@ interface CheckPatientExistenceResponse {
 ```typescript
 interface SyncPatientRequest {
   keyWS: string;              // required, max 120 — clave del web service
-  codeTypeDocPatient: string; // required, max 20 — código tipo documento
+  document_type_id: number;   // required, debe existir en attributes_patients
   documentPatient: string;    // required, max 45 — número de documento
 }
 ```
@@ -761,7 +743,7 @@ interface SyncPatientRequest {
 ```json
 {
   "keyWS": "ABC123KEY",
-  "codeTypeDocPatient": "CC",
+  "document_type_id": 12,
   "documentPatient": "1234567890"
 }
 ```
@@ -799,146 +781,17 @@ interface SyncPatientResponse {
 
 ---
 
-### 3.10 Enviar código de verificación
+### 3.10 Enviar código de verificación (REMOVIDO)
 
-Este endpoint permite enviar un código de verificación de 6 dígitos al paciente, tanto por correo electrónico como por SMS, usando el tipo y número de documento como identificación.
+Este endpoint ya no está expuesto como ruta pública en la API. La funcionalidad de envío y verificación de códigos permanece implementada en la capa de servicios (`app/Services/PatientService.php`) y está integrada dentro del flujo de autoregistro (`/patients/register` y `/patients/confirm-registration`).
 
-| Propiedad | Valor |
-|---|---|
-| **Método** | `POST` |
-| **URL** | `/api/v1/patients/send-code` |
-| **Autenticación** | API Key (`X-API-Key`) |
-| **Throttle** | `patients` |
-
-#### Cuerpo de la petición
-
-```typescript
-interface SendVerificationCodeRequest {
-  document_type_code: string;  // required, max 20, ej: "CC", "NIT"
-  document_number: string;     // required, max 45, ej: "1234567890"
-  company_id?: number;         // opcional, ID de empresa para personalizar la plantilla del correo (logo, colores, nombre)
-}
-```
-
-**Ejemplo:**
-```json
-{
-  "document_type_code": "CC",
-  "document_number": "1234567890",
-  "company_id": 1
-}
-```
-
-#### Respuesta exitosa — `200 OK`
-
-El sistema busca al paciente por tipo y número de documento. Si existe, envía el mismo código de 6 dígitos al correo electrónico y al número de celular registrados (salta los canales que el paciente no tenga configurados).
-
-```json
-{
-  "status": true,
-  "message": "Código de verificación enviado correctamente.",
-  "data": {
-    "patient_id": 1,
-    "channels": [
-      {
-        "channel": "email",
-        "recipient": "paciente@mail.com",
-        "expires_at": "2026-06-02T10:00:00.000000Z"
-      },
-      {
-        "channel": "cellphone",
-        "recipient": "3001234567",
-        "expires_at": "2026-06-02T10:00:00.000000Z"
-      }
-    ]
-  }
-}
-```
-
-> Ambos canales reciben el **mismo código**. Si el paciente solo tiene registrado uno de los dos medios, ese será el único canal utilizado.
-> 
-> El correo electrónico se envía con una plantilla HTML personalizada que muestra el **logotipo, nombre y colores corporativos** de la empresa asociada al paciente. Si se envía `company_id`, se usa esa empresa para la plantilla; de lo contrario, se usa la empresa del paciente si tiene una, o la plantilla por defecto de Portal Pacientes.
-
-```typescript
-interface SendCodeChannel {
-  channel: string;     // "email" | "cellphone"
-  recipient: string;   // email o número de teléfono
-  expires_at: string;  // ISO 8601, expira en 10 minutos
-}
-
-interface SendVerificationCodeResponse {
-  patient_id: number;
-  channels: SendCodeChannel[];
-}
-```
-
-#### Respuesta de error
-
-| Código | Condición |
-|---|---|
-| `422` | Validación fallida (document_type_code o document_number faltantes) |
-| `404` | No se encontró un paciente con el tipo y número de documento proporcionados |
+Si necesita reenviar o verificar códigos desde el frontend, utilice el flujo de autoregistro descrito en las secciones 3.1 y 3.2. Si requiere un endpoint HTTP separado para reenviar/verificar códigos, solicite que lo agreguemos explícitamente y lo exponemos con validaciones y throttle adecuados.
 
 ---
 
-### 3.11 Verificar código de verificación
+### 3.11 Verificar código de verificación (REMOVIDO)
 
-Este endpoint verifica el código enviado al paciente, usando tipo y número de documento como identificación.
-
-| Propiedad | Valor |
-|---|---|
-| **Método** | `POST` |
-| **URL** | `/api/v1/patients/verify-code` |
-| **Autenticación** | API Key (`X-API-Key`) |
-| **Throttle** | `patients` |
-
-#### Cuerpo de la petición
-
-```typescript
-interface VerifyCodeRequest {
-  document_type_code: string;  // required, max 20, ej: "CC", "NIT"
-  document_number: string;     // required, max 45, ej: "1234567890"
-  code: string;                // required, código de 6 dígitos recibido
-  company_id?: number;         // opcional, filtra por empresa
-}
-```
-
-**Ejemplo:**
-```json
-{
-  "document_type_code": "CC",
-  "document_number": "1234567890",
-  "code": "482913",
-  "company_id": 1
-}
-```
-
-#### Respuesta exitosa — `200 OK`
-
-```json
-{
-  "status": true,
-  "message": "Código verificado correctamente.",
-  "data": {
-    "verified": true,
-    "patient": { /* objeto Patient */ }
-  }
-}
-```
-
-```typescript
-interface VerifyCodeResponse {
-  verified: boolean;
-  patient: Patient;
-}
-```
-
-#### Respuesta de error
-
-| Código | Condición |
-|---|---|
-| `404` | No se encontró un paciente con el tipo y número de documento proporcionados |
-| `422` | Código inválido o expirado |
+Este endpoint ya no está expuesto como ruta pública en la API. La verificación de códigos forma parte del flujo de autoregistro (`/patients/register` y `/patients/confirm-registration`) y se realiza por la lógica interna del servicio. Para comprobar códigos desde el frontend, use la secuencia completa de registro autoregistro.
 
 ---
 
@@ -948,32 +801,175 @@ interface VerifyCodeResponse {
 interface Patient {
   id: number;
   company_id: number | null;
-  document_type_code: string;
+  document_type_id: number | null;
   document_number: string;
   document_expedition_date: string | null;  // formato "Y-m-d"
   first_name: string;
   last_name: string;
   date_birth: string | null;                // formato "Y-m-d"
-  gender_code: string | null;
-  gender_identity_code: string | null;
-  civil_status_code: string | null;
-  scholarship_code: string | null;
-  political_division_code: string | null;
-  residence_zone_code: string | null;
+  gender_id: number | null;
+  gender_identity_id: number | null;
+  civil_status_id: number | null;
+  scholarship_id: number | null;
   email: string;
   cellphone_code: string | null;
   cellphone: string;
   address: string | null;
-  city_code: string | null;
-  state_code: string | null;
-  country_code: string | null;
-  source: string;                           // "manual" | "gomedisys" | "self-registration"
+  source: string;
   external_reference: string | null;
   active: boolean;
   last_login: string | null;                // formato ISO 8601
-  created_at: string;
-  updated_at: string;
+  created_at: string;                       // formato ISO 8601
+  updated_at: string;                       // formato ISO 8601
 }
+
+interface AccountState {
+  active: boolean;
+  password_set: boolean;
+}
+
+interface RegisterPatientRequest {
+  document_type_id: number;
+  document_number: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  cellphone: string;
+  password: string;
+  password_confirmation: string;
+  cellphone_code?: string;
+  document_expedition_date?: string;
+  date_birth?: string;
+  gender_id?: number;
+  gender_identity_id?: number;
+  civil_status_id?: number;
+  scholarship_id?: number;
+  address?: string;
+  company_id?: number;
+}
+
+interface ConfirmRegistrationRequest {
+  session_token: string;
+  email_code: string;
+  cellphone_code: string;
+}
+
+interface InitiateRegistrationResponse {
+  session_token: string;
+  expires_at: string;
+  channels: {
+    email: boolean;
+    cellphone: boolean;
+  };
+}
+
+interface ConfirmRegistrationResponse {
+  patient: Patient;
+  account_state: {
+    active: boolean;
+    password_set: boolean;
+  };
+  source: string;
+}
+
+interface CreatePatientRequest {
+  document_type_id: number;
+  document_number: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  cellphone: string;
+  cellphone_code?: string;
+  company_id?: number;
+  document_expedition_date?: string;
+  date_birth?: string;
+  gender_id?: number;
+  gender_identity_id?: number;
+  civil_status_id?: number;
+  scholarship_id?: number;
+  address?: string;
+  password?: string;
+  password_confirmation?: string;
+}
+
+interface UpdatePatientRequest {
+  id: number;
+  document_type_id: number;
+  document_number: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  cellphone: string;
+  cellphone_code?: string;
+  document_expedition_date?: string;
+  date_birth?: string;
+  gender_id?: number;
+  gender_identity_id?: number;
+  civil_status_id?: number;
+  scholarship_id?: number;
+  address?: string;
+}
+
+interface UpdatePasswordRequest {
+  id_password: number;
+  new_password: string;
+  new_password_confirmation: string;
+}
+
+interface DisableEnablePatientRequest {
+  id: number;
+  active: boolean;
+}
+
+interface CheckPatientExistenceRequest {
+  document_type_id: number;
+  document_number: string;
+  company_id?: number;
+}
+
+interface CheckPatientExistenceResponse {
+  exists: boolean;
+  patient: Patient | null;
+}
+
+interface SyncPatientRequest {
+  keyWS: string;
+  document_type_id: number;
+  documentPatient: string;
+}
+
+// ===================================================
+// Atributos de paciente (catálogos)
+// ===================================================
+interface PatientAttribute {
+  id: number;
+  code: string;
+  name: string;
+  short: string | null;
+  value: string | null;
+  description: string | null;
+  order: number | null;
+  icon: string | null;
+}
+
+// ===================================================
+// Empresa
+// ===================================================
+interface CompanyResponse {
+  id: number;
+  name: string;
+  slug: string;
+  icon: string | null;
+  icon_url: string | null;
+  logo: string | null;
+  logo_url: string | null;
+  primary_color: string | null;
+  secondary_color: string | null;
+  active: boolean;
+}
+
+// Respuesta de GET /patient-attributes (todos agrupados)
+type PatientAttributesGrouped = Record<string, PatientAttribute[]>;
 ```
 
 ---
@@ -1044,6 +1040,7 @@ interface CompanyResponse {
 | **Método** | `GET` |
 | **URL** | `/api/v1/patient-attributes` |
 | **Autenticación** | API Key (`X-API-Key`) |
+| **Parámetros query** | `company_id` (opcional) — necesario si no hay sesión autenticada |
 
 #### Respuesta exitosa — `200 OK`
 
@@ -1116,6 +1113,7 @@ type PatientAttributesResponse = Record<string, PatientAttribute[]>;
 | **Método** | `GET` |
 | **URL** | `/api/v1/patient-attributes/{type}` |
 | **Autenticación** | API Key (`X-API-Key`) |
+| **Parámetros query** | `company_id` (opcional) — necesario si no hay sesión autenticada |
 
 `{type}` es el slug del tipo de atributo (ej: `tipo-documento`, `sexo`, `genero`, `estado-civil`, `nivel-escolar`, `ocupacion`, `division-politica`, `zona-residencia`, `sede`, `asegurador`, `tipo-ingreso`, `causa-ingreso`, `via-ingreso`, `consultorio`, `linea-pago`, `diagnostico`).
 
@@ -1157,7 +1155,7 @@ type PatientAttributesResponse = Record<string, PatientAttribute[]>;
 | Código | Condición |
 |---|---|
 | `401` | API key inválida o no proporcionada (falta `X-API-Key`) |
-| `400` | Usuario no asociado a empresa o `company_id` no proporcionado |
+| `400` | Usuario no asociado a una empresa o `company_id` no proporcionado |
 | `404` | Tipo de atributo no encontrado (slug inválido o sin atributos) |
 | `500` | Error interno |
 
@@ -1233,276 +1231,7 @@ El campo `data` contiene un objeto donde cada clave es el nombre del campo y el 
 
 ---
 
-## 8. Interfaces TypeScript completas
-
-```typescript
-// ===================================================
-// Envoltorio de respuesta
-// ===================================================
-interface ApiResponse<T = any> {
-  status: boolean;
-  message: string;
-  data: T;
-}
-
-// ===================================================
-// Autenticación
-// ===================================================
-interface LoginRequest {
-  tipo_documento: string;
-  numero_documento: string;
-  contraseña: string;
-  device_name?: string;
-  abilities?: string[];
-}
-
-interface LoginResponse {
-  token: string;
-  token_type: string;
-  expires_at: string | null;
-}
-
-interface User {
-  id: number;
-  person_id: number | null;
-  email: string;
-  email_verified_at: string | null;
-  last_login: string | null;
-  inactivated_at: string | null;
-  token: string | null;
-  profile_photo: string | null;
-  theme: string | null;
-  active: number;
-  created_at: string;
-  updated_at: string;
-}
-
-// ===================================================
-// Paciente
-// ===================================================
-interface Patient {
-  id: number;
-  company_id: number | null;
-  document_type_code: string;
-  document_number: string;
-  document_expedition_date: string | null;
-  first_name: string;
-  last_name: string;
-  date_birth: string | null;
-  gender_code: string | null;
-  civil_status_code: string | null;
-  email: string;
-  cellphone_code: string | null;
-  cellphone: string;
-  address: string | null;
-  city_code: string | null;
-  state_code: string | null;
-  country_code: string | null;
-  source: string;
-  external_reference: string | null;
-  active: boolean;
-  last_login: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
-interface AccountState {
-  active: boolean;
-  password_set: boolean;
-}
-
-interface RegisterPatientRequest {
-  document_type_code: string;
-  document_number: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  cellphone: string;
-  password: string;
-  password_confirmation: string;
-  cellphone_code?: string;
-  document_expedition_date?: string;
-  date_birth?: string;
-  gender_code?: string;
-  gender_identity_code?: string;
-  civil_status_code?: string;
-  scholarship_code?: string;
-  political_division_code?: string;
-  residence_zone_code?: string;
-  address?: string;
-  city_code?: string;
-  state_code?: string;
-  country_code?: string;
-  company_id?: number;
-}
-
-interface ConfirmRegistrationRequest {
-  session_token: string;
-  email_code: string;
-  cellphone_code: string;
-}
-
-interface InitiateRegistrationResponse {
-  session_token: string;
-  expires_at: string;
-  channels: {
-    email: boolean;
-    cellphone: boolean;
-  };
-}
-
-interface ConfirmRegistrationResponse {
-  patient: Patient;
-  account_state: {
-    active: boolean;
-    password_set: boolean;
-  };
-  source: string;
-}
-
-interface CreatePatientRequest {
-  document_type_code: string;
-  document_number: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  cellphone: string;
-  cellphone_code?: string;
-  company_id?: number;
-  document_expedition_date?: string;
-  date_birth?: string;
-  gender_code?: string;
-  gender_identity_code?: string;
-  civil_status_code?: string;
-  scholarship_code?: string;
-  political_division_code?: string;
-  residence_zone_code?: string;
-  address?: string;
-  city_code?: string;
-  state_code?: string;
-  country_code?: string;
-  password?: string;
-  password_confirmation?: string;
-}
-
-interface UpdatePatientRequest {
-  id: number;
-  document_type_code: string;
-  document_number: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  cellphone: string;
-  cellphone_code?: string;
-  company_id?: number;
-  document_expedition_date?: string;
-  date_birth?: string;
-  gender_code?: string;
-  gender_identity_code?: string;
-  civil_status_code?: string;
-  scholarship_code?: string;
-  political_division_code?: string;
-  residence_zone_code?: string;
-  address?: string;
-  city_code?: string;
-  state_code?: string;
-  country_code?: string;
-}
-
-interface UpdatePasswordRequest {
-  id_password: number;
-  new_password: string;
-  new_password_confirmation: string;
-}
-
-interface DisableEnablePatientRequest {
-  id: number;
-  active: boolean;
-}
-
-interface CheckPatientExistenceRequest {
-  document_type_code: string;
-  document_number: string;
-  company_id?: number;
-}
-
-interface CheckPatientExistenceResponse {
-  exists: boolean;
-  patient: Patient | null;
-}
-
-interface SyncPatientRequest {
-  keyWS: string;
-  codeTypeDocPatient: string;
-  documentPatient: string;
-}
-
-interface SendVerificationCodeRequest {
-  document_type_code: string;
-  document_number: string;
-  company_id?: number;
-}
-
-interface SendCodeChannel {
-  channel: string;
-  recipient: string;
-  expires_at: string;
-}
-
-interface SendVerificationCodeResponse {
-  patient_id: number;
-  channels: SendCodeChannel[];
-}
-
-interface VerifyCodeRequest {
-  document_type_code: string;
-  document_number: string;
-  code: string;
-  company_id?: number;
-}
-
-interface VerifyCodeResponse {
-  verified: boolean;
-  patient: Patient;
-}
-
-// ===================================================
-// Atributos de paciente (catálogos)
-// ===================================================
-interface PatientAttribute {
-  id: number;
-  code: string;
-  name: string;
-  short: string | null;
-  value: string | null;
-  description: string | null;
-  order: number | null;
-  icon: string | null;
-}
-
-// ===================================================
-// Empresa
-// ===================================================
-interface CompanyResponse {
-  id: number;
-  name: string;
-  slug: string;
-  icon: string | null;
-  icon_url: string | null;
-  logo: string | null;
-  logo_url: string | null;
-  primary_color: string | null;
-  secondary_color: string | null;
-  active: boolean;
-}
-
-// Respuesta de GET /patient-attributes (todos agrupados)
-type PatientAttributesGrouped = Record<string, PatientAttribute[]>;
-```
-
----
-
-## 9. Tabla resumen de endpoints
+## 8. Tabla resumen de endpoints
 
 | # | Método | URL | Autenticación | Throttle | Descripción |
 |---|---|---|---|---|---|
@@ -1518,19 +1247,19 @@ type PatientAttributesGrouped = Record<string, PatientAttribute[]>;
 | 10 | `POST` | `/api/v1/patients/disable-enable` | Bearer Token | `patients` | Habilitar/deshabilitar |
 | 11 | `POST` | `/api/v1/patients/sync` | Bearer Token | `patients` | Sincronizar con Gomedisys |
 | 12 | `POST` | `/api/v1/patients/check-existence` | API Key | `patients` | Verificar existencia por documento/email/teléfono |
-| 13 | `POST` | `/api/v1/patients/send-code` | API Key | `patients` | Enviar código de verificación a ambos canales |
-| 14 | `POST` | `/api/v1/patients/verify-code` | API Key | `patients` | Verificar código con tipo y número de documento |
+| 13 | (REMOVED) | `/api/v1/patients/send-code` | API Key | `patients` | Endpoint removido; usar flujo de autoregistro |
+| 14 | (REMOVED) | `/api/v1/patients/verify-code` | API Key | `patients` | Endpoint removido; usar flujo de autoregistro |
 | 15 | `GET` | `/api/v1/companies/{company}` | API Key | — | Datos de empresa (logo, colores, icono) |
 | 16 | `GET` | `/api/v1/patient-attributes` | API Key | — | Catálogos agrupados |
 | 17 | `GET` | `/api/v1/patient-attributes/{type}` | API Key | — | Catálogos por tipo |
 
 ---
 
-## 10. Flujo de autenticación recomendado (Angular)
+## 9. Flujo de autenticación recomendado (Angular)
 
-### 10.1 API Key para endpoints públicos
+### 9.1 API Key para endpoints públicos
 
-Los endpoints sin autenticación de sesión (`/auth/token`, `/patients/register`, `/patient-attributes`) requieren la cabecera `X-API-Key`. Recomendamos configurarla en el `environment` de Angular:
+Los endpoints sin autenticación de sesión (`/auth/token`, `/patients/register`, `/patients/check-existence`, `/patient-attributes`, `/companies/{company}`) requieren la cabecera `X-API-Key`. Recomendamos configurarla en el `environment` de Angular:
 
 ```typescript
 // environments/environment.ts
@@ -1572,7 +1301,7 @@ export class ApiInterceptor implements HttpInterceptor {
 }
 ```
 
-### 10.2 Flujo de inicio de sesión
+### 9.2 Flujo de inicio de sesión
 
 1. El usuario ingresa tipo de documento + número de documento + contraseña en un formulario de login.
 2. Se llama a `POST /api/v1/auth/token` (con `X-API-Key`).
@@ -1583,9 +1312,9 @@ export class ApiInterceptor implements HttpInterceptor {
 
 ---
 
-## 11. Consideraciones para formularios reactivos en Angular
+## 10. Consideraciones para formularios reactivos en Angular
 
-### 11.1 Carga de catálogos en selects/dropdowns
+### 10.1 Carga de catálogos en selects/dropdowns
 
 Para poblar selects con valores de catálogo (tipo de documento, sexo, etc.), los catálogos requieren un `company_id` (empresa). Si el usuario no ha iniciado sesión, debes enviar el `company_id` como query parameter:
 
@@ -1620,7 +1349,7 @@ this.patientService.getPatientAttributes().subscribe({
 
 > **Nota:** Cuando se usa con `Authorization: Bearer` (usuario autenticado), el `company_id` se resuelve automáticamente desde la empresa del usuario. No es necesario enviar `company_id` en ese caso.
 
-### 11.2 Validaciones frontend
+### 10.2 Validaciones frontend
 
 Mapear las validaciones del backend:
 
@@ -1631,7 +1360,7 @@ Mapear las validaciones del backend:
 | `tipo_documento` | `Validators.required` (login) |
 | `numero_documento` | `Validators.required` (login) |
 | `contraseña` | `Validators.required` (login) |
-| `document_type_code` | `Validators.required` |
+| `document_type_id` | `Validators.required` |
 | `document_number` | `Validators.required` |
 | `first_name` | `Validators.required`, `Validators.maxLength(120)` |
 | `last_name` | `Validators.required`, `Validators.maxLength(120)` |
@@ -1640,20 +1369,15 @@ Mapear las validaciones del backend:
 | `cellphone_code` | `Validators.maxLength(10)` |
 | `document_expedition_date` | Opcional, formato fecha |
 | `date_birth` | Opcional, formato fecha |
-| `gender_code` | Opcional |
-| `gender_identity_code` | Opcional |
-| `civil_status_code` | Opcional |
-| `scholarship_code` | Opcional |
-| `political_division_code` | Opcional |
-| `residence_zone_code` | Opcional |
+| `gender_id` | Opcional |
+| `gender_identity_id` | Opcional |
+| `civil_status_id` | Opcional |
+| `scholarship_id` | Opcional |
 | `address` | `Validators.maxLength(300)` |
-| `city_code` | Opcional |
-| `state_code` | Opcional |
-| `country_code` | Opcional |
 | `password` | `Validators.minLength(6)` (registro) o `Validators.minLength(8)` (creación manual) |
 | `password_confirmation` | Debe coincidir con `password` (custom validator) |
 
-### 11.3 Manejo de errores del backend
+### 10.3 Manejo de errores del backend
 
 ```typescript
 // Servicio genérico
@@ -1684,7 +1408,7 @@ handleError(error: HttpErrorResponse): Observable<never> {
 
 ---
 
-## 12. Glosario de slugs de catálogos
+## 11. Glosario de slugs de catálogos
 
 Estos son los slugs disponibles para el endpoint `GET /api/v1/patient-attributes/{type}`:
 

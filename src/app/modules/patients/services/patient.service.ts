@@ -16,15 +16,11 @@ import {
   InitiateRegistrationResponse,
   Patient,
   RegisterPatientRequest,
-  SendVerificationCodeRequest,
-  SendVerificationCodeResponse,
   ShowPatientResponse,
   SyncPatientRequest,
   SyncPatientResponse,
   UpdatePasswordRequest,
   UpdatePatientRequest,
-  VerifyCodeRequest,
-  VerifyCodeResponse,
 } from '../models';
 
 @Injectable({
@@ -82,13 +78,4 @@ export class PatientService {
     return this.http.post<ApiResponse<CheckPatientExistenceResponse>>(`${this.baseUrl}/check-existence`, body);
   }
 
-  sendVerificationCode(data: SendVerificationCodeRequest): Observable<ApiResponse<SendVerificationCodeResponse>> {
-    const body = { ...data, company_id: this.config.companyId };
-    return this.http.post<ApiResponse<SendVerificationCodeResponse>>(`${this.baseUrl}/send-code`, body);
-  }
-
-  verifyCode(data: VerifyCodeRequest): Observable<ApiResponse<VerifyCodeResponse>> {
-    const body = { ...data, company_id: this.config.companyId };
-    return this.http.post<ApiResponse<VerifyCodeResponse>>(`${this.baseUrl}/verify-code`, body);
-  }
 }

@@ -93,7 +93,7 @@ export class SignFormComponent implements OnInit, OnDestroy {
   private buildForm(): void {
     this.form = new FormGroup(
       {
-        document_type_code: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+        document_type_id: new FormControl(null, { validators: [Validators.required] }),
         document_number: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(45)] }),
         first_name: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(120)] }),
         last_name: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(120)] }),
@@ -102,8 +102,8 @@ export class SignFormComponent implements OnInit, OnDestroy {
         email: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.email, Validators.maxLength(191)] }),
         document_expedition_date: new FormControl(''),
         date_birth: new FormControl(''),
-        gender_code: new FormControl(''),
-        civil_status_code: new FormControl(''),
+        gender_id: new FormControl(null),
+        civil_status_id: new FormControl(null),
         address: new FormControl('', { validators: [Validators.maxLength(300)] }),
         password: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(6)] }),
         password_confirmation: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
@@ -170,8 +170,8 @@ export class SignFormComponent implements OnInit, OnDestroy {
   }
 
   checkExistence(): void {
-    if (this.form.get('document_type_code')?.invalid || this.form.get('document_number')?.invalid) {
-      this.form.get('document_type_code')?.markAsTouched();
+    if (this.form.get('document_type_id')?.invalid || this.form.get('document_number')?.invalid) {
+      this.form.get('document_type_id')?.markAsTouched();
       this.form.get('document_number')?.markAsTouched();
       return;
     }
@@ -180,7 +180,7 @@ export class SignFormComponent implements OnInit, OnDestroy {
     this.errorMessage = '';
 
     this.patientService.checkExistence({
-      document_type_code: this.form.get('document_type_code')!.value,
+      document_type_id: this.form.get('document_type_id')!.value,
       document_number: this.form.get('document_number')!.value,
     }).subscribe({
       next: (res) => {

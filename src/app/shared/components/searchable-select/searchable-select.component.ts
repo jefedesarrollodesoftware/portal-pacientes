@@ -17,7 +17,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
   ],
 })
 export class SearchableSelectComponent implements ControlValueAccessor, OnDestroy {
-  @Input() options: { code: string; name: string }[] = [];
+  @Input() options: { id: number; name: string }[] = [];
   @Input() placeholder = 'Seleccione...';
   @Input() invalid = false;
   @Input() disabled = false;
@@ -27,12 +27,12 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnDestro
   @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
 
   searchText = '';
-  filteredOptions: { code: string; name: string }[] = [];
+  filteredOptions: { id: number; name: string }[] = [];
   displayValue = '';
-  value = '';
+  value: number | null = null;
   isOpen = false;
 
-  private onChange: (value: string) => void = () => {};
+  private onChange: (value: number | null) => void = () => {};
   private onTouched: () => void = () => {};
   private closeHandler: ((event: MouseEvent) => void) | null = null;
   private keyHandler: ((event: KeyboardEvent) => void) | null = null;
@@ -41,12 +41,12 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnDestro
     this.removeListeners();
   }
 
-  writeValue(value: string): void {
-    this.value = value ?? '';
+  writeValue(value: number | null): void {
+    this.value = value ?? null;
     this.updateDisplay();
   }
 
-  registerOnChange(fn: (value: string) => void): void {
+  registerOnChange(fn: (value: number | null) => void): void {
     this.onChange = fn;
   }
 
@@ -64,8 +64,8 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnDestro
     this.filterOptions();
   }
 
-  selectOption(option: { code: string; name: string }): void {
-    this.value = option.code;
+  selectOption(option: { id: number; name: string }): void {
+    this.value = option.id;
     this.displayValue = option.name;
     this.searchText = '';
     this.filteredOptions = [...this.options];
@@ -74,8 +74,8 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnDestro
     this.close();
   }
 
-  isSelected(option: { code: string; name: string }): boolean {
-    return this.value === option.code;
+  isSelected(option: { id: number; name: string }): boolean {
+    return this.value === option.id;
   }
 
   onTriggerClick(): void {
@@ -146,7 +146,7 @@ export class SearchableSelectComponent implements ControlValueAccessor, OnDestro
   }
 
   private updateDisplay(): void {
-    const selected = this.options.find(o => o.code === this.value);
+    const selected = this.options.find(o => o.id === this.value);
     this.displayValue = selected ? selected.name : '';
   }
 }

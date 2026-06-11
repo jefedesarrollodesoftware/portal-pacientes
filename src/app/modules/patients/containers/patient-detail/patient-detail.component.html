@@ -8,19 +8,17 @@
           </div>
           <div>
             <h4 class="mb-1">{{ patient.first_name }} {{ patient.last_name }}</h4>
-            <p class="text-muted small mb-0">{{ patient.document_type_code }} {{ patient.document_number }}</p>
+            <p class="text-muted small mb-0">{{ docType }} {{ patient.document_number }}</p>
           </div>
         </div>
         <span class="badge" [class.bg-success]="patient.active" [class.bg-secondary]="!patient.active">{{ patient.active ? 'Activo' : 'Inactivo' }}</span>
       </div>
       <div class="row g-3">
-        <div class="col-sm-6"><small class="text-muted d-block">Tipo Documento</small><span>{{ patient.document_type_code }}</span></div>
+        <div class="col-sm-6"><small class="text-muted d-block">Tipo Documento</small><span>{{ docType }}</span></div>
         <div class="col-sm-6"><small class="text-muted d-block">Número Documento</small><span>{{ patient.document_number }}</span></div>
         <div class="col-sm-6"><small class="text-muted d-block">Email</small><span>{{ patient.email }}</span></div>
         <div class="col-sm-6"><small class="text-muted d-block">Celular</small><span>{{ patient.cellphone_code ? '+' + patient.cellphone_code + ' ' : '' }}{{ patient.cellphone }}</span></div>
         <div class="col-sm-6"><small class="text-muted d-block">Fecha Nacimiento</small><span>{{ patient.date_birth || '-' }}</span></div>
-        <div class="col-sm-6"><small class="text-muted d-block">Género</small><span>{{ patient.gender_code || '-' }}</span></div>
-        <div class="col-sm-6"><small class="text-muted d-block">Estado Civil</small><span>{{ patient.civil_status_code || '-' }}</span></div>
         <div class="col-sm-6"><small class="text-muted d-block">Dirección</small><span>{{ patient.address || '-' }}</span></div>
         <div class="col-12"><small class="text-muted d-block">Fuente</small><span>{{ patient.source }}</span></div>
       </div>

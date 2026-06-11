@@ -25,11 +25,11 @@
           <label class="form-label">Tipo de Documento</label>
           <app-searchable-select
             [options]="documentTypes"
-            formControlName="document_type_code"
+            formControlName="document_type_id"
             placeholder="Seleccione..."
-            [invalid]="isInvalid('document_type_code')"
+            [invalid]="isInvalid('document_type_id')"
           ></app-searchable-select>
-          @if (hasError('document_type_code', 'required')) {
+          @if (hasError('document_type_id', 'required')) {
             <div class="invalid-feedback">Selecciona un tipo de documento</div>
           }
         </div>
@@ -57,7 +57,7 @@
           <span>{{ errorMessage }}</span>
         </div>
       }
-      <button class="btn btn-primary w-100" type="submit" [disabled]="form.get('document_type_code')?.invalid || form.get('document_number')?.invalid || checking">
+      <button class="btn btn-primary w-100" type="submit" [disabled]="form.get('document_type_id')?.invalid || form.get('document_number')?.invalid || checking">
         @if (checking) {
           <span class="spinner-border spinner-border-sm me-2" role="status"></span>
         }
@@ -74,11 +74,11 @@
           <label class="form-label">Tipo de Documento</label>
           <app-searchable-select
             [options]="documentTypes"
-            formControlName="document_type_code"
+            formControlName="document_type_id"
             placeholder="Seleccione..."
-            [invalid]="isInvalid('document_type_code')"
+            [invalid]="isInvalid('document_type_id')"
           ></app-searchable-select>
-          @if (hasError('document_type_code', 'required')) {
+          @if (hasError('document_type_id', 'required')) {
             <div class="invalid-feedback">Selecciona un tipo de documento</div>
           }
         </div>
@@ -206,18 +206,18 @@
           <label class="form-label">Sexo</label>
           <app-searchable-select
             [options]="genders"
-            formControlName="gender_code"
+            formControlName="gender_id"
             placeholder="Seleccione..."
-            [invalid]="isInvalid('gender_code')"
+            [invalid]="isInvalid('gender_id')"
           ></app-searchable-select>
         </div>
         <div class="col-12 col-md-6">
           <label class="form-label">Estado Civil</label>
           <app-searchable-select
             [options]="civilStatuses"
-            formControlName="civil_status_code"
+            formControlName="civil_status_id"
             placeholder="Seleccione..."
-            [invalid]="isInvalid('civil_status_code')"
+            [invalid]="isInvalid('civil_status_id')"
           ></app-searchable-select>
         </div>
       </div>

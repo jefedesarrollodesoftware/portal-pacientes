@@ -7,25 +7,20 @@ export interface ApiResponse<T = any> {
 export interface Patient {
   id: number;
   company_id: number | null;
-  document_type_code: string;
+  document_type_id: number | null;
   document_number: string;
   document_expedition_date: string | null;
   first_name: string;
   last_name: string;
   date_birth: string | null;
-  gender_code: string | null;
-  gender_identity_code: string | null;
-  civil_status_code: string | null;
-  scholarship_code: string | null;
-  political_division_code: string | null;
-  residence_zone_code: string | null;
+  gender_id: number | null;
+  gender_identity_id: number | null;
+  civil_status_id: number | null;
+  scholarship_id: number | null;
   email: string;
   cellphone_code: string | null;
   cellphone: string;
   address: string | null;
-  city_code: string | null;
-  state_code: string | null;
-  country_code: string | null;
   source: string;
   external_reference: string | null;
   active: boolean;
@@ -53,7 +48,7 @@ export interface PatientAttribute {
 export type PatientAttributesGrouped = Record<string, PatientAttribute[]>;
 
 export interface RegisterPatientRequest {
-  document_type_code: string;
+  document_type_id: number;
   document_number: string;
   first_name: string;
   last_name: string;
@@ -64,16 +59,11 @@ export interface RegisterPatientRequest {
   cellphone_code?: string;
   document_expedition_date?: string;
   date_birth?: string;
-  gender_code?: string;
-  gender_identity_code?: string;
-  civil_status_code?: string;
-  scholarship_code?: string;
-  political_division_code?: string;
-  residence_zone_code?: string;
+  gender_id?: number;
+  gender_identity_id?: number;
+  civil_status_id?: number;
+  scholarship_id?: number;
   address?: string;
-  city_code?: string;
-  state_code?: string;
-  country_code?: string;
   company_id?: number;
 }
 
@@ -99,7 +89,7 @@ export interface ConfirmRegistrationResponse {
 }
 
 export interface CreatePatientRequest {
-  document_type_code: string;
+  document_type_id: number;
   document_number: string;
   first_name: string;
   last_name: string;
@@ -109,16 +99,11 @@ export interface CreatePatientRequest {
   company_id?: number;
   document_expedition_date?: string;
   date_birth?: string;
-  gender_code?: string;
-  gender_identity_code?: string;
-  civil_status_code?: string;
-  scholarship_code?: string;
-  political_division_code?: string;
-  residence_zone_code?: string;
+  gender_id?: number;
+  gender_identity_id?: number;
+  civil_status_id?: number;
+  scholarship_id?: number;
   address?: string;
-  city_code?: string;
-  state_code?: string;
-  country_code?: string;
   password?: string;
   password_confirmation?: string;
 }
@@ -132,7 +117,7 @@ export interface CreatePatientResponse {
 
 export interface UpdatePatientRequest {
   id: number;
-  document_type_code: string;
+  document_type_id: number;
   document_number: string;
   first_name: string;
   last_name: string;
@@ -141,16 +126,11 @@ export interface UpdatePatientRequest {
   cellphone_code?: string;
   document_expedition_date?: string;
   date_birth?: string;
-  gender_code?: string;
-  gender_identity_code?: string;
-  civil_status_code?: string;
-  scholarship_code?: string;
-  political_division_code?: string;
-  residence_zone_code?: string;
+  gender_id?: number;
+  gender_identity_id?: number;
+  civil_status_id?: number;
+  scholarship_id?: number;
   address?: string;
-  city_code?: string;
-  state_code?: string;
-  country_code?: string;
 }
 
 export interface UpdatePasswordRequest {
@@ -166,7 +146,7 @@ export interface DisableEnablePatientRequest {
 
 export interface SyncPatientRequest {
   keyWS: string;
-  codeTypeDocPatient: string;
+  document_type_id: number;
   documentPatient: string;
 }
 
@@ -183,7 +163,7 @@ export interface ShowPatientResponse {
 }
 
 export interface CheckPatientExistenceRequest {
-  document_type_code: string;
+  document_type_id: number;
   document_number: string;
   company_id?: number;
 }
@@ -191,35 +171,6 @@ export interface CheckPatientExistenceRequest {
 export interface CheckPatientExistenceResponse {
   exists: boolean;
   patient: Patient | null;
-}
-
-export interface SendVerificationCodeRequest {
-  document_type_code: string;
-  document_number: string;
-  company_id?: number;
-}
-
-export interface SendCodeChannel {
-  channel: string;
-  recipient: string;
-  expires_at: string;
-}
-
-export interface SendVerificationCodeResponse {
-  patient_id: number;
-  channels: SendCodeChannel[];
-}
-
-export interface VerifyCodeRequest {
-  document_type_code: string;
-  document_number: string;
-  code: string;
-  company_id?: number;
-}
-
-export interface VerifyCodeResponse {
-  verified: boolean;
-  patient: Patient;
 }
 
 export interface CompanyResponse {
