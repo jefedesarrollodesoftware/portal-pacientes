@@ -15,8 +15,6 @@ export class SidebarComponent {
 
   sidebarItems = [
     { name: 'Dashboard', route: routes.DASHBOARD, icon: 'house' },
-    { name: 'Registrar Paciente', route: routes.PATIENTS_REGISTER, icon: 'user-plus' },
-    { name: 'Consultar Paciente', route: routes.PATIENTS_LIST, icon: 'magnifying-glass' },
     { name: 'Mis Citas', route: routes.PATIENTS_APPOINTMENTS, icon: 'calendar-days' },
   ];
 }

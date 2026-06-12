@@ -5,13 +5,17 @@
   [class.greenTheme]="isGreenTheme"
   [class.darkMode]="isDarkMode"
 >
-  <app-header (toggleSidebar)="toggleMobileSidebar()"></app-header>
+  <app-header [company]="company" (toggleSidebar)="toggleMobileSidebar()"></app-header>
 
   <div class="d-flex layout-body">
     <aside class="layout-sidebar d-none d-lg-flex flex-column bg-dark text-white shadow-sm">
       <div class="sidebar-header d-flex align-items-center p-3 border-bottom border-secondary border-opacity-25">
-        <i class="fas fa-hospital text-info me-2"></i>
-        <span class="fw-bold">Portal Pacientes</span>
+        @if (company?.logo_url) {
+          <img [src]="company!.logo_url" alt="Logo" class="me-2" style="height:28px;width:auto;object-fit:contain" />
+        } @else {
+          <i class="fas fa-hospital text-info me-2"></i>
+        }
+        <span class="fw-bold">{{ company?.name || 'Portal Pacientes' }}</span>
       </div>
       <div class="flex-grow-1 overflow-auto py-2">
         <app-sidebar></app-sidebar>
@@ -34,8 +38,12 @@
   >
     <div class="offcanvas-header bg-dark text-white border-bottom border-secondary border-opacity-25">
       <h5 class="offcanvas-title d-flex align-items-center" id="mobileSidebarLabel">
-        <i class="fas fa-hospital text-info me-2"></i>
-        Portal Pacientes
+        @if (company?.logo_url) {
+          <img [src]="company!.logo_url" alt="Logo" class="me-2" style="height:24px;width:auto;object-fit:contain" />
+        } @else {
+          <i class="fas fa-hospital text-info me-2"></i>
+        }
+        {{ company?.name || 'Portal Pacientes' }}
       </h5>
       <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>

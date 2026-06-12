@@ -1,11 +1,15 @@
-<nav class="navbar navbar-expand navbar-dark bg-primary shadow-sm fixed-top px-3">
+<nav class="navbar navbar-expand navbar-dark shadow-sm fixed-top px-3" [style.background-color]="company?.primary_color || '#0d6efd'">
   <button class="btn btn-link text-white d-lg-none me-2 p-0 border-0" type="button" (click)="onToggleSidebar()">
     <i class="fas fa-bars"></i>
   </button>
 
   <a class="navbar-brand d-flex align-items-center" routerLink="/dashboard">
-    <i class="fas fa-hospital me-2"></i>
-    <span class="fw-bold d-none d-sm-inline">Portal Pacientes</span>
+    @if (companyLogo) {
+      <img [src]="companyLogo" alt="Logo" class="me-2" style="height:32px;width:auto;object-fit:contain" />
+    } @else {
+      <i class="fas fa-hospital me-2"></i>
+    }
+    <span class="fw-bold d-none d-sm-inline">{{ companyName }}</span>
   </a>
 
   <div class="ms-auto d-flex align-items-center">

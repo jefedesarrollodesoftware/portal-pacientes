@@ -16,10 +16,4 @@ export class UserComponent {
   public signOutEmit(): void {
     this.signOut.emit();
   }
-
-  avatar() {
-    return this.user && this.user.avatar && this.user.avatar.length
-      ? this.user.avatar[0].publicUrl
-      : './assets/profile.png';
-  }
 }

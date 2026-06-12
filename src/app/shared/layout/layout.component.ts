@@ -2,7 +2,9 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
+  Inject,
   OnDestroy,
+  OnInit,
   ViewChild,
 } from '@angular/core';
 import { MediaMatcher } from '@angular/cdk/layout';
@@ -10,6 +12,9 @@ import { SharedService } from '../services/shared.service';
 import { RouterModule } from '@angular/router';
 import { HeaderComponent } from '../header/containers/header/header.component';
 import { SidebarComponent } from '../sidebar/sidebar.component';
+import { CompanyService } from '../../modules/auth/services/company.service';
+import { APP_RUNTIME_CONFIG, AppRuntimeConfig } from '../../app.config';
+import { CompanyResponse } from '../../modules/patients/models';
 
 
 declare var bootstrap: any;
@@ -25,20 +30,56 @@ declare var bootstrap: any;
     SidebarComponent
 ],
 })
-export class LayoutComponent implements OnDestroy {
+export class LayoutComponent implements OnDestroy, OnInit {
   @ViewChild('offcanvasEl') offcanvasEl: ElementRef;
   public mobileQuery: MediaQueryList;
   private mobileQueryListener: () => void;
   private bsOffcanvas: any;
+  company: CompanyResponse | null = null;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private media: MediaMatcher,
     private service: SharedService,
+    private companyService: CompanyService,
+    @Inject(APP_RUNTIME_CONFIG) private config: AppRuntimeConfig,
   ) {
     this.mobileQuery = media.matchMedia('(max-width: 991.98px)');
     this.mobileQueryListener = () => changeDetectorRef.detectChanges();
     this.mobileQuery.addListener(this.mobileQueryListener);
+  }
+
+  ngOnInit(): void {
+    this.loadCompany();
+  }
+
+  private loadCompany(): void {
+    this.companyService.getCompany(this.config.companyId).subscribe({
+      next: (res) => {
+        this.company = res.data;
+        this.applyTheme(res.data);
+      },
+      error: () => {},
+    });
+  }
+
+  private applyTheme(company: CompanyResponse): void {
+    const root = document.documentElement;
+    if (company.primary_color) {
+      root.style.setProperty('--primary-color', company.primary_color);
+    }
+    if (company.secondary_color) {
+      root.style.setProperty('--secondary-color', company.secondary_color);
+    }
+    if (company.icon_url) {
+      let link = document.querySelector<HTMLLinkElement>('link[rel~="icon"]');
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'icon';
+        document.head.appendChild(link);
+      }
+      link.href = company.icon_url;
+    }
   }
 
   public ngOnDestroy(): void {
