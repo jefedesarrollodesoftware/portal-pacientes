@@ -7,7 +7,6 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { MediaMatcher } from '@angular/cdk/layout';
 import { SharedService } from '../services/shared.service';
 import { RouterModule } from '@angular/router';
 import { HeaderComponent } from '../header/containers/header/header.component';
@@ -32,19 +31,18 @@ declare var bootstrap: any;
 })
 export class LayoutComponent implements OnDestroy, OnInit {
   @ViewChild('offcanvasEl') offcanvasEl: ElementRef;
-  public mobileQuery: MediaQueryList;
+  private mobileQuery: MediaQueryList;
   private mobileQueryListener: () => void;
   private bsOffcanvas: any;
   company: CompanyResponse | null = null;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
-    private media: MediaMatcher,
     private service: SharedService,
     private companyService: CompanyService,
     @Inject(APP_RUNTIME_CONFIG) private config: AppRuntimeConfig,
   ) {
-    this.mobileQuery = media.matchMedia('(max-width: 991.98px)');
+    this.mobileQuery = window.matchMedia('(max-width: 991.98px)');
     this.mobileQueryListener = () => changeDetectorRef.detectChanges();
     this.mobileQuery.addListener(this.mobileQueryListener);
   }

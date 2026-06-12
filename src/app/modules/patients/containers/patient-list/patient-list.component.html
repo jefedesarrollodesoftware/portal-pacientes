@@ -7,27 +7,27 @@
       <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
         <div class="row g-3 mb-3">
           <div class="col-12 col-sm-5">
-            <mat-form-field appearance="outline" class="d-block">
-              <mat-label>Tipo de Documento</mat-label>
-              <select matNativeControl formControlName="document_type_code">
+            <div class="mb-3">
+              <label class="form-label" for="docType">Tipo de Documento</label>
+              <select class="form-select" id="docType" formControlName="document_type_code">
                 <option value="" disabled>Seleccione...</option>
                 @for (doc of documentTypes; track doc) {
                   <option [value]="doc.code">{{ doc.name }}</option>
                 }
               </select>
-              @if (searchForm.get('document_type_code')?.hasError('required')) {
-                <mat-error>Selecciona un tipo de documento.</mat-error>
+              @if (searchForm.get('document_type_code')?.hasError('required') && searchForm.get('document_type_code')?.touched) {
+                <div class="invalid-feedback d-block">Selecciona un tipo de documento.</div>
               }
-            </mat-form-field>
+            </div>
           </div>
           <div class="col-12 col-sm-5">
-            <mat-form-field appearance="outline" class="d-block">
-              <mat-label>Número de Documento</mat-label>
-              <input matInput formControlName="document_number" placeholder="1234567890" />
-              @if (searchForm.get('document_number')?.hasError('required')) {
-                <mat-error>Ingresa el número de documento.</mat-error>
+            <div class="mb-3">
+              <label class="form-label" for="docNumber">Número de Documento</label>
+              <input class="form-control" id="docNumber" formControlName="document_number" placeholder="1234567890" />
+              @if (searchForm.get('document_number')?.hasError('required') && searchForm.get('document_number')?.touched) {
+                <div class="invalid-feedback d-block">Ingresa el número de documento.</div>
               }
-            </mat-form-field>
+            </div>
           </div>
           <div class="col-12 col-sm-2 d-flex align-items-end pb-2">
             <button class="btn btn-primary w-100" type="submit" [disabled]="searchForm.invalid || loading">

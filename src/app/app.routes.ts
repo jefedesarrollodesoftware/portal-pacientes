@@ -35,7 +35,6 @@ export const APP_ROUTES: Routes = [
     children: [
       {
         path: 'dashboard',
-        pathMatch: 'full',
         canActivate: [authGuard],
         loadChildren: () =>
           import('./modules/patients/patients.module').then((m) => m.PatientsModule),

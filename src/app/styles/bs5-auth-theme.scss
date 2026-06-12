@@ -304,62 +304,6 @@
   color: #64748b;
 }
 
-/* Make Angular Material form fields visually match Bootstrap controls across the app */
-.card .mat-form-field,
-.auth-form .mat-form-field,
-.mat-form-field {
-  width: 100%;
-  display: block;
-}
-
-.mat-form-field .mat-form-field-infix {
-  border-radius: 1rem;
-  background: $white;
-  padding: 0.05rem 0.1rem;
-}
-
-.mat-form-field-appearance-outline .mat-form-field-outline {
-  display: none; /* hide default outline to simulate BS5 style */
-}
-
-.mat-form-field .mat-form-field-flex {
-  align-items: stretch;
-}
-
-.mat-form-field .mat-form-field-infix input.mat-input-element,
-.mat-form-field .mat-form-field-infix textarea.mat-input-element,
-.mat-form-field .mat-form-field-infix select.mat-native-control {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  border-radius: 1rem;
-  border: 1px solid #cfd8e5;
-  background: $white;
-  box-shadow: none;
-  height: auto;
-}
-
-.mat-form-field .mat-form-field-infix input.mat-input-element:focus,
-.mat-form-field .mat-form-field-infix select.mat-native-control:focus {
-  outline: none;
-  border-color: #0b63ce;
-  box-shadow: 0 0 0 0.2rem rgba(11,99,206,0.12);
-}
-
-/* smaller radius for compact areas */
-.card .mat-form-field .mat-form-field-infix input.mat-input-element,
-.card .mat-form-field .mat-form-field-infix select.mat-native-control {
-  border-radius: 0.9rem;
-}
-
-@media (max-width: 575.98px) {
-  .mat-form-field .mat-form-field-infix input.mat-input-element,
-  .mat-form-field .mat-form-field-infix select.mat-native-control,
-  .mat-form-field .mat-form-field-infix textarea.mat-input-element {
-    padding: 0.55rem 0.85rem;
-    border-radius: 0.6rem;
-  }
-}
-
 /* Force Bootstrap native input/select styles inside auth forms to avoid mixed styling */
 .auth-form .form-control,
 .auth-form .form-select,

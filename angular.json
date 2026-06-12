@@ -33,8 +33,7 @@
               "bootstrap/dist/css/bootstrap.min.css",
               "@fortawesome/fontawesome-free/css/all.min.css",
               "node_modules/ngx-toastr/toastr.css",
-              "src/styles.scss",
-              "src/custom-theme.scss"
+              "src/styles.scss"
             ],
             "scripts": [
               "@popperjs/core/dist/umd/popper.min.js",
