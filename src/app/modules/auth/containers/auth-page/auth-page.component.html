@@ -97,7 +97,7 @@
               <h2 class="auth-section-title">Crear cuenta</h2>
               <p class="auth-section-subtitle">Completa tus datos para registrarte en el portal.</p>
               <div class="mt-4">
-                <app-sign-form></app-sign-form>
+                <app-sign-form (registrationComplete)="onRegistrationComplete()"></app-sign-form>
               </div>
             </div>
           }

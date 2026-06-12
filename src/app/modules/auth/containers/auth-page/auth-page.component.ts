@@ -82,4 +82,8 @@ export class AuthPageComponent implements OnInit {
   public openTab(tab: 'login' | 'register'): void {
     this.activeTab = tab;
   }
+
+  public onRegistrationComplete(): void {
+    this.openTab('login');
+  }
 }

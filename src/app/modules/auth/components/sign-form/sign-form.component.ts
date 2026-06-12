@@ -1,8 +1,7 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, EventEmitter, OnInit, OnDestroy, Output } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 
 import { HttpErrorResponse } from '@angular/common/http';
-import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { Subscription, interval } from 'rxjs';
 
@@ -27,6 +26,8 @@ import { setBackendErrors } from '../../../patients/utils/form-error-handler';
 ],
 })
 export class SignFormComponent implements OnInit, OnDestroy {
+  @Output() registrationComplete = new EventEmitter<void>();
+
   currentStep = 1;
 
   form!: FormGroup;
@@ -49,7 +50,6 @@ export class SignFormComponent implements OnInit, OnDestroy {
     private patientAttributesService: PatientAttributesService,
     private patientService: PatientService,
     private toastr: ToastrService,
-    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -255,7 +255,7 @@ export class SignFormComponent implements OnInit, OnDestroy {
       next: (res) => {
         this.confirming = false;
         this.toastr.success(res.message || 'Paciente registrado correctamente.');
-        this.router.navigate(['/login']);
+        this.registrationComplete.emit();
       },
       error: (err: HttpErrorResponse) => {
         this.confirming = false;

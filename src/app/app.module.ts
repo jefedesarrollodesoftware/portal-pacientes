@@ -7,7 +7,6 @@ import { ToastrModule } from 'ngx-toastr';
 import { AppComponent } from './app.component';
 import { APP_ROUTES } from './app.routes';
 import { NotFoundComponent } from './shared/not-found/not-found.component';
-import { MAT_SELECT_CONFIG } from '@angular/material/select';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { httpInterceptor } from './shared/services/http-interceptor.service';
 
@@ -21,13 +20,6 @@ import { httpInterceptor } from './shared/services/http-interceptor.service';
     ToastrModule.forRoot(),
   ],
   providers: [
-    {
-      provide: MAT_SELECT_CONFIG,
-      useValue: {
-        hideSingleSelectionIndicator: true,
-        panelWidth: null,
-      },
-    },
     provideZoneChangeDetection(),
     provideRouter(APP_ROUTES),
     provideHttpClient(withInterceptors([httpInterceptor])),
