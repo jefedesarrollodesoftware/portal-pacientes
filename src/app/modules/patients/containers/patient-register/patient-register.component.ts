@@ -4,12 +4,6 @@ import { Router, RouterModule } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { HttpErrorResponse } from '@angular/common/http';
 
-
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatButtonModule } from '@angular/material/button';
-
 import { PatientService } from '../../services/patient.service';
 import { PatientAttributesService } from '../../services/patient-attributes.service';
 import { PatientAttribute, InitiateRegistrationResponse } from '../../models';
@@ -23,10 +17,6 @@ import { setBackendErrors } from '../../utils/form-error-handler';
   imports: [
     ReactiveFormsModule,
     RouterModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatButtonModule
 ],
 })
 export class PatientRegisterComponent implements OnInit {

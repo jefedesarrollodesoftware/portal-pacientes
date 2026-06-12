@@ -1,21 +1,52 @@
 export interface Appointment {
-  id: number;
-  patient_id: number;
-  patient_name?: string;
-  appointment_date: string;
-  appointment_time: string;
-  status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
-  type: string;
-  doctor?: string;
-  location?: string;
-  notes?: string;
-  created_at: string;
-  updated_at: string;
+  idAppointment: number;
+  codeTypeDocProfessional: string;
+  documentProfessional: string;
+  firstGNameProfessional: string;
+  secondGNameProfessional: string;
+  firstFNameProfessional: string;
+  secondFNameProfessional: string;
+  dateAppointment: string;
+  timeAppointment: string;
+  durationAppointment: number;
+  idExam: number;
+  nameExam: string;
+  codeExamType: string;
+  nameExamType: string;
+  codeOffice: string;
+  nameOffice: string;
+  codeState: string;
+  nameState: string;
+  idContract: number;
+  codeContract: string;
+  nameContract: string;
+  idPlan: number;
+  codePlan: string;
+  namePlan: string;
+  hasEHREvent: boolean;
+  products: string;
+  modality: string;
+  idRoom: number;
+  codeRoom: string;
+  videoLink: string | null;
+  identifier: number;
+}
+
+export interface AppointmentListResponse {
+  appointments: Appointment[];
 }
 
 export interface AppointmentListParams {
-  status?: string;
+  states?: string;
   from?: string;
   to?: string;
-  patient_id?: number;
+}
+
+export interface AppointmentState {
+  code: string;
+  name: string;
+}
+
+export interface AppointmentStatesResponse {
+  states: AppointmentState[];
 }

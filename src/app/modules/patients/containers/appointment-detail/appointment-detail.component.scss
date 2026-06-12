@@ -8,65 +8,70 @@
   padding: 48px 0;
 }
 
-.detail-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 24px;
-  margin-top: 16px;
-}
-
-.detail-item {
-  display: flex;
-  flex-direction: column;
-
-  &.full-width {
-    grid-column: 1 / -1;
-  }
-
-  .label {
-    font-size: 12px;
-    color: rgba(0, 0, 0, 0.54);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 4px;
-  }
-
-  .value {
-    font-size: 16px;
-    color: rgba(0, 0, 0, 0.87);
-  }
-}
-
 .status-badge {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: 16px;
-  font-size: 12px;
-  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  i {
+    font-size: 10px;
+  }
 }
 
-.status-pending {
+.status-requested {
   background: #fff3e0;
   color: #e65100;
-}
-
-.status-confirmed {
-  background: #e3f2fd;
-  color: #1565c0;
-}
-
-.status-completed {
-  background: #e8f5e9;
-  color: #2e7d32;
+  border: 1px solid #ffb74d;
 }
 
 .status-cancelled {
-  background: #fbe9e7;
+  background: #ffebee;
   color: #c62828;
+  border: 1px solid #ef9a9a;
 }
 
-mat-card-actions {
-  display: flex;
-  gap: 12px;
-  padding: 16px;
+.status-pending {
+  background: #e3f2fd;
+  color: #1565c0;
+  border: 1px solid #64b5f6;
+}
+
+.status-confirmed {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #81c784;
+}
+
+.status-completed {
+  background: #f3e5f5;
+  color: #7b1fa2;
+  border: 1px solid #ce93d8;
+}
+
+.modality-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  background: #eceff1;
+  color: #37474f;
+}
+
+.modality-presential {
+  background: #e1f5fe;
+  color: #0277bd;
+}
+
+.modality-virtual {
+  background: #f3e5f5;
+  color: #7b1fa2;
 }

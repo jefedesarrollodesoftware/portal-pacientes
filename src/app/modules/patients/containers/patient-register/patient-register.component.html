@@ -9,30 +9,41 @@
         <p class="text-muted small mb-3">Ingresa tu tipo y número de documento para verificar si puedes registrarte.</p>
         <div class="row g-3 mb-3">
           <div class="col-12 col-md-6">
-            <mat-form-field appearance="outline" class="d-block">
-              <mat-label>Tipo de Documento</mat-label>
-              <select matNativeControl formControlName="document_type_id">
+            <div class="mb-3">
+              <label for="docType" class="form-label">Tipo de Documento</label>
+              <select
+                id="docType"
+                class="form-select"
+                [class.is-invalid]="registerForm.get('document_type_id')?.invalid && registerForm.get('document_type_id')?.touched"
+                formControlName="document_type_id">
                 <option value="" disabled>Seleccione...</option>
                 @for (doc of documentTypes; track doc) {
                   <option [value]="doc.id">{{ doc.name }}</option>
                 }
               </select>
-              @if (registerForm.get('document_type_id')?.hasError('required')) {
-                <mat-error>El tipo de documento es obligatorio.</mat-error>
+              @if (registerForm.get('document_type_id')?.hasError('required') && registerForm.get('document_type_id')?.touched) {
+                <div class="invalid-feedback">El tipo de documento es obligatorio.</div>
               }
-            </mat-form-field>
+            </div>
           </div>
           <div class="col-12 col-md-6">
-            <mat-form-field appearance="outline" class="d-block">
-              <mat-label>Número de Documento</mat-label>
-              <input matInput formControlName="document_number" placeholder="1234567890" />
-              @if (registerForm.get('document_number')?.hasError('required')) {
-                <mat-error>El número de documento es obligatorio.</mat-error>
+            <div class="mb-3">
+              <label for="docNumber" class="form-label">Número de Documento</label>
+              <input
+                id="docNumber"
+                type="text"
+                class="form-control"
+                [class.is-invalid]="registerForm.get('document_number')?.invalid && registerForm.get('document_number')?.touched"
+                formControlName="document_number"
+                placeholder="1234567890"
+              />
+              @if (registerForm.get('document_number')?.hasError('required') && registerForm.get('document_number')?.touched) {
+                <div class="invalid-feedback">El número de documento es obligatorio.</div>
               }
               @if (registerForm.get('document_number')?.hasError('maxlength')) {
-                <mat-error>Máx. 45 caracteres.</mat-error>
+                <div class="invalid-feedback">Máx. 45 caracteres.</div>
               }
-            </mat-form-field>
+            </div>
           </div>
         </div>
         <button class="btn btn-primary w-100 py-2" type="submit" [disabled]="registerForm.get('document_type_id')?.invalid || registerForm.get('document_number')?.invalid || checking">
@@ -52,196 +63,278 @@
       <form [formGroup]="registerForm" (ngSubmit)="initiateRegistration()">
         <div class="row g-3 mb-2">
           <div class="col-12 col-md-6">
-            <mat-form-field appearance="outline" class="d-block">
-              <mat-label>Tipo de Documento</mat-label>
-              <select matNativeControl formControlName="document_type_id">
+            <div class="mb-3">
+              <label for="docType2" class="form-label">Tipo de Documento</label>
+              <select
+                id="docType2"
+                class="form-select"
+                [class.is-invalid]="registerForm.get('document_type_id')?.invalid && registerForm.get('document_type_id')?.touched"
+                formControlName="document_type_id">
                 <option value="" disabled>Seleccione...</option>
                 @for (doc of documentTypes; track doc) {
                   <option [value]="doc.id">{{ doc.name }}</option>
                 }
               </select>
-              @if (registerForm.get('document_type_id')?.hasError('required')) {
-                <mat-error>El tipo de documento es obligatorio.</mat-error>
+              @if (registerForm.get('document_type_id')?.hasError('required') && registerForm.get('document_type_id')?.touched) {
+                <div class="invalid-feedback">El tipo de documento es obligatorio.</div>
               }
-            </mat-form-field>
+            </div>
           </div>
           <div class="col-12 col-md-6">
-            <mat-form-field appearance="outline" class="d-block">
-              <mat-label>Número de Documento</mat-label>
-              <input matInput formControlName="document_number" placeholder="1234567890" />
-              @if (registerForm.get('document_number')?.hasError('required')) {
-                <mat-error>El número de documento es obligatorio.</mat-error>
+            <div class="mb-3">
+              <label for="docNumber2" class="form-label">Número de Documento</label>
+              <input
+                id="docNumber2"
+                type="text"
+                class="form-control"
+                [class.is-invalid]="registerForm.get('document_number')?.invalid && registerForm.get('document_number')?.touched"
+                formControlName="document_number"
+                placeholder="1234567890"
+              />
+              @if (registerForm.get('document_number')?.hasError('required') && registerForm.get('document_number')?.touched) {
+                <div class="invalid-feedback">El número de documento es obligatorio.</div>
               }
               @if (registerForm.get('document_number')?.hasError('maxlength')) {
-                <mat-error>Máx. 45 caracteres.</mat-error>
+                <div class="invalid-feedback">Máx. 45 caracteres.</div>
               }
-            </mat-form-field>
+            </div>
           </div>
         </div>
         <div class="row g-3 mb-2">
           <div class="col-12 col-md-6">
-            <mat-form-field appearance="outline" class="d-block">
-              <mat-label>Nombres</mat-label>
-              <input matInput formControlName="first_name" placeholder="Juan" />
-              @if (registerForm.get('first_name')?.hasError('required')) {
-                <mat-error>El nombre es obligatorio.</mat-error>
+            <div class="mb-3">
+              <label for="firstName" class="form-label">Nombres</label>
+              <input
+                id="firstName"
+                type="text"
+                class="form-control"
+                [class.is-invalid]="registerForm.get('first_name')?.invalid && registerForm.get('first_name')?.touched"
+                formControlName="first_name"
+                placeholder="Juan"
+              />
+              @if (registerForm.get('first_name')?.hasError('required') && registerForm.get('first_name')?.touched) {
+                <div class="invalid-feedback">El nombre es obligatorio.</div>
               }
               @if (registerForm.get('first_name')?.hasError('maxlength')) {
-                <mat-error>Máx. 120 caracteres.</mat-error>
+                <div class="invalid-feedback">Máx. 120 caracteres.</div>
               }
-            </mat-form-field>
+            </div>
           </div>
           <div class="col-12 col-md-6">
-            <mat-form-field appearance="outline" class="d-block">
-              <mat-label>Apellidos</mat-label>
-              <input matInput formControlName="last_name" placeholder="Pérez" />
-              @if (registerForm.get('last_name')?.hasError('required')) {
-                <mat-error>Los apellidos son obligatorios.</mat-error>
+            <div class="mb-3">
+              <label for="lastName" class="form-label">Apellidos</label>
+              <input
+                id="lastName"
+                type="text"
+                class="form-control"
+                [class.is-invalid]="registerForm.get('last_name')?.invalid && registerForm.get('last_name')?.touched"
+                formControlName="last_name"
+                placeholder="Pérez"
+              />
+              @if (registerForm.get('last_name')?.hasError('required') && registerForm.get('last_name')?.touched) {
+                <div class="invalid-feedback">Los apellidos son obligatorios.</div>
               }
               @if (registerForm.get('last_name')?.hasError('maxlength')) {
-                <mat-error>Máx. 120 caracteres.</mat-error>
+                <div class="invalid-feedback">Máx. 120 caracteres.</div>
               }
-            </mat-form-field>
+            </div>
           </div>
         </div>
         <div class="row g-3 mb-2">
           <div class="col-12 col-md-6">
-            <mat-form-field appearance="outline" class="d-block">
-              <mat-label>Celular</mat-label>
-              <input matInput formControlName="cellphone" placeholder="3001234567" />
-              <i matIconPrefix class="fas fa-phone"></i>
-              @if (registerForm.get('cellphone')?.hasError('required')) {
-                <mat-error>El celular es obligatorio.</mat-error>
+            <div class="mb-3">
+              <label for="cellphone" class="form-label">Celular</label>
+              <input
+                id="cellphone"
+                type="text"
+                class="form-control"
+                [class.is-invalid]="registerForm.get('cellphone')?.invalid && registerForm.get('cellphone')?.touched"
+                formControlName="cellphone"
+                placeholder="3001234567"
+              />
+              @if (registerForm.get('cellphone')?.hasError('required') && registerForm.get('cellphone')?.touched) {
+                <div class="invalid-feedback">El celular es obligatorio.</div>
               }
               @if (registerForm.get('cellphone')?.hasError('maxlength')) {
-                <mat-error>Máx. 45 caracteres.</mat-error>
+                <div class="invalid-feedback">Máx. 45 caracteres.</div>
               }
-            </mat-form-field>
+            </div>
           </div>
           <div class="col-12 col-md-6">
-            <mat-form-field appearance="outline" class="d-block">
-              <mat-label>Código de Celular</mat-label>
-              <input matInput formControlName="cellphone_code" placeholder="57" />
+            <div class="mb-3">
+              <label for="cellphoneCode" class="form-label">Código de Celular</label>
+              <input
+                id="cellphoneCode"
+                type="text"
+                class="form-control"
+                [class.is-invalid]="registerForm.get('cellphone_code')?.invalid && registerForm.get('cellphone_code')?.touched"
+                formControlName="cellphone_code"
+                placeholder="57"
+              />
               @if (registerForm.get('cellphone_code')?.hasError('maxlength')) {
-                <mat-error>Máx. 10 caracteres.</mat-error>
+                <div class="invalid-feedback">Máx. 10 caracteres.</div>
               }
-            </mat-form-field>
+            </div>
           </div>
         </div>
-        <mat-form-field appearance="outline" class="d-block mb-2">
-          <mat-label>Correo Electrónico</mat-label>
-          <input matInput formControlName="email" type="email" placeholder="paciente@mail.com" />
-          <i matIconPrefix class="fas fa-envelope"></i>
-          @if (registerForm.get('email')?.hasError('required')) {
-            <mat-error>El correo electrónico es obligatorio.</mat-error>
+        <div class="mb-3">
+          <label for="email" class="form-label">Correo Electrónico</label>
+          <input
+            id="email"
+            type="email"
+            class="form-control"
+            [class.is-invalid]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
+            formControlName="email"
+            placeholder="paciente@mail.com"
+          />
+          @if (registerForm.get('email')?.hasError('required') && registerForm.get('email')?.touched) {
+            <div class="invalid-feedback">El correo electrónico es obligatorio.</div>
           }
           @if (registerForm.get('email')?.hasError('email')) {
-            <mat-error>Ingresa un correo válido.</mat-error>
+            <div class="invalid-feedback">Ingresa un correo válido.</div>
           }
           @if (registerForm.get('email')?.hasError('maxlength')) {
-            <mat-error>Máx. 191 caracteres.</mat-error>
+            <div class="invalid-feedback">Máx. 191 caracteres.</div>
           }
-        </mat-form-field>
+        </div>
         <div class="row g-3 mb-2">
           <div class="col-12 col-md-6">
-            <mat-form-field appearance="outline" class="d-block">
-              <mat-label>Fecha de Expedición del Documento</mat-label>
-              <input matInput formControlName="document_expedition_date" type="date" />
-            </mat-form-field>
+            <div class="mb-3">
+              <label for="docExpDate" class="form-label">Fecha de Expedición del Documento</label>
+              <input
+                id="docExpDate"
+                type="date"
+                class="form-control"
+                formControlName="document_expedition_date"
+              />
+            </div>
           </div>
           <div class="col-12 col-md-6">
-            <mat-form-field appearance="outline" class="d-block">
-              <mat-label>Fecha de Nacimiento</mat-label>
-              <input matInput formControlName="date_birth" type="date" />
-            </mat-form-field>
+            <div class="mb-3">
+              <label for="dateBirth" class="form-label">Fecha de Nacimiento</label>
+              <input
+                id="dateBirth"
+                type="date"
+                class="form-control"
+                formControlName="date_birth"
+              />
+            </div>
           </div>
         </div>
         <div class="row g-3 mb-2">
           <div class="col-12 col-md-6">
-            <mat-form-field appearance="outline" class="d-block">
-              <mat-label>Género</mat-label>
-              <select matNativeControl formControlName="gender_id">
+            <div class="mb-3">
+              <label for="gender" class="form-label">Género</label>
+              <select
+                id="gender"
+                class="form-select"
+                formControlName="gender_id">
                 <option value="">Seleccione...</option>
                 @for (g of genders; track g) {
                   <option [value]="g.id">{{ g.name }}</option>
                 }
               </select>
-            </mat-form-field>
+            </div>
           </div>
           <div class="col-12 col-md-6">
-            <mat-form-field appearance="outline" class="d-block">
-              <mat-label>Identidad de Género</mat-label>
-              <select matNativeControl formControlName="gender_identity_id">
+            <div class="mb-3">
+              <label for="genderIdentity" class="form-label">Identidad de Género</label>
+              <select
+                id="genderIdentity"
+                class="form-select"
+                formControlName="gender_identity_id">
                 <option value="">Seleccione...</option>
                 @for (gi of genderIdentities; track gi) {
                   <option [value]="gi.id">{{ gi.name }}</option>
                 }
               </select>
-            </mat-form-field>
+            </div>
           </div>
         </div>
         <div class="row g-3 mb-2">
           <div class="col-12 col-md-6">
-            <mat-form-field appearance="outline" class="d-block">
-              <mat-label>Estado Civil</mat-label>
-              <select matNativeControl formControlName="civil_status_id">
+            <div class="mb-3">
+              <label for="civilStatus" class="form-label">Estado Civil</label>
+              <select
+                id="civilStatus"
+                class="form-select"
+                formControlName="civil_status_id">
                 <option value="">Seleccione...</option>
                 @for (cs of civilStatuses; track cs) {
                   <option [value]="cs.id">{{ cs.name }}</option>
                 }
               </select>
-            </mat-form-field>
+            </div>
           </div>
           <div class="col-12 col-md-6">
-            <mat-form-field appearance="outline" class="d-block">
-              <mat-label>Nivel Escolar</mat-label>
-              <select matNativeControl formControlName="scholarship_id">
+            <div class="mb-3">
+              <label for="scholarship" class="form-label">Nivel Escolar</label>
+              <select
+                id="scholarship"
+                class="form-select"
+                formControlName="scholarship_id">
                 <option value="">Seleccione...</option>
                 @for (s of scholarships; track s) {
                   <option [value]="s.id">{{ s.name }}</option>
                 }
               </select>
-            </mat-form-field>
+            </div>
           </div>
         </div>
-
         <div class="row g-3 mb-3">
           <div class="col-12">
-            <mat-form-field appearance="outline" class="d-block">
-              <mat-label>Dirección</mat-label>
-              <input matInput formControlName="address" placeholder="Calle 123 #45-67" />
+            <div class="mb-3">
+              <label for="address" class="form-label">Dirección</label>
+              <input
+                id="address"
+                type="text"
+                class="form-control"
+                [class.is-invalid]="registerForm.get('address')?.invalid && registerForm.get('address')?.touched"
+                formControlName="address"
+                placeholder="Calle 123 #45-67"
+              />
               @if (registerForm.get('address')?.hasError('maxlength')) {
-                <mat-error>Máx. 300 caracteres.</mat-error>
+                <div class="invalid-feedback">Máx. 300 caracteres.</div>
               }
-            </mat-form-field>
+            </div>
           </div>
         </div>
         <div class="row g-3 mb-3">
           <div class="col-12 col-md-6">
-            <mat-form-field appearance="outline" class="d-block">
-              <mat-label>Contraseña</mat-label>
-              <input matInput formControlName="password" type="password" />
-              <i matIconPrefix class="fas fa-lock"></i>
-              @if (registerForm.get('password')?.hasError('required')) {
-                <mat-error>La contraseña es obligatoria.</mat-error>
+            <div class="mb-3">
+              <label for="password" class="form-label">Contraseña</label>
+              <input
+                id="password"
+                type="password"
+                class="form-control"
+                [class.is-invalid]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched"
+                formControlName="password"
+              />
+              @if (registerForm.get('password')?.hasError('required') && registerForm.get('password')?.touched) {
+                <div class="invalid-feedback">La contraseña es obligatoria.</div>
               }
               @if (registerForm.get('password')?.hasError('minlength')) {
-                <mat-error>Mín. 6 caracteres.</mat-error>
+                <div class="invalid-feedback">Mín. 6 caracteres.</div>
               }
-            </mat-form-field>
+            </div>
           </div>
           <div class="col-12 col-md-6">
-            <mat-form-field appearance="outline" class="d-block">
-              <mat-label>Confirmar Contraseña</mat-label>
-              <input matInput formControlName="password_confirmation" type="password" />
-              <i matIconPrefix class="fas fa-lock"></i>
-              @if (registerForm.get('password_confirmation')?.hasError('required')) {
-                <mat-error>Confirma tu contraseña.</mat-error>
+            <div class="mb-3">
+              <label for="passwordConfirm" class="form-label">Confirmar Contraseña</label>
+              <input
+                id="passwordConfirm"
+                type="password"
+                class="form-control"
+                [class.is-invalid]="registerForm.get('password_confirmation')?.invalid && registerForm.get('password_confirmation')?.touched"
+                formControlName="password_confirmation"
+              />
+              @if (registerForm.get('password_confirmation')?.hasError('required') && registerForm.get('password_confirmation')?.touched) {
+                <div class="invalid-feedback">Confirma tu contraseña.</div>
               }
               @if (registerForm.get('password_confirmation')?.hasError('mismatch')) {
-                <mat-error>Las contraseñas no coinciden.</mat-error>
+                <div class="invalid-feedback">Las contraseñas no coinciden.</div>
               }
-            </mat-form-field>
+            </div>
           </div>
         </div>
         <div class="d-flex gap-2">
@@ -271,16 +364,22 @@
           </p>
         </div>
         <div class="mb-3">
-          <mat-form-field appearance="outline" class="d-block">
-            <mat-label>Código de Verificación</mat-label>
-            <input matInput formControlName="code" placeholder="000000" maxlength="6" />
-            @if (codeForm.get('code')?.hasError('required')) {
-              <mat-error>El código es obligatorio.</mat-error>
-            }
-            @if (codeForm.get('code')?.hasError('minlength') || codeForm.get('code')?.hasError('maxlength')) {
-              <mat-error>Debe tener 6 dígitos.</mat-error>
-            }
-          </mat-form-field>
+          <label for="verificationCode" class="form-label">Código de Verificación</label>
+          <input
+            id="verificationCode"
+            type="text"
+            class="form-control text-center"
+            [class.is-invalid]="codeForm.get('code')?.invalid && codeForm.get('code')?.touched"
+            formControlName="code"
+            placeholder="000000"
+            maxlength="6"
+          />
+          @if (codeForm.get('code')?.hasError('required') && codeForm.get('code')?.touched) {
+            <div class="invalid-feedback">El código es obligatorio.</div>
+          }
+          @if ((codeForm.get('code')?.hasError('minlength') || codeForm.get('code')?.hasError('maxlength')) && codeForm.get('code')?.touched) {
+            <div class="invalid-feedback">Debe tener 6 dígitos.</div>
+          }
         </div>
         <button class="btn btn-primary w-100 py-2 mb-2" type="submit" [disabled]="codeForm.invalid || confirming">
           @if (confirming) {

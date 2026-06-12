@@ -1156,7 +1156,7 @@ type PatientAttributesResponse = Record<string, PatientAttribute[]>;
 | **Autenticación** | API Key (`X-API-Key`) |
 | **Parámetros query** | `company_id` (opcional) — necesario si no hay sesión autenticada |
 
-`{type}` es el slug del tipo de atributo (ej: `tipo-documento`, `sexo`, `genero`, `estado-civil`, `nivel-escolar`, `ocupacion`, `division-politica`, `zona-residencia`, `sede`, `asegurador`, `tipo-ingreso`, `causa-ingreso`, `via-ingreso`, `consultorio`, `linea-pago`, `diagnostico`).
+`{type}` es el slug del tipo de atributo (ej: `tipo-documento`, `sexo`, `genero`, `estado-civil`, `nivel-escolar`, `ocupacion`, `division-politica`, `zona-residencia`, `sede`, `asegurador`, `tipo-ingreso`, `causa-ingreso`, `via-ingreso`, `consultorio`, `linea-pago`, `diagnostico`, `estados-citas`).
 
 **Ejemplo:** `GET /api/v1/patient-attributes/sexo`
 
@@ -1272,7 +1272,76 @@ El campo `data` contiene un objeto donde cada clave es el nombre del campo y el 
 
 ---
 
-## 8. Tabla resumen de endpoints
+## 8. Endpoints de Citas
+
+### 8.1 Obtener citas del paciente autenticado
+
+| Propiedad | Valor |
+|---|---|
+| **Método** | `GET` |
+| **URL** | `/api/v1/appointments` |
+| **Autenticación** | Bearer Token (Sanctum) |
+| **Parámetros query** | `states` (opcional) — filtro de estados (códigos separados por coma, ej: `S,C,P`) |
+
+Retorna las citas del paciente autenticado consultadas en Gomedisys. Por defecto trae las citas con estados `S` (Agendada) y `C` (Cancelada). Se puede filtrar por otros estados usando el parámetro `states`.
+
+Internamente utiliza el método `POST /api/Appointment/GetAppointmentPatientP` de Gomedisys que permite filtrar por estados. Gomedisys también expone el método `GET /api/Appointment/GetAppointmentPatient` para consulta simple sin filtro de estados.
+
+> Para poblar el **select de estados** (filtro de citas), use el catálogo local `GET /api/v1/patient-attributes/estados-citas` (ver sección 6.2). Los códigos retornados allí son los mismos que acepta el parámetro `states`.
+
+**Ejemplo:** `GET /api/v1/appointments?states=S,P`
+
+```typescript
+interface AppointmentsResponse {
+  appointments: any[];   // Array de citas desde Gomedisys (formato sin transformar)
+}
+```
+
+#### Respuesta exitosa — `200 OK`
+
+```json
+{
+  "status": true,
+  "message": "OK",
+  "data": {
+    "appointments": [
+      {
+        "date": "2026-06-15T10:00:00",
+        "state": "S",
+        "stateName": "Agendada",
+        "exam": "Consulta General",
+        "office": "Sede Principal",
+        "doctor": "Dr. Pérez"
+      }
+    ]
+  }
+}
+```
+
+> El formato exacto de cada cita depende de la respuesta de la API externa de Gomedisys.
+
+#### Respuesta de error
+
+| Código | Condición |
+|---|---|
+| `401` | Token inválido o no autenticado |
+| `500` | Error al consultar Gomedisys |
+
+---
+
+### 8.2 Obtener estados de citas (catálogo) — REMOVIDO
+
+Este endpoint ya no está disponible como ruta independiente. Los estados de citas se obtienen a través del endpoint genérico de catálogos, que consulta los datos sincronizados localmente por `gomedisys:sync-catalogs`:
+
+`GET /api/v1/patient-attributes/estados-citas`
+
+Ver sección 6.2 para más detalles sobre el uso de este endpoint.
+
+> **Nota:** Los códigos de estado retornados por este catálogo son los mismos que acepta el parámetro `states` de `GET /api/v1/appointments` (sección 8.1).
+
+---
+
+## 9. Tabla resumen de endpoints
 
 | # | Método | URL | Autenticación | Throttle | Descripción |
 |---|---|---|---|---|---|
@@ -1293,12 +1362,14 @@ El campo `data` contiene un objeto donde cada clave es el nombre del campo y el 
 | 15 | `GET` | `/api/v1/companies/{company}` | API Key | — | Datos de empresa (logo, colores, icono) |
 | 16 | `GET` | `/api/v1/patient-attributes` | API Key | — | Catálogos agrupados |
 | 17 | `GET` | `/api/v1/patient-attributes/{type}` | API Key | — | Catálogos por tipo |
+| 18 | `GET` | `/api/v1/appointments` | Bearer Token | — | Citas del paciente autenticado |
+| 19 | (REMOVED) | `/api/v1/appointment-states` | — | — | Catálogo de estados de citas — usar `GET /api/v1/patient-attributes/estados-citas` |
 
 ---
 
-## 9. Flujo de autenticación recomendado (Angular)
+## 10. Flujo de autenticación recomendado (Angular)
 
-### 9.1 API Key para endpoints públicos
+### 10.1 API Key para endpoints públicos
 
 Los endpoints sin autenticación de sesión (`/auth/token`, `/patients/register`, `/patients/check-existence`, `/patient-attributes`, `/companies/{company}`) requieren la cabecera `X-API-Key`. Recomendamos configurarla en el `environment` de Angular:
 
@@ -1342,7 +1413,7 @@ export class ApiInterceptor implements HttpInterceptor {
 }
 ```
 
-### 9.2 Flujo de inicio de sesión
+### 10.2 Flujo de inicio de sesión
 
 1. El usuario ingresa tipo de documento + número de documento + contraseña en un formulario de login.
 2. Se llama a `POST /api/v1/auth/token` (con `X-API-Key`).
@@ -1353,9 +1424,9 @@ export class ApiInterceptor implements HttpInterceptor {
 
 ---
 
-## 10. Consideraciones para formularios reactivos en Angular
+## 11. Consideraciones para formularios reactivos en Angular
 
-### 10.1 Carga de catálogos en selects/dropdowns
+### 11.1 Carga de catálogos en selects/dropdowns
 
 Para poblar selects con valores de catálogo (tipo de documento, sexo, etc.), los catálogos requieren un `company_id` (empresa). Si el usuario no ha iniciado sesión, debes enviar el `company_id` como query parameter:
 
@@ -1390,7 +1461,7 @@ this.patientService.getPatientAttributes().subscribe({
 
 > **Nota:** Cuando se usa con `Authorization: Bearer` (usuario autenticado), el `company_id` se resuelve automáticamente desde la empresa del usuario. No es necesario enviar `company_id` en ese caso.
 
-### 10.2 Validaciones frontend
+### 11.2 Validaciones frontend
 
 Mapear las validaciones del backend:
 
@@ -1418,7 +1489,7 @@ Mapear las validaciones del backend:
 | `password` | `Validators.minLength(6)` (registro) o `Validators.minLength(8)` (creación manual) |
 | `password_confirmation` | Debe coincidir con `password` (custom validator) |
 
-### 10.3 Manejo de errores del backend
+### 11.3 Manejo de errores del backend
 
 ```typescript
 // Servicio genérico
@@ -1449,7 +1520,7 @@ handleError(error: HttpErrorResponse): Observable<never> {
 
 ---
 
-## 11. Glosario de slugs de catálogos
+## 12. Glosario de slugs de catálogos
 
 Estos son los slugs disponibles para el endpoint `GET /api/v1/patient-attributes/{type}`:
 
@@ -1471,3 +1542,4 @@ Estos son los slugs disponibles para el endpoint `GET /api/v1/patient-attributes
 | `consultorio` | Consultorio |
 | `linea-pago` | Línea Pago |
 | `diagnostico` | Diagnóstico |
+| `estados-citas` | Estados Citas |

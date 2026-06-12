@@ -42,23 +42,34 @@ export class AppointmentDetailComponent implements OnInit {
     });
   }
 
-  getStatusClass(status: string): string {
-    const map: Record<string, string> = {
-      pending: 'status-pending',
-      confirmed: 'status-confirmed',
-      completed: 'status-completed',
-      cancelled: 'status-cancelled',
-    };
-    return map[status] || '';
+  getFullDoctorName(a: Appointment): string {
+    const parts = [a.firstGNameProfessional, a.secondGNameProfessional, a.firstFNameProfessional, a.secondFNameProfessional];
+    return parts.filter(Boolean).join(' ');
   }
 
-  getStatusLabel(status: string): string {
+  statusBadgeClass(codeState: string): string {
     const map: Record<string, string> = {
-      pending: 'Pendiente',
-      confirmed: 'Confirmada',
-      completed: 'Completada',
-      cancelled: 'Cancelada',
+      S: 'status-requested',
+      C: 'status-cancelled',
+      P: 'status-pending',
+      A: 'status-confirmed',
     };
-    return map[status] || status;
+    return map[codeState] || 'status-completed';
+  }
+
+  modalityBadgeClass(modality: string): string {
+    const map: Record<string, string> = {
+      'Presencial': 'modality-presential',
+      'Virtual': 'modality-virtual',
+    };
+    return map[modality] || '';
+  }
+
+  getModalityIcon(modality: string): string {
+    const map: Record<string, string> = {
+      'Presencial': 'fa-solid fa-house',
+      'Virtual': 'fa-solid fa-video',
+    };
+    return map[modality] || 'fa-solid fa-stethoscope';
   }
 }
