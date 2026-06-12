@@ -300,9 +300,9 @@
         <div class="auth-verify-icon mb-3">
           <i class="fas fa-envelope-open-text fa-3x text-primary"></i>
         </div>
-        <h5 class="mb-2">Códigos de verificación enviados</h5>
+        <h5 class="mb-2">Código de verificación enviado</h5>
         <p class="text-muted small mb-0">
-          Hemos enviado códigos de 6 dígitos a tu correo electrónico y celular. Ingresa ambos para confirmar tu registro.
+          Hemos enviado un código de 6 dígitos a tu correo electrónico o celular. Ingrésalo para confirmar tu registro.
         </p>
         <div class="auth-timer mt-3" [class.text-danger]="sessionExpired" [class.text-warning]="!sessionExpired && remainingTime && remainingTime <= '02:00'">
           <i class="fas fa-clock me-1"></i>
@@ -316,42 +316,22 @@
         </div>
       </div>
       <div class="mb-3">
-        <label for="emailCode" class="form-label">Código de Correo Electrónico</label>
+        <label for="verificationCode" class="form-label">Código de Verificación</label>
         <input
-          id="emailCode"
+          id="verificationCode"
           type="text"
           class="form-control text-center"
-          formControlName="email_code"
+          formControlName="code"
           placeholder="000000"
           maxlength="6"
           inputmode="numeric"
           pattern="[0-9]*"
-          [class.is-invalid]="isCodeInvalid('email_code')"
+          [class.is-invalid]="isCodeInvalid('code')"
           />
-        @if (hasCodeError('email_code', 'required')) {
-          <div class="invalid-feedback text-center">Ingresa el código recibido por correo</div>
+        @if (hasCodeError('code', 'required')) {
+          <div class="invalid-feedback text-center">Ingresa el código de verificación</div>
         }
-        @if (hasCodeError('email_code', 'minlength') || hasCodeError('email_code', 'maxlength')) {
-          <div class="invalid-feedback text-center">Debe tener 6 dígitos</div>
-        }
-      </div>
-      <div class="mb-3">
-        <label for="cellphoneCode" class="form-label">Código de Celular</label>
-        <input
-          id="cellphoneCode"
-          type="text"
-          class="form-control text-center"
-          formControlName="cellphone_code"
-          placeholder="000000"
-          maxlength="6"
-          inputmode="numeric"
-          pattern="[0-9]*"
-          [class.is-invalid]="isCodeInvalid('cellphone_code')"
-          />
-        @if (hasCodeError('cellphone_code', 'required')) {
-          <div class="invalid-feedback text-center">Ingresa el código recibido por celular</div>
-        }
-        @if (hasCodeError('cellphone_code', 'minlength') || hasCodeError('cellphone_code', 'maxlength')) {
+        @if (hasCodeError('code', 'minlength') || hasCodeError('code', 'maxlength')) {
           <div class="invalid-feedback text-center">Debe tener 6 dígitos</div>
         }
       </div>

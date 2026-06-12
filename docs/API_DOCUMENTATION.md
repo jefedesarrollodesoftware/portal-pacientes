@@ -23,7 +23,7 @@ Accept: application/json
 Content-Type: application/json   (solo en POST)
 ```
 
-#### Peticiones públicas (sin sesión: auth/token, patients/register, patient-attributes, patients/check-existence)
+#### Peticiones públicas (sin sesión: auth/token, patients/register, patients/confirm-registration, patients/check-existence, patient-attributes, companies/{company})
 
 ```
 X-API-Key: {api_key}
@@ -60,11 +60,13 @@ interface ApiResponse<T = any> {
 | **Autenticación** | API Key (`X-API-Key`) |
 | **Throttle** | `patient-auth` |
 
+Autentica tanto a **usuarios administrativos** (tabla `users` + `people`) como a **pacientes autoregistrados** (tabla `patients`). Primero busca en `users`/`people`; si no encuentra coincidencia, busca en `patients`.
+
 #### Cuerpo de la petición
 
 ```typescript
 interface LoginRequest {
-  tipo_documento: string;    // required, código del tipo de documento (ej: "CC", "NIT")
+  document_type_id: string;  // required, ID numérico del tipo de documento (ej: "1", "2")
   numero_documento: string;  // required, número de documento
   contraseña: string;        // required, mínimo 1 carácter
   device_name?: string;      // opcional, max 120 chars, default "b2b-client"
@@ -76,10 +78,10 @@ interface LoginRequest {
 
 ```json
 {
-  "tipo_documento": "CC",
+  "document_type_id": "1",
   "numero_documento": "1234567890",
   "contraseña": "secreta123",
-  "device_name": "web-angular-app"
+  "device_name": "b2b-client"
 }
 ```
 
@@ -119,7 +121,7 @@ interface LoginResponse {
   "status": false,
   "message": "Error de validacion.",
   "data": {
-    "tipo_documento": ["El tipo de documento es obligatorio."],
+    "document_type_id": ["El tipo de documento es obligatorio."],
     "contraseña": ["La contrasena es obligatoria."]
   }
 }
@@ -171,7 +173,12 @@ interface LoginResponse {
 | **URL** | `/api/v1/auth/me` |
 | **Autenticación** | Bearer Token (Sanctum) |
 
-#### Respuesta exitosa — `200 OK`
+Retorna los datos del modelo autenticado. El objeto varía según quién inició sesión:
+
+- **Usuario administrativo** (tabla `users` → `people`): incluye campos como `person_id`, `email_verified_at`, `inactivated_at`, `profile_photo`, `theme`.
+- **Paciente autoregistrado** (tabla `patients`): incluye campos como `document_type_id`, `document_number`, `first_name`, `last_name`, `cellphone`, `address`, `source`, `external_reference`.
+
+#### Respuesta exitosa (usuario administrativo) — `200 OK`
 
 ```json
 {
@@ -194,7 +201,41 @@ interface LoginResponse {
 }
 ```
 
+#### Respuesta exitosa (paciente autoregistrado) — `200 OK`
+
+```json
+{
+  "status": true,
+  "message": "OK",
+  "data": {
+    "id": 1,
+    "company_id": null,
+    "document_type_id": 1,
+    "document_number": "1110474142",
+    "document_expedition_date": "2007-01-22T00:00:00.000000Z",
+    "first_name": "Christian",
+    "last_name": "Cortés",
+    "date_birth": "1989-01-14T00:00:00.000000Z",
+    "gender_id": 15,
+    "gender_identity_id": null,
+    "civil_status_id": 24,
+    "scholarship_id": 38,
+    "email": "paciente@mail.com",
+    "cellphone_code": "57",
+    "cellphone": "3001234567",
+    "address": "Cra. 25c #76B-07 Piso 2",
+    "source": "self-registration",
+    "external_reference": "1110474142",
+    "active": true,
+    "last_login": "2026-06-12T19:02:27.000000Z",
+    "created_at": "2026-06-12T19:02:27.000000Z",
+    "updated_at": "2026-06-12T19:02:27.000000Z"
+  }
+}
+```
+
 ```typescript
+// Usuario administrativo
 interface User {
   id: number;
   person_id: number | null;
@@ -209,6 +250,9 @@ interface User {
   created_at: string;
   updated_at: string;
 }
+
+// Paciente autoregistrado
+type AuthenticatedPatient = Patient;  // misma estructura que en sección 4
 ```
 
 ---
@@ -280,7 +324,7 @@ interface RegisterPatientRequest {
 ```json
 {
   "status": true,
-  "message": "Códigos de verificación enviados. Confirme su registro usando el session_token.",
+  "message": "Códigos de verificación enviados.",
   "data": {
     "session_token": "550e8400-e29b-41d4-a716-446655440000",
     "expires_at": "2026-06-09T12:00:00.000000Z",
@@ -314,7 +358,7 @@ interface InitiateRegistrationResponse {
 
 ### 3.2 Confirmar registro de paciente (autoregistro) — Paso 2
 
-Confirma el registro usando los códigos recibidos por email y SMS junto con el `session_token` del paso 1. Si ambos códigos son correctos, se crea el paciente en la base de datos.
+Confirma el registro usando el código de verificación recibido (por email o SMS) junto con el `session_token` del paso 1. Si el código es correcto, se crea el paciente en la base de datos.
 
 | Propiedad | Valor |
 |---|---|
@@ -328,8 +372,7 @@ Confirma el registro usando los códigos recibidos por email y SMS junto con el 
 ```typescript
 interface ConfirmRegistrationRequest {
   session_token: string;    // required, UUID obtenido en /register
-  email_code: string;       // required, código de 6 dígitos recibido por email
-  cellphone_code: string;   // required, código de 6 dígitos recibido por SMS
+  code: string;             // required, código de 6 dígitos recibido por email o SMS
 }
 ```
 
@@ -338,8 +381,7 @@ interface ConfirmRegistrationRequest {
 ```json
 {
   "session_token": "550e8400-e29b-41d4-a716-446655440000",
-  "email_code": "482913",
-  "cellphone_code": "719284"
+  "code": "482913"
 }
 ```
 
@@ -850,8 +892,7 @@ interface RegisterPatientRequest {
 
 interface ConfirmRegistrationRequest {
   session_token: string;
-  email_code: string;
-  cellphone_code: string;
+  code: string;
 }
 
 interface InitiateRegistrationResponse {
@@ -1354,13 +1395,13 @@ this.patientService.getPatientAttributes().subscribe({
 Mapear las validaciones del backend:
 
 | Campo | Regla Angular |
-|---|---|
+|---|---|---|
 | Campo | Regla Angular |
 |---|---|---|
-| `tipo_documento` | `Validators.required` (login) |
+| `document_type_id` | `Validators.required` (login) |
 | `numero_documento` | `Validators.required` (login) |
 | `contraseña` | `Validators.required` (login) |
-| `document_type_id` | `Validators.required` |
+| `document_type_id` | `Validators.required` (registro) |
 | `document_number` | `Validators.required` |
 | `first_name` | `Validators.required`, `Validators.maxLength(120)` |
 | `last_name` | `Validators.required`, `Validators.maxLength(120)` |

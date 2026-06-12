@@ -4,15 +4,15 @@
     <select
       id="loginDocumentType"
       class="form-select"
-      formControlName="tipo_documento"
-      [class.is-invalid]="isInvalid('tipo_documento')"
+      formControlName="document_type_id"
+      [class.is-invalid]="isInvalid('document_type_id')"
       >
       <option value="" disabled>Seleccione...</option>
       @for (doc of documentTypes; track doc) {
-        <option [value]="doc.code">{{ doc.name }}</option>
+        <option [value]="doc.id">{{ doc.name }}</option>
       }
     </select>
-    @if (hasError('tipo_documento', 'required')) {
+    @if (hasError('document_type_id', 'required')) {
       <div class="invalid-feedback">
         Selecciona un tipo de documento
       </div>

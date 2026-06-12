@@ -17,7 +17,7 @@ export type LoginFormValue = LoginCredentials;
 export class LoginFormComponent implements OnInit {
   @Output() sendLoginForm = new EventEmitter<LoginFormValue>();
   form = new FormGroup({
-    tipo_documento: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    document_type_id: new FormControl<number | null>(null, { validators: [Validators.required] }),
     numero_documento: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(45)] }),
     contraseña: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
   });

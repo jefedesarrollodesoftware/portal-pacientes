@@ -10,7 +10,7 @@ import { ApiResponse, RegisterPatientRequest } from '../../modules/patients/mode
 import { LoginResponse, User as ApiUser } from '../../modules/auth/models';
 
 export type LoginCredentials = {
-  tipo_documento: string;
+  document_type_id: number;
   numero_documento: string;
   contraseña: string;
   device_name?: string;
@@ -140,7 +140,7 @@ export class AuthService {
     this.requestLogin();
 
     const payload = {
-      tipo_documento: creds.tipo_documento,
+      document_type_id: creds.document_type_id,
       numero_documento: creds.numero_documento,
       contraseña: creds.contraseña,
       device_name: creds.device_name || 'b2b-client',
@@ -207,10 +207,7 @@ export class AuthService {
   }
 
   public logoutUser(): void {
-    this.http.delete(`${this.api}/token`).pipe(take(1)).subscribe({
-      complete: () => this.clearSession(),
-      error: () => this.clearSession(),
-    });
+    this.clearSession();
   }
 
   public loginError(payload: string): void {

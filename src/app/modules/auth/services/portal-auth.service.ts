@@ -22,7 +22,7 @@ export class PortalAuthService {
   ) {}
 
   login(credentials: LoginRequest): Observable<ApiResponse<LoginResponse>> {
-    const payload: LoginRequest = {
+    const payload = {
       ...credentials,
       device_name: credentials.device_name || 'b2b-client',
     };

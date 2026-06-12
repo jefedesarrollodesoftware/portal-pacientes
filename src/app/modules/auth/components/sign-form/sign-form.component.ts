@@ -114,8 +114,7 @@ export class SignFormComponent implements OnInit, OnDestroy {
 
   private buildCodeForm(): void {
     this.codeForm = new FormGroup({
-      email_code: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(6), Validators.maxLength(6)] }),
-      cellphone_code: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(6), Validators.maxLength(6)] }),
+      code: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(6), Validators.maxLength(6)] }),
     });
   }
 
@@ -251,8 +250,7 @@ export class SignFormComponent implements OnInit, OnDestroy {
 
     this.patientService.confirmRegistration({
       session_token: this.sessionData.session_token,
-      email_code: this.codeForm.value.email_code,
-      cellphone_code: this.codeForm.value.cellphone_code,
+      code: this.codeForm.value.code,
     }).subscribe({
       next: (res) => {
         this.confirming = false;

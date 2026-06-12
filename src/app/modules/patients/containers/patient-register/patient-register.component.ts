@@ -84,8 +84,7 @@ export class PatientRegisterComponent implements OnInit {
 
   private buildCodeForm(): void {
     this.codeForm = this.fb.group({
-      email_code: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(6)]],
-      cellphone_code: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(6)]],
+      code: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(6)]],
     });
   }
 
@@ -192,8 +191,7 @@ export class PatientRegisterComponent implements OnInit {
     this.confirming = true;
     this.patientService.confirmRegistration({
       session_token: this.sessionData.session_token,
-      email_code: this.codeForm.value.email_code,
-      cellphone_code: this.codeForm.value.cellphone_code,
+      code: this.codeForm.value.code,
     }).subscribe({
       next: (res) => {
         this.confirming = false;

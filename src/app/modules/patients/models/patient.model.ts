@@ -78,8 +78,7 @@ export interface InitiateRegistrationResponse {
 
 export interface ConfirmRegistrationRequest {
   session_token: string;
-  email_code: string;
-  cellphone_code: string;
+  code: string;
 }
 
 export interface ConfirmRegistrationResponse {

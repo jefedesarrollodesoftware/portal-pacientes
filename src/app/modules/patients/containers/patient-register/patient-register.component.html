@@ -265,36 +265,22 @@
           <div class="mb-3">
             <i class="fas fa-envelope-open-text fa-3x text-primary"></i>
           </div>
-          <h5 class="mb-2">Códigos de verificación enviados</h5>
+          <h5 class="mb-2">Código de verificación enviado</h5>
           <p class="text-muted small mb-0">
-            Hemos enviado códigos de 6 dígitos a tu correo electrónico y celular.
+            Hemos enviado un código de 6 dígitos a tu correo electrónico o celular.
           </p>
         </div>
-        <div class="row g-3 mb-3">
-          <div class="col-12 col-md-6">
-            <mat-form-field appearance="outline" class="d-block">
-              <mat-label>Código de Correo Electrónico</mat-label>
-              <input matInput formControlName="email_code" placeholder="000000" maxlength="6" />
-              @if (codeForm.get('email_code')?.hasError('required')) {
-                <mat-error>El código de correo es obligatorio.</mat-error>
-              }
-              @if (codeForm.get('email_code')?.hasError('minlength') || codeForm.get('email_code')?.hasError('maxlength')) {
-                <mat-error>Debe tener 6 dígitos.</mat-error>
-              }
-            </mat-form-field>
-          </div>
-          <div class="col-12 col-md-6">
-            <mat-form-field appearance="outline" class="d-block">
-              <mat-label>Código de Celular</mat-label>
-              <input matInput formControlName="cellphone_code" placeholder="000000" maxlength="6" />
-              @if (codeForm.get('cellphone_code')?.hasError('required')) {
-                <mat-error>El código de celular es obligatorio.</mat-error>
-              }
-              @if (codeForm.get('cellphone_code')?.hasError('minlength') || codeForm.get('cellphone_code')?.hasError('maxlength')) {
-                <mat-error>Debe tener 6 dígitos.</mat-error>
-              }
-            </mat-form-field>
-          </div>
+        <div class="mb-3">
+          <mat-form-field appearance="outline" class="d-block">
+            <mat-label>Código de Verificación</mat-label>
+            <input matInput formControlName="code" placeholder="000000" maxlength="6" />
+            @if (codeForm.get('code')?.hasError('required')) {
+              <mat-error>El código es obligatorio.</mat-error>
+            }
+            @if (codeForm.get('code')?.hasError('minlength') || codeForm.get('code')?.hasError('maxlength')) {
+              <mat-error>Debe tener 6 dígitos.</mat-error>
+            }
+          </mat-form-field>
         </div>
         <button class="btn btn-primary w-100 py-2 mb-2" type="submit" [disabled]="codeForm.invalid || confirming">
           @if (confirming) {

@@ -14,7 +14,7 @@ export interface User {
 }
 
 export interface LoginRequest {
-  tipo_documento: string;
+  document_type_id: number;
   numero_documento: string;
   contraseña: string;
   device_name?: string;
