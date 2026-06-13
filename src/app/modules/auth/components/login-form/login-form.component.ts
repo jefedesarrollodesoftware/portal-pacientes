@@ -4,6 +4,7 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { AuthService, LoginCredentials } from '../../../../shared/services/auth.service';
 import { PatientAttributesService } from '../../../patients/services/patient-attributes.service';
 import { PatientAttribute } from '../../../patients/models';
+import { SearchableSelectComponent } from '../../../../shared/components/searchable-select/searchable-select.component';
 
 export type LoginFormValue = LoginCredentials;
 
@@ -12,7 +13,7 @@ export type LoginFormValue = LoginCredentials;
   templateUrl: './login-form.component.html',
   styleUrls: ['./login-form.component.scss'],
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, SearchableSelectComponent],
 })
 export class LoginFormComponent implements OnInit {
   @Output() sendLoginForm = new EventEmitter<LoginFormValue>();

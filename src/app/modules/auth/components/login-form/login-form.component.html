@@ -1,17 +1,12 @@
 <form class="auth-form" [formGroup]="form" (ngSubmit)="login()">
   <div class="mb-3">
-    <label for="loginDocumentType" class="form-label">Tipo de Documento</label>
-    <select
-      id="loginDocumentType"
-      class="form-select"
+    <label class="form-label">Tipo de Documento</label>
+    <app-searchable-select
+      [options]="documentTypes"
       formControlName="document_type_id"
-      [class.is-invalid]="isInvalid('document_type_id')"
-      >
-      <option value="" disabled>Seleccione...</option>
-      @for (doc of documentTypes; track doc) {
-        <option [value]="doc.id">{{ doc.name }}</option>
-      }
-    </select>
+      placeholder="Seleccione..."
+      [invalid]="isInvalid('document_type_id')"
+    ></app-searchable-select>
     @if (hasError('document_type_id', 'required')) {
       <div class="invalid-feedback">
         Selecciona un tipo de documento
