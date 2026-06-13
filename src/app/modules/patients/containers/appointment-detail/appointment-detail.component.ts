@@ -1,9 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 
-import { AppointmentService } from '../../services/appointment.service';
+import { AppointmentService } from '../../services';
 import { Appointment } from '../../models';
+
+interface ProductInfo {
+  idProduct: number;
+  legalCode: string;
+  name: string;
+}
 
 @Component({
   selector: 'app-appointment-detail',
@@ -13,33 +19,43 @@ import { Appointment } from '../../models';
 })
 export class AppointmentDetailComponent implements OnInit {
   appointment: Appointment | null = null;
-  loading = false;
+  notFound = false;
+  products: ProductInfo[] = [];
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private appointmentService: AppointmentService,
     private toastr: ToastrService,
   ) {}
 
   ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
-    if (idParam) {
-      this.loadAppointment(Number(idParam));
+    if (!idParam) {
+      this.notFound = true;
+      return;
+    }
+
+    const id = Number(idParam);
+    const cached = this.appointmentService.getAppointmentFromCache(id);
+
+    if (cached) {
+      this.appointment = cached;
+      this.parseProducts();
+    } else {
+      this.notFound = true;
+      this.toastr.error('No se encontró la información de la cita.');
     }
   }
 
-  private loadAppointment(id: number): void {
-    this.loading = true;
-    this.appointmentService.getAppointmentById(id).subscribe({
-      next: (res) => {
-        this.appointment = res.data;
-        this.loading = false;
-      },
-      error: () => {
-        this.loading = false;
-        this.toastr.error('Error al cargar el detalle de la cita.');
-      },
-    });
+  private parseProducts(): void {
+    if (this.appointment?.products) {
+      try {
+        this.products = JSON.parse(this.appointment.products);
+      } catch {
+        this.products = [];
+      }
+    }
   }
 
   getFullDoctorName(a: Appointment): string {

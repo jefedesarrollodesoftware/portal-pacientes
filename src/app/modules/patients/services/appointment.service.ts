@@ -9,8 +9,17 @@ import { ApiResponse, Appointment, AppointmentListParams, AppointmentListRespons
 })
 export class AppointmentService {
   private readonly baseUrl = '/api/v1/appointments';
+  private appointmentsCache: Appointment[] = [];
 
   constructor(private http: HttpClient) {}
+
+  setAppointmentsCache(appointments: Appointment[]): void {
+    this.appointmentsCache = appointments;
+  }
+
+  getAppointmentFromCache(id: number): Appointment | undefined {
+    return this.appointmentsCache.find(a => a.idAppointment === id);
+  }
 
   getMyAppointments(params?: AppointmentListParams): Observable<ApiResponse<AppointmentListResponse>> {
     let httpParams = new HttpParams();

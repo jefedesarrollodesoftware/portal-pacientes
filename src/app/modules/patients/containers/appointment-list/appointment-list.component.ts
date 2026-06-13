@@ -48,6 +48,7 @@ export class AppointmentListComponent implements OnInit {
     this.appointmentService.getMyAppointments(params).subscribe({
       next: (res) => {
         this.appointments = res.data.appointments || [];
+        this.appointmentService.setAppointmentsCache(this.appointments);
         this.loading = false;
       },
       error: () => {
@@ -61,8 +62,8 @@ export class AppointmentListComponent implements OnInit {
     this.loadAppointments();
   }
 
-  viewDetail(id: number): void {
-    this.router.navigate([routes.PATIENTS_APPOINTMENTS, id]);
+  viewDetail(appointment: Appointment): void {
+    this.router.navigate([routes.PATIENTS_APPOINTMENTS, appointment.idAppointment]);
   }
 
   getFullDoctorName(a: Appointment): string {
