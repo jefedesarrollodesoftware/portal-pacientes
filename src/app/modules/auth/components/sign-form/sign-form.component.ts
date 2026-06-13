@@ -44,7 +44,11 @@ export class SignFormComponent implements OnInit, OnDestroy {
   errorMessage = '';
   remainingTime = '';
   sessionExpired = false;
+  canResend = false;
+  resendCountdown = '';
+  resending = false;
   private timerSubscription?: Subscription;
+  private resendTimerSubscription?: Subscription;
 
   constructor(
     private patientAttributesService: PatientAttributesService,
@@ -60,6 +64,7 @@ export class SignFormComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.stopTimer();
+    this.stopResendTimer();
   }
 
   private startTimer(): void {
@@ -74,7 +79,7 @@ export class SignFormComponent implements OnInit, OnDestroy {
       if (diff <= 0) {
         this.remainingTime = '00:00';
         this.sessionExpired = true;
-        this.errorMessage = 'La sesión ha expirado. Debes iniciar el registro nuevamente.';
+        this.canResend = true;
         this.stopTimer();
         return;
       }
@@ -88,6 +93,55 @@ export class SignFormComponent implements OnInit, OnDestroy {
   private stopTimer(): void {
     this.timerSubscription?.unsubscribe();
     this.timerSubscription = undefined;
+  }
+
+  private startResendCooldown(): void {
+    this.stopResendTimer();
+    this.canResend = false;
+    const resendAt = Date.now() + 10 * 60 * 1000;
+
+    this.resendTimerSubscription = interval(1000).subscribe(() => {
+      const now = Date.now();
+      const diff = resendAt - now;
+
+      if (diff <= 0) {
+        this.canResend = true;
+        this.resendCountdown = '';
+        this.stopResendTimer();
+        return;
+      }
+
+      const minutes = Math.floor(diff / 60000);
+      const seconds = Math.floor((diff % 60000) / 1000);
+      this.resendCountdown = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    });
+  }
+
+  private stopResendTimer(): void {
+    this.resendTimerSubscription?.unsubscribe();
+    this.resendTimerSubscription = undefined;
+  }
+
+  resendCode(): void {
+    if (this.resending) return;
+    this.resending = true;
+    this.errorMessage = '';
+
+    const payload = this.buildPayload();
+    this.patientService.register(payload).subscribe({
+      next: (res) => {
+        this.resending = false;
+        this.sessionData = res.data;
+        this.codeForm.reset();
+        this.startTimer();
+        this.startResendCooldown();
+        this.toastr.success('Códigos reenviados a tu correo y celular.');
+      },
+      error: (err: HttpErrorResponse) => {
+        this.resending = false;
+        this.errorMessage = err.error?.message || 'Error al reenviar el código. Intenta de nuevo.';
+      },
+    });
   }
 
   private buildForm(): void {
@@ -220,6 +274,7 @@ export class SignFormComponent implements OnInit, OnDestroy {
         this.codeForm.reset();
         this.errorMessage = '';
         this.startTimer();
+        this.startResendCooldown();
         this.toastr.success('Códigos de verificación enviados a tu correo y celular.');
       },
       error: (err: HttpErrorResponse) => {

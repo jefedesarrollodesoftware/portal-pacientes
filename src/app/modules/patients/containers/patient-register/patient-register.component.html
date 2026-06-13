@@ -387,6 +387,16 @@
           }
           {{ confirming ? 'Confirmando...' : 'Confirmar registro' }}
         </button>
+        <button type="button" class="btn btn-outline-primary w-100 mb-2" [disabled]="!canResend || resending" (click)="resendCode()">
+          @if (resending) {
+            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+            Reenviando...
+          } @else if (canResend) {
+            <i class="fas fa-repeat me-1"></i>Reenviar código
+          } @else {
+            <i class="fas fa-clock me-1"></i>Reenviar en {{ resendCountdown }}
+          }
+        </button>
         <button type="button" class="btn btn-outline-secondary w-100" (click)="goBack()">
           Volver
         </button>

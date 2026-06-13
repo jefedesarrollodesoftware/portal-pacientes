@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Subscription, interval } from 'rxjs';
 
 import { PatientService } from '../../services/patient.service';
 import { PatientAttributesService } from '../../services/patient-attributes.service';
@@ -19,7 +20,7 @@ import { setBackendErrors } from '../../utils/form-error-handler';
     RouterModule,
 ],
 })
-export class PatientRegisterComponent implements OnInit {
+export class PatientRegisterComponent implements OnInit, OnDestroy {
   currentStep = 1;
   registerForm: FormGroup;
   codeForm: FormGroup;
@@ -27,6 +28,10 @@ export class PatientRegisterComponent implements OnInit {
   submitting = false;
   confirming = false;
   sessionData: InitiateRegistrationResponse | null = null;
+  canResend = false;
+  resendCountdown = '';
+  resending = false;
+  private resendTimerSubscription?: Subscription;
 
   documentTypes: PatientAttribute[] = [];
   genders: PatientAttribute[] = [];
@@ -157,6 +162,7 @@ export class PatientRegisterComponent implements OnInit {
         this.submitting = false;
         this.sessionData = res.data;
         this.currentStep = 3;
+        this.startResendCooldown();
         this.toastr.success('Códigos de verificación enviados a tu correo y celular.');
       },
       error: (err: HttpErrorResponse) => {
@@ -194,6 +200,61 @@ export class PatientRegisterComponent implements OnInit {
           this.toastr.error('Código inválido o sesión expirada. Solicita un nuevo registro.');
         } else {
           this.toastr.error(err.error?.message || 'Error al confirmar el registro.');
+        }
+      },
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.stopResendTimer();
+  }
+
+  private startResendCooldown(): void {
+    this.stopResendTimer();
+    this.canResend = false;
+    const resendAt = Date.now() + 10 * 60 * 1000;
+
+    this.resendTimerSubscription = interval(1000).subscribe(() => {
+      const now = Date.now();
+      const diff = resendAt - now;
+
+      if (diff <= 0) {
+        this.canResend = true;
+        this.resendCountdown = '';
+        this.stopResendTimer();
+        return;
+      }
+
+      const minutes = Math.floor(diff / 60000);
+      const seconds = Math.floor((diff % 60000) / 1000);
+      this.resendCountdown = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    });
+  }
+
+  private stopResendTimer(): void {
+    this.resendTimerSubscription?.unsubscribe();
+    this.resendTimerSubscription = undefined;
+  }
+
+  resendCode(): void {
+    if (this.resending || !this.sessionData) return;
+    this.resending = true;
+
+    const payload = this.buildPayload();
+    this.patientService.register(payload).subscribe({
+      next: (res) => {
+        this.resending = false;
+        this.sessionData = res.data;
+        this.codeForm.reset();
+        this.startResendCooldown();
+        this.toastr.success('Códigos reenviados a tu correo y celular.');
+      },
+      error: (err: HttpErrorResponse) => {
+        this.resending = false;
+        if (err.status === 422) {
+          this.toastr.error('Sesión expirada. Debes iniciar el registro nuevamente.');
+        } else {
+          this.toastr.error(err.error?.message || 'Error al reenviar el código. Intenta de nuevo.');
         }
       },
     });
