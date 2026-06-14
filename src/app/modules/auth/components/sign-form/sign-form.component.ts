@@ -1,12 +1,9 @@
 import { Component, EventEmitter, OnInit, OnDestroy, Output } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
-
 import { HttpErrorResponse } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
 import { Subscription, interval } from 'rxjs';
-
 import { SearchableSelectComponent } from '../../../../shared/components/searchable-select/searchable-select.component';
-
 import { PatientAttributesService } from '../../../patients/services/patient-attributes.service';
 import { PatientService } from '../../../patients/services/patient.service';
 import {

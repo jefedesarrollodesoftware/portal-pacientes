@@ -2,7 +2,6 @@
 import { Component, DestroyRef, Inject, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Params, RouterModule } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-
 import { AuthService, LoginCredentials } from '../../../../shared/services/auth.service';
 import { CompanyService } from '../../services/company.service';
 import { APP_RUNTIME_CONFIG, AppRuntimeConfig } from '../../../../app.config';

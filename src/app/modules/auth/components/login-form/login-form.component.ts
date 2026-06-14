@@ -1,6 +1,5 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-
 import { AuthService, LoginCredentials } from '../../../../shared/services/auth.service';
 import { PatientAttributesService } from '../../../patients/services/patient-attributes.service';
 import { PatientAttribute } from '../../../patients/models';
