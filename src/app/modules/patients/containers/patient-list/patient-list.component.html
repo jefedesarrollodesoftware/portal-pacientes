@@ -4,86 +4,93 @@
     <p class="card-subtitle text-muted mb-4">Busca un paciente por tipo y número de documento</p>
 
     @if (!searched || patient) {
-      <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
-        <div class="row g-3 mb-3">
-          <div class="col-12 col-sm-5">
-            <div class="mb-3">
-              <label class="form-label" for="docType">Tipo de Documento</label>
-              <select class="form-select" id="docType" formControlName="document_type_code">
-                <option value="" disabled>Seleccione...</option>
-                @for (doc of documentTypes; track doc) {
-                  <option [value]="doc.code">{{ doc.name }}</option>
-                }
-              </select>
-              @if (searchForm.get('document_type_code')?.hasError('required') && searchForm.get('document_type_code')?.touched) {
-                <div class="invalid-feedback d-block">Selecciona un tipo de documento.</div>
+    <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
+      <div class="row g-3 mb-3">
+        <div class="col-12 col-sm-5">
+          <div class="mb-3">
+            <label class="form-label" for="docType">Tipo de Documento</label>
+            <select class="form-select" id="docType" formControlName="document_type_code">
+              <option value="" disabled>Seleccione...</option>
+              @for (doc of documentTypes; track doc) {
+              <option [value]="doc.code">{{ doc.name }}</option>
               }
-            </div>
-          </div>
-          <div class="col-12 col-sm-5">
-            <div class="mb-3">
-              <label class="form-label" for="docNumber">Número de Documento</label>
-              <input class="form-control" id="docNumber" formControlName="document_number" placeholder="1234567890" />
-              @if (searchForm.get('document_number')?.hasError('required') && searchForm.get('document_number')?.touched) {
-                <div class="invalid-feedback d-block">Ingresa el número de documento.</div>
-              }
-            </div>
-          </div>
-          <div class="col-12 col-sm-2 d-flex align-items-end pb-2">
-            <button class="btn btn-primary w-100" type="submit" [disabled]="searchForm.invalid || loading">
-              <i class="fas fa-magnifying-glass me-1"></i>Buscar
-            </button>
+            </select>
+            @if (searchForm.get('document_type_code')?.hasError('required') &&
+            searchForm.get('document_type_code')?.touched) {
+            <div class="invalid-feedback d-block">Selecciona un tipo de documento.</div>
+            }
           </div>
         </div>
-      </form>
+        <div class="col-12 col-sm-5">
+          <div class="mb-3">
+            <label class="form-label" for="docNumber">Número de Documento</label>
+            <input class="form-control" id="docNumber" formControlName="document_number" placeholder="1234567890" />
+            @if (searchForm.get('document_number')?.hasError('required') && searchForm.get('document_number')?.touched)
+            {
+            <div class="invalid-feedback d-block">Ingresa el número de documento.</div>
+            }
+          </div>
+        </div>
+        <div class="col-12 col-sm-2 d-flex align-items-end pb-2">
+          <button class="btn btn-primary w-100" type="submit" [disabled]="searchForm.invalid || loading">
+            <i class="fas fa-magnifying-glass me-1"></i>Buscar
+          </button>
+        </div>
+      </div>
+    </form>
     }
 
     @if (loading) {
-      <div class="text-center py-5">
-        <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando...</span></div>
-      </div>
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando...</span></div>
+    </div>
     }
 
     @if (patient && !loading) {
-      <div>
-        <hr>
-          <div class="d-flex flex-column flex-sm-row align-items-sm-center gap-3 mb-3">
-            <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width:56px;height:56px">
-              <i class="fas fa-user text-primary"></i>
-            </div>
-            <div class="flex-grow-1">
-              <h5 class="mb-1">{{ patient.first_name }} {{ patient.last_name }}</h5>
-              <p class="text-muted small mb-0">{{ lastDocTypeCode }} {{ patient.document_number }}</p>
-            </div>
-            <div class="d-flex gap-2 flex-shrink-0">
-              <button class="btn btn-outline-secondary btn-sm" type="button" (click)="newSearch()">
-                <i class="fas fa-rotate-right me-1"></i>Nueva
-              </button>
-              <button class="btn btn-info text-white btn-sm" (click)="viewDetail()">
-                <i class="fas fa-eye me-1"></i>Detalle
-              </button>
-            </div>
-          </div>
-          <div class="row g-3">
-            <div class="col-sm-4"><small class="text-muted d-block">Email</small><span>{{ patient.email }}</span></div>
-            <div class="col-sm-4"><small class="text-muted d-block">Celular</small><span>{{ patient.cellphone }}</span></div>
-            <div class="col-sm-4"><small class="text-muted d-block">Estado</small><span class="badge" [class.bg-success]="patient.active" [class.bg-secondary]="!patient.active">{{ patient.active ? 'Activo' : 'Inactivo' }}</span></div>
-          </div>
+    <div>
+      <hr>
+      <div class="d-flex flex-column flex-sm-row align-items-sm-center gap-3 mb-3">
+        <div
+          class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+          style="width:56px;height:56px">
+          <i class="fas fa-user text-primary"></i>
         </div>
-      }
-
-      @if (searched && !patient && !loading) {
-        <div class="text-center py-5">
-          <i class="fas fa-user-magnifying-glass text-muted d-block mb-2" style="font-size:48px"></i>
-          <p class="text-muted">No se encontró ningún paciente con esos datos.</p>
+        <div class="flex-grow-1">
+          <h5 class="mb-1">{{ patient.first_name }} {{ patient.last_name }}</h5>
+          <p class="text-muted small mb-0">{{ lastDocTypeCode }} {{ patient.document_number }}</p>
         </div>
-      }
-
-      @if (!searched && !loading) {
-        <div class="text-center py-5">
-          <i class="fas fa-magnifying-glass text-muted d-block mb-2" style="font-size:48px"></i>
-          <p class="text-muted">Ingresa tipo y número de documento para consultar un paciente.</p>
+        <div class="d-flex gap-2 flex-shrink-0">
+          <button class="btn btn-outline-secondary btn-sm" type="button" (click)="newSearch()">
+            <i class="fas fa-rotate-right me-1"></i>Nueva
+          </button>
+          <button class="btn btn-info text-white btn-sm" (click)="viewDetail()">
+            <i class="fas fa-eye me-1"></i>Detalle
+          </button>
         </div>
-      }
+      </div>
+      <div class="row g-3">
+        <div class="col-sm-4"><small class="text-muted d-block">Email</small><span>{{ patient.email }}</span></div>
+        <div class="col-sm-4"><small class="text-muted d-block">Celular</small><span>{{ patient.cellphone }}</span>
+        </div>
+        <div class="col-sm-4"><small class="text-muted d-block">Estado</small><span class="badge"
+            [class.bg-success]="patient.active" [class.bg-secondary]="!patient.active">{{ patient.active ? 'Activo' :
+            'Inactivo' }}</span></div>
+      </div>
     </div>
+    }
+
+    @if (searched && !patient && !loading) {
+    <div class="text-center py-5">
+      <i class="fas fa-user-magnifying-glass text-muted d-block mb-2" style="font-size:48px"></i>
+      <p class="text-muted">No se encontró ningún paciente con esos datos.</p>
+    </div>
+    }
+
+    @if (!searched && !loading) {
+    <div class="text-center py-5">
+      <i class="fas fa-magnifying-glass text-muted d-block mb-2" style="font-size:48px"></i>
+      <p class="text-muted">Ingresa tipo y número de documento para consultar un paciente.</p>
+    </div>
+    }
   </div>
+</div>

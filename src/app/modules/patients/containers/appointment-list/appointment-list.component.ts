@@ -1,26 +1,26 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
+import { Component, OnInit } from "@angular/core";
+import { Router } from "@angular/router";
+import { ToastrService } from "ngx-toastr";
 
-import { AppointmentService, AppointmentStateService } from '../../services';
-import { Appointment, AppointmentState } from '../../models';
-import { routes } from '../../../../consts';
+import { AppointmentService, PatientAttributesService } from "../../services";
+import { Appointment, AppointmentState, PatientAttribute } from "../../models";
+import { routes } from "../../../../consts";
 
 @Component({
-  selector: 'app-appointment-list',
-  templateUrl: './appointment-list.component.html',
-  styleUrls: ['./appointment-list.component.scss'],
+  selector: "app-appointment-list",
+  templateUrl: "./appointment-list.component.html",
+  styleUrls: ["./appointment-list.component.scss"],
   standalone: false,
 })
 export class AppointmentListComponent implements OnInit {
   appointments: Appointment[] = [];
   appointmentStates: AppointmentState[] = [];
   loading = false;
-  filterStatus = '';
+  filterStatus = "";
 
   constructor(
     private appointmentService: AppointmentService,
-    private appointmentStateService: AppointmentStateService,
+    private patientAttributesService: PatientAttributesService,
     private toastr: ToastrService,
     private router: Router,
   ) {}
@@ -31,19 +31,24 @@ export class AppointmentListComponent implements OnInit {
   }
 
   private loadAppointmentStates(): void {
-    this.appointmentStateService.getAll().subscribe({
+    this.patientAttributesService.getByType("estados-citas").subscribe({
       next: (res) => {
-        this.appointmentStates = res.data.states;
+        this.appointmentStates = res.data.map(
+          (attr: PatientAttribute) =>
+            ({ code: attr.code, name: attr.name }) as AppointmentState,
+        );
       },
       error: () => {
-        this.toastr.error('Error al cargar los estados de citas.');
+        this.toastr.error("Error al cargar los estados de citas.");
       },
     });
   }
 
   loadAppointments(): void {
     this.loading = true;
-    const params = this.filterStatus ? { states: this.filterStatus } : undefined;
+    const params = this.filterStatus
+      ? { states: this.filterStatus }
+      : undefined;
 
     this.appointmentService.getMyAppointments(params).subscribe({
       next: (res) => {
@@ -53,7 +58,7 @@ export class AppointmentListComponent implements OnInit {
       },
       error: () => {
         this.loading = false;
-        this.toastr.error('Error al cargar las citas.');
+        this.toastr.error("Error al cargar las citas.");
       },
     });
   }
@@ -63,37 +68,45 @@ export class AppointmentListComponent implements OnInit {
   }
 
   viewDetail(appointment: Appointment): void {
-    this.router.navigate([routes.PATIENTS_APPOINTMENTS, appointment.idAppointment]);
+    this.router.navigate([
+      routes.PATIENTS_APPOINTMENTS,
+      appointment.idAppointment,
+    ]);
   }
 
   getFullDoctorName(a: Appointment): string {
-    const parts = [a.firstGNameProfessional, a.secondGNameProfessional, a.firstFNameProfessional, a.secondFNameProfessional];
-    return parts.filter(Boolean).join(' ');
+    const parts = [
+      a.firstGNameProfessional,
+      a.secondGNameProfessional,
+      a.firstFNameProfessional,
+      a.secondFNameProfessional,
+    ];
+    return parts.filter(Boolean).join(" ");
   }
 
   statusBadgeClass(codeState: string): string {
     const map: Record<string, string> = {
-      S: 'status-requested',
-      C: 'status-cancelled',
-      P: 'status-pending',
-      A: 'status-confirmed',
+      S: "status-requested",
+      C: "status-cancelled",
+      P: "status-pending",
+      A: "status-confirmed",
     };
-    return map[codeState] || 'status-completed';
+    return map[codeState] || "status-completed";
   }
 
   modalityBadgeClass(modality: string): string {
     const map: Record<string, string> = {
-      'Presencial': 'modality-presential',
-      'Virtual': 'modality-virtual',
+      Presencial: "modality-presential",
+      Virtual: "modality-virtual",
     };
-    return map[modality] || '';
+    return map[modality] || "";
   }
 
   getModalityIcon(modality: string): string {
     const map: Record<string, string> = {
-      'Presencial': 'fa-solid fa-house',
-      'Virtual': 'fa-solid fa-video',
+      Presencial: "fa-solid fa-house",
+      Virtual: "fa-solid fa-video",
     };
-    return map[modality] || 'fa-solid fa-stethoscope';
+    return map[modality] || "fa-solid fa-stethoscope";
   }
 }

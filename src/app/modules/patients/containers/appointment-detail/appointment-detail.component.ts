@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
+import { Component, OnInit } from "@angular/core";
+import { ActivatedRoute, Router } from "@angular/router";
+import { ToastrService } from "ngx-toastr";
 
-import { AppointmentService } from '../../services';
-import { Appointment } from '../../models';
+import { AppointmentService } from "../../services";
+import { Appointment } from "../../models";
 
 interface ProductInfo {
   idProduct: number;
@@ -12,9 +12,9 @@ interface ProductInfo {
 }
 
 @Component({
-  selector: 'app-appointment-detail',
-  templateUrl: './appointment-detail.component.html',
-  styleUrls: ['./appointment-detail.component.scss'],
+  selector: "app-appointment-detail",
+  templateUrl: "./appointment-detail.component.html",
+  styleUrls: ["./appointment-detail.component.scss"],
   standalone: false,
 })
 export class AppointmentDetailComponent implements OnInit {
@@ -30,7 +30,7 @@ export class AppointmentDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const idParam = this.route.snapshot.paramMap.get('id');
+    const idParam = this.route.snapshot.paramMap.get("id");
     if (!idParam) {
       this.notFound = true;
       return;
@@ -44,7 +44,7 @@ export class AppointmentDetailComponent implements OnInit {
       this.parseProducts();
     } else {
       this.notFound = true;
-      this.toastr.error('No se encontró la información de la cita.');
+      this.toastr.error("No se encontró la información de la cita.");
     }
   }
 
@@ -59,33 +59,38 @@ export class AppointmentDetailComponent implements OnInit {
   }
 
   getFullDoctorName(a: Appointment): string {
-    const parts = [a.firstGNameProfessional, a.secondGNameProfessional, a.firstFNameProfessional, a.secondFNameProfessional];
-    return parts.filter(Boolean).join(' ');
+    const parts = [
+      a.firstGNameProfessional,
+      a.secondGNameProfessional,
+      a.firstFNameProfessional,
+      a.secondFNameProfessional,
+    ];
+    return parts.filter(Boolean).join(" ");
   }
 
   statusBadgeClass(codeState: string): string {
     const map: Record<string, string> = {
-      S: 'status-requested',
-      C: 'status-cancelled',
-      P: 'status-pending',
-      A: 'status-confirmed',
+      S: "status-requested",
+      C: "status-cancelled",
+      P: "status-pending",
+      A: "status-confirmed",
     };
-    return map[codeState] || 'status-completed';
+    return map[codeState] || "status-completed";
   }
 
   modalityBadgeClass(modality: string): string {
     const map: Record<string, string> = {
-      'Presencial': 'modality-presential',
-      'Virtual': 'modality-virtual',
+      Presencial: "modality-presential",
+      Virtual: "modality-virtual",
     };
-    return map[modality] || '';
+    return map[modality] || "";
   }
 
   getModalityIcon(modality: string): string {
     const map: Record<string, string> = {
-      'Presencial': 'fa-solid fa-house',
-      'Virtual': 'fa-solid fa-video',
+      Presencial: "fa-solid fa-house",
+      Virtual: "fa-solid fa-video",
     };
-    return map[modality] || 'fa-solid fa-stethoscope';
+    return map[modality] || "fa-solid fa-stethoscope";
   }
 }

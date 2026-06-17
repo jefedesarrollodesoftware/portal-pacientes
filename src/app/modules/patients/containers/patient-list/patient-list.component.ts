@@ -1,18 +1,18 @@
-import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
-import { HttpErrorResponse } from '@angular/common/http';
+import { Component } from "@angular/core";
+import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { Router } from "@angular/router";
+import { ToastrService } from "ngx-toastr";
+import { HttpErrorResponse } from "@angular/common/http";
 
-import { PatientService } from '../../services/patient.service';
-import { PatientAttributesService } from '../../services/patient-attributes.service';
-import { Patient, PatientAttribute } from '../../models';
-import { routes } from '../../../../consts';
+import { PatientService } from "../../services/patient.service";
+import { PatientAttributesService } from "../../services/patient-attributes.service";
+import { Patient, PatientAttribute } from "../../models";
+import { routes } from "../../../../consts";
 
 @Component({
-  selector: 'app-patient-list',
-  templateUrl: './patient-list.component.html',
-  styleUrls: ['./patient-list.component.scss'],
+  selector: "app-patient-list",
+  templateUrl: "./patient-list.component.html",
+  styleUrls: ["./patient-list.component.scss"],
   standalone: false,
 })
 export class PatientListComponent {
@@ -21,7 +21,7 @@ export class PatientListComponent {
   loading = false;
   patient: Patient | null = null;
   documentTypes: PatientAttribute[] = [];
-  lastDocTypeCode = '';
+  lastDocTypeCode = "";
 
   constructor(
     private fb: FormBuilder,
@@ -36,18 +36,18 @@ export class PatientListComponent {
 
   private buildForm(): void {
     this.searchForm = this.fb.group({
-      document_type_code: ['', Validators.required],
-      document_number: ['', Validators.required],
+      document_type_code: ["", Validators.required],
+      document_number: ["", Validators.required],
     });
   }
 
   private loadDocumentTypes(): void {
-    this.patientAttributesService.getByType('tipo-documento').subscribe({
+    this.patientAttributesService.getByType("tipo-documento").subscribe({
       next: (res) => {
         this.documentTypes = res.data;
       },
       error: () => {
-        this.toastr.error('No se pudieron cargar los tipos de documento.');
+        this.toastr.error("No se pudieron cargar los tipos de documento.");
       },
     });
   }
@@ -65,20 +65,22 @@ export class PatientListComponent {
     const { document_type_code, document_number } = this.searchForm.value;
     this.lastDocTypeCode = document_type_code;
 
-    this.patientService.getByDocument(document_type_code, document_number).subscribe({
-      next: (res) => {
-        this.patient = res.data.patient;
-        this.loading = false;
-      },
-      error: (err: HttpErrorResponse) => {
-        this.loading = false;
-        if (err.status === 404) {
-          this.toastr.warning('Paciente no encontrado.');
-        } else {
-          this.toastr.error('Error al consultar el paciente.');
-        }
-      },
-    });
+    this.patientService
+      .getByDocument(document_type_code, document_number)
+      .subscribe({
+        next: (res) => {
+          this.patient = res.data.patient;
+          this.loading = false;
+        },
+        error: (err: HttpErrorResponse) => {
+          this.loading = false;
+          if (err.status === 404) {
+            this.toastr.warning("Paciente no encontrado.");
+          } else {
+            this.toastr.error("Error al consultar el paciente.");
+          }
+        },
+      });
   }
 
   viewDetail(): void {

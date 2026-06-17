@@ -1011,6 +1011,22 @@ interface CompanyResponse {
 
 // Respuesta de GET /patient-attributes (todos agrupados)
 type PatientAttributesGrouped = Record<string, PatientAttribute[]>;
+
+// ===================================================
+// Catálogos de citas
+// ===================================================
+interface AppointmentCatalogsListResponse {
+  catalogs: {
+    type: string;    // Identificador del catálogo (ej: "Exams", "Insurances")
+    name: string;    // Nombre descriptivo
+    url: string;     // URL para obtener los items del catálogo
+  }[];
+}
+
+interface AppointmentCatalogResponse {
+  type: string;      // Identificador del catálogo solicitado
+  items: any[];      // Items del catálogo desde Gomedisys (formato según tipo)
+}
 ```
 
 ---
@@ -1156,7 +1172,7 @@ type PatientAttributesResponse = Record<string, PatientAttribute[]>;
 | **Autenticación** | API Key (`X-API-Key`) |
 | **Parámetros query** | `company_id` (opcional) — necesario si no hay sesión autenticada |
 
-`{type}` es el slug del tipo de atributo (ej: `tipo-documento`, `sexo`, `genero`, `estado-civil`, `nivel-escolar`, `ocupacion`, `division-politica`, `zona-residencia`, `sede`, `asegurador`, `tipo-ingreso`, `causa-ingreso`, `via-ingreso`, `consultorio`, `linea-pago`, `diagnostico`, `estados-citas`).
+`{type}` es el slug del tipo de atributo (ej: `tipo-documento`, `sexo`, `identidad-de-genero`, `estado-civil`, `nivel-escolar`, `ocupaciones`, `sede`, `asegurador`, `tipo-ingreso`, `causa-ingreso`, `via-ingreso`, `ubicacion-fisica`, `consultorio`, `linea-pago`, `diagnostico`, `estados-citas`, `examenes`, `contrato-plan`, `profesional`, `servicio-salud`, `causas-cancelacion`).
 
 **Ejemplo:** `GET /api/v1/patient-attributes/sexo`
 
@@ -1287,8 +1303,6 @@ Retorna las citas del paciente autenticado consultadas en Gomedisys. Por defecto
 
 Internamente utiliza el método `POST /api/Appointment/GetAppointmentPatientP` de Gomedisys que permite filtrar por estados. Gomedisys también expone el método `GET /api/Appointment/GetAppointmentPatient` para consulta simple sin filtro de estados.
 
-> Para poblar el **select de estados** (filtro de citas), use el catálogo local `GET /api/v1/patient-attributes/estados-citas` (ver sección 6.2). Los códigos retornados allí son los mismos que acepta el parámetro `states`.
-
 **Ejemplo:** `GET /api/v1/appointments?states=S,P`
 
 ```typescript
@@ -1326,19 +1340,178 @@ interface AppointmentsResponse {
 |---|---|
 | `401` | Token inválido o no autenticado |
 | `500` | Error al consultar Gomedisys |
+---
+
+### 8.2 Obtener catálogos para creación de citas
+
+Estos endpoints permiten poblar los elementos `<select>` del formulario de creación de citas. Los datos se obtienen en tiempo real desde la API externa de Gomedisys.
+
+#### 8.2.1 Listar catálogos disponibles
+
+| Propiedad | Valor |
+|---|---|
+| **Método** | `GET` |
+| **URL** | `/api/v1/appointments/catalogs` |
+| **Autenticación** | Bearer Token (Sanctum) |
+
+Retorna la lista de catálogos disponibles para la creación de citas.
+
+**Ejemplo:** `GET /api/v1/appointments/catalogs`
+
+```typescript
+interface AppointmentCatalogsListResponse {
+  catalogs: {
+    type: string;    // "Exams" | "Insurances" | "Offices" | "Professionals"
+    name: string;
+    url: string;
+  }[];
+}
+```
+
+#### Respuesta exitosa — `200 OK`
+
+```json
+{
+  "status": true,
+  "message": "OK",
+  "data": {
+    "catalogs": [
+      {
+        "type": "Exams",
+        "name": "Exámenes disponibles",
+        "url": "https://admin-portal-pacientes.local/api/v1/appointments/catalogs/Exams"
+      },
+      {
+        "type": "Insurances",
+        "name": "Contratos y Planes",
+        "url": "https://admin-portal-pacientes.local/api/v1/appointments/catalogs/Insurances"
+      },
+      {
+        "type": "Offices",
+        "name": "Sedes",
+        "url": "https://admin-portal-pacientes.local/api/v1/appointments/catalogs/Offices"
+      },
+      {
+        "type": "Professionals",
+        "name": "Profesionales",
+        "url": "https://admin-portal-pacientes.local/api/v1/appointments/catalogs/Professionals"
+      }
+    ]
+  }
+}
+```
 
 ---
 
-### 8.2 Obtener estados de citas (catálogo) — REMOVIDO
+#### 8.2.2 Obtener items de un catálogo específico
 
-Este endpoint ya no está disponible como ruta independiente. Los estados de citas se obtienen a través del endpoint genérico de catálogos, que consulta los datos sincronizados localmente por `gomedisys:sync-catalogs`:
+| Propiedad | Valor |
+|---|---|
+| **Método** | `GET` |
+| **URL** | `/api/v1/appointments/catalogs/{type}` |
+| **Autenticación** | Bearer Token (Sanctum) |
 
-`GET /api/v1/patient-attributes/estados-citas`
+`{type}` puede ser: `Exams`, `Insurances`, `Offices`, `Professionals`, `EnEncounterClass`, `enReasonAdmission`, `enHealthService`, `enAdminSource`, `enPhysicalLocation`, `enPhysicalLocationRoom`, `CausalLists`.
 
-Ver sección 6.2 para más detalles sobre el uso de este endpoint.
+**Ejemplo:** `GET /api/v1/appointments/catalogs/Exams`
 
-> **Nota:** Los códigos de estado retornados por este catálogo son los mismos que acepta el parámetro `states` de `GET /api/v1/appointments` (sección 8.1).
+```typescript
+interface AppointmentCatalogResponse {
+  type: string;
+  items: any[];    // Formato según el tipo de catálogo
+}
+```
 
+#### Respuesta exitosa — `200 OK`
+
+```json
+{
+  "status": true,
+  "message": "OK",
+  "data": {
+    "type": "Exams",
+    "items": [
+      {
+        "idExam": 1,
+        "nameExam": "Consulta General",
+        "codeExamType": "CONSULTA"
+      },
+      {
+        "idExam": 2,
+        "nameExam": "Consulta Especializada",
+        "codeExamType": "CONSULTA_ESP"
+      }
+    ]
+  }
+}
+```
+
+> El formato exacto de cada item depende de la respuesta de la API externa de Gomedisys.
+
+#### Respuesta de error
+
+| Código | Condición |
+|---|---|
+| `401` | Token inválido o no autenticado |
+| `404` | Tipo de catálogo no disponible |
+| `500` | Error al obtener el catálogo desde Gomedisys |
+
+---
+
+### 8.3 Obtener slots disponibles
+
+| Propiedad | Valor |
+|---|---|
+| **Método** | `GET` |
+| **URL** | `/api/v1/appointments/slots` |
+| **Autenticación** | Bearer Token (Sanctum) |
+
+Consulta los horarios disponibles en Gomedisys para un examen y rango de fechas específico, mediante el endpoint `GetScheduler`.
+
+#### Parámetros query
+
+| Parámetro | Tipo | Requerido | Descripción |
+|---|---|---|---|
+| `idExam` | integer | Sí | ID del examen (obtenido del catálogo `Exams`) |
+| `dateBegin` | string | Sí | Fecha de inicio (formato ISO, ej: `2026-07-01`) |
+| `dateEnd` | string | No | Fecha de fin (formato ISO, ej: `2026-07-31`). Si no se envía, se usa la misma fecha que `dateBegin` |
+
+**Ejemplo:** `GET /api/v1/appointments/slots?idExam=1&dateBegin=2026-07-01&dateEnd=2026-07-31`
+
+#### Respuesta exitosa — `200 OK`
+
+```json
+{
+  "status": true,
+  "message": "OK",
+  "data": {
+    "slots": [
+      {
+        "idSlot": 45,
+        "idExam": 1,
+        "dateSlot": "2026-07-01T08:00:00",
+        "available": true
+      }
+    ]
+  }
+}
+```
+
+```typescript
+interface AppointmentSlotsResponse {
+  slots: any[];   // Array de slots desde Gomedisys (formato sin transformar)
+}
+```
+
+> El formato exacto de cada slot depende de la respuesta de la API externa de Gomedisys.
+
+#### Respuesta de error
+
+| Código | Condición |
+|---|---|
+| `401` | Token inválido o no autenticado |
+| `422` | Parámetros faltantes o inválidos |
+| `500` | Error al consultar Gomedisys |
 ---
 
 ## 9. Tabla resumen de endpoints
@@ -1362,8 +1535,10 @@ Ver sección 6.2 para más detalles sobre el uso de este endpoint.
 | 15 | `GET` | `/api/v1/companies/{company}` | API Key | — | Datos de empresa (logo, colores, icono) |
 | 16 | `GET` | `/api/v1/patient-attributes` | API Key | — | Catálogos agrupados |
 | 17 | `GET` | `/api/v1/patient-attributes/{type}` | API Key | — | Catálogos por tipo |
-| 18 | `GET` | `/api/v1/appointments` | Bearer Token | — | Citas del paciente autenticado |
-| 19 | (REMOVED) | `/api/v1/appointment-states` | — | — | Catálogo de estados de citas — usar `GET /api/v1/patient-attributes/estados-citas` |
+| 18 | `GET` | `/api/v1/appointments/catalogs` | Bearer Token | — | Listar catálogos disponibles para creación de citas |
+| 19 | `GET` | `/api/v1/appointments/catalogs/{type}` | Bearer Token | — | Items de un catálogo específico (Exams, Insurances, etc.) |
+| 20 | `GET` | `/api/v1/appointments` | Bearer Token | — | Citas del paciente autenticado |
+| 21 | `GET` | `/api/v1/appointments/slots` | Bearer Token | — | Obtener slots disponibles por examen y rango de fechas |
 
 ---
 
@@ -1528,18 +1703,22 @@ Estos son los slugs disponibles para el endpoint `GET /api/v1/patient-attributes
 |---|---|
 | `tipo-documento` | Tipo Documento |
 | `sexo` | Sexo |
-| `genero` | Género |
+| `identidad-de-genero` | Identidad de Género |
 | `estado-civil` | Estado Civil |
 | `nivel-escolar` | Nivel Escolar |
-| `ocupacion` | Ocupación |
-| `division-politica` | División Política |
-| `zona-residencia` | Zona Residencia |
+| `ocupaciones` | Ocupaciones |
 | `sede` | Sede |
 | `asegurador` | Asegurador |
 | `tipo-ingreso` | Tipo Ingreso |
 | `causa-ingreso` | Causa Ingreso |
 | `via-ingreso` | Vía Ingreso |
+| `ubicacion-fisica` | Ubicacion Fisica |
 | `consultorio` | Consultorio |
 | `linea-pago` | Línea Pago |
 | `diagnostico` | Diagnóstico |
 | `estados-citas` | Estados Citas |
+| `examenes` | Examenes |
+| `contrato-plan` | Contrato Plan |
+| `profesional` | Profesional |
+| `servicio-salud` | Servicio Salud |
+| `causas-cancelacion` | Causas Cancelacion |

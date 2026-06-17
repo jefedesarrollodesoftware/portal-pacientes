@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { ApiResponse, Appointment, AppointmentListParams, AppointmentListResponse } from '../models';
+import { ApiResponse, Appointment, AppointmentCatalogResponse, AppointmentListParams, AppointmentListResponse, AppointmentSlotsResponse, CreateAppointmentRequest, CreateAppointmentResponse } from '../models';
 
 @Injectable({
   providedIn: 'root',
@@ -33,5 +33,21 @@ export class AppointmentService {
 
   getAppointmentById(id: number): Observable<ApiResponse<Appointment>> {
     return this.http.get<ApiResponse<Appointment>>(`${this.baseUrl}/${id}`);
+  }
+
+  createAppointment(body: CreateAppointmentRequest): Observable<ApiResponse<CreateAppointmentResponse>> {
+    return this.http.post<ApiResponse<CreateAppointmentResponse>>(this.baseUrl, body);
+  }
+
+  getSlots(idExam: number, dateBegin: string, dateEnd: string): Observable<ApiResponse<AppointmentSlotsResponse>> {
+    const params = new HttpParams()
+      .set('idExam', idExam.toString())
+      .set('dateBegin', dateBegin)
+      .set('dateEnd', dateEnd);
+    return this.http.get<ApiResponse<AppointmentSlotsResponse>>(`${this.baseUrl}/slots`, { params });
+  }
+
+  getCatalog(type: string): Observable<ApiResponse<AppointmentCatalogResponse>> {
+    return this.http.get<ApiResponse<AppointmentCatalogResponse>>(`${this.baseUrl}/catalogs/${type}`);
   }
 }

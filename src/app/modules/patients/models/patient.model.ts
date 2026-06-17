@@ -152,7 +152,7 @@ export interface SyncPatientRequest {
 export interface SyncPatientResponse {
   patient: Patient;
   synced: boolean;
-  created_or_updated: 'created' | 'updated';
+  created_or_updated: "created" | "updated";
   source: string;
 }
 

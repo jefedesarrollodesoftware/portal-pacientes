@@ -50,3 +50,48 @@ export interface AppointmentState {
 export interface AppointmentStatesResponse {
   states: AppointmentState[];
 }
+
+export interface CreateAppointmentRequest {
+  idSlot: number;
+  idExam: number;
+  codeExamType: string;
+  dateExpected: string;
+  codeContract: string;
+  codePlan: string;
+  codeRegime: string;
+  codeTypeAffiliate: string;
+  codeLevelAffiliate: string;
+  note?: string;
+  email?: string;
+  cellPhone?: string;
+  emailActive?: boolean;
+  smsActive?: boolean;
+  isForTelemedicine?: boolean;
+  products?: string;
+}
+
+export interface CreateAppointmentResponse {
+  appointment: any;
+}
+
+export interface Slot {
+  idSlot: number;
+  idExam: number;
+  dateSlot: string;
+  available: boolean;
+}
+
+export interface AppointmentSlotsResponse {
+  slots: Slot[];
+}
+
+export interface CatalogItem {
+  code: string;
+  name: string;
+  value: string;
+}
+
+export interface AppointmentCatalogResponse {
+  type: string;
+  items: any[];
+}

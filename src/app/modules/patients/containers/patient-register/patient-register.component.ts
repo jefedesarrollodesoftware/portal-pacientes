@@ -1,24 +1,26 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
-import { HttpErrorResponse } from '@angular/common/http';
-import { Subscription, interval } from 'rxjs';
+import { Component, OnInit, OnDestroy } from "@angular/core";
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from "@angular/forms";
+import { Router, RouterModule } from "@angular/router";
+import { ToastrService } from "ngx-toastr";
+import { HttpErrorResponse } from "@angular/common/http";
+import { Subscription, interval } from "rxjs";
 
-import { PatientService } from '../../services/patient.service';
-import { PatientAttributesService } from '../../services/patient-attributes.service';
-import { PatientAttribute, InitiateRegistrationResponse } from '../../models';
-import { setBackendErrors } from '../../utils/form-error-handler';
+import { PatientService } from "../../services/patient.service";
+import { PatientAttributesService } from "../../services/patient-attributes.service";
+import { PatientAttribute, InitiateRegistrationResponse } from "../../models";
+import { setBackendErrors } from "../../utils/form-error-handler";
 
 @Component({
-  selector: 'app-patient-register',
-  templateUrl: './patient-register.component.html',
+  selector: "app-patient-register",
+  templateUrl: "./patient-register.component.html",
   styleUrls: [],
   standalone: true,
-  imports: [
-    ReactiveFormsModule,
-    RouterModule,
-],
+  imports: [ReactiveFormsModule, RouterModule],
 })
 export class PatientRegisterComponent implements OnInit, OnDestroy {
   currentStep = 1;
@@ -29,7 +31,7 @@ export class PatientRegisterComponent implements OnInit, OnDestroy {
   confirming = false;
   sessionData: InitiateRegistrationResponse | null = null;
   canResend = false;
-  resendCountdown = '';
+  resendCountdown = "";
   resending = false;
   private resendTimerSubscription?: Subscription;
 
@@ -57,21 +59,24 @@ export class PatientRegisterComponent implements OnInit, OnDestroy {
     this.registerForm = this.fb.group(
       {
         document_type_id: [null, Validators.required],
-        document_number: ['', [Validators.required, Validators.maxLength(45)]],
-        first_name: ['', [Validators.required, Validators.maxLength(120)]],
-        last_name: ['', [Validators.required, Validators.maxLength(120)]],
-        cellphone: ['', [Validators.required, Validators.maxLength(45)]],
-        cellphone_code: ['', [Validators.maxLength(10)]],
-        email: ['', [Validators.required, Validators.email, Validators.maxLength(191)]],
-        document_expedition_date: [''],
-        date_birth: [''],
+        document_number: ["", [Validators.required, Validators.maxLength(45)]],
+        first_name: ["", [Validators.required, Validators.maxLength(120)]],
+        last_name: ["", [Validators.required, Validators.maxLength(120)]],
+        cellphone: ["", [Validators.required, Validators.maxLength(45)]],
+        cellphone_code: ["", [Validators.maxLength(10)]],
+        email: [
+          "",
+          [Validators.required, Validators.email, Validators.maxLength(191)],
+        ],
+        document_expedition_date: [""],
+        date_birth: [""],
         gender_id: [null],
         gender_identity_id: [null],
         civil_status_id: [null],
         scholarship_id: [null],
-        address: ['', Validators.maxLength(300)],
-        password: ['', [Validators.required, Validators.minLength(6)]],
-        password_confirmation: ['', Validators.required],
+        address: ["", Validators.maxLength(300)],
+        password: ["", [Validators.required, Validators.minLength(6)]],
+        password_confirmation: ["", Validators.required],
       },
       { validators: this.passwordsMatchValidator },
     );
@@ -79,75 +84,100 @@ export class PatientRegisterComponent implements OnInit, OnDestroy {
 
   private buildCodeForm(): void {
     this.codeForm = this.fb.group({
-      code: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(6)]],
+      code: [
+        "",
+        [Validators.required, Validators.minLength(6), Validators.maxLength(6)],
+      ],
     });
   }
 
-  private passwordsMatchValidator(group: FormGroup): Record<string, unknown> | null {
-    const password = group.get('password')?.value;
-    const confirmation = group.get('password_confirmation')?.value;
+  private passwordsMatchValidator(
+    group: FormGroup,
+  ): Record<string, unknown> | null {
+    const password = group.get("password")?.value;
+    const confirmation = group.get("password_confirmation")?.value;
     if (password && confirmation && password !== confirmation) {
-      group.get('password_confirmation')?.setErrors({ mismatch: true });
+      group.get("password_confirmation")?.setErrors({ mismatch: true });
       return { mismatch: true };
     }
     return null;
   }
 
   private loadDocumentTypes(): void {
-    this.patientAttributesService.getByType('tipo-documento').subscribe({
-      next: (res) => { this.documentTypes = res.data; },
+    this.patientAttributesService.getByType("tipo-documento").subscribe({
+      next: (res) => {
+        this.documentTypes = res.data;
+      },
       error: () => {},
     });
   }
 
   private loadAllCatalogs(): void {
-    this.patientAttributesService.getByType('sexo').subscribe({
-      next: (res) => { this.genders = res.data; },
+    this.patientAttributesService.getByType("sexo").subscribe({
+      next: (res) => {
+        this.genders = res.data;
+      },
       error: () => {},
     });
-    this.patientAttributesService.getByType('genero').subscribe({
-      next: (res) => { this.genderIdentities = res.data; },
+    this.patientAttributesService.getByType("genero").subscribe({
+      next: (res) => {
+        this.genderIdentities = res.data;
+      },
       error: () => {},
     });
-    this.patientAttributesService.getByType('estado-civil').subscribe({
-      next: (res) => { this.civilStatuses = res.data; },
+    this.patientAttributesService.getByType("estado-civil").subscribe({
+      next: (res) => {
+        this.civilStatuses = res.data;
+      },
       error: () => {},
     });
-    this.patientAttributesService.getByType('nivel-escolar').subscribe({
-      next: (res) => { this.scholarships = res.data; },
+    this.patientAttributesService.getByType("nivel-escolar").subscribe({
+      next: (res) => {
+        this.scholarships = res.data;
+      },
       error: () => {},
     });
   }
 
   checkExistence(): void {
-    if (this.registerForm.get('document_type_id')?.invalid || this.registerForm.get('document_number')?.invalid) {
-      this.registerForm.get('document_type_id')?.markAsTouched();
-      this.registerForm.get('document_number')?.markAsTouched();
+    if (
+      this.registerForm.get("document_type_id")?.invalid ||
+      this.registerForm.get("document_number")?.invalid
+    ) {
+      this.registerForm.get("document_type_id")?.markAsTouched();
+      this.registerForm.get("document_number")?.markAsTouched();
       return;
     }
     this.checking = true;
-    this.patientService.checkExistence({
-      document_type_id: this.registerForm.get('document_type_id')!.value,
-      document_number: this.registerForm.get('document_number')!.value,
-    }).subscribe({
-      next: (res) => {
-        this.checking = false;
-        if (res.data === null) {
-          this.toastr.error(res.message);
-          return;
-        }
-        if (res.data.exists) {
-          this.toastr.error('El paciente ya se encuentra registrado en el sistema.');
-          return;
-        }
-        this.loadAllCatalogs();
-        this.currentStep = 2;
-      },
-      error: (err: HttpErrorResponse) => {
-        this.checking = false;
-        this.toastr.error(err.error?.message || 'Error al verificar el documento. Intenta de nuevo.');
-      },
-    });
+    this.patientService
+      .checkExistence({
+        document_type_id: this.registerForm.get("document_type_id")!.value,
+        document_number: this.registerForm.get("document_number")!.value,
+      })
+      .subscribe({
+        next: (res) => {
+          this.checking = false;
+          if (res.data === null) {
+            this.toastr.error(res.message);
+            return;
+          }
+          if (res.data.exists) {
+            this.toastr.error(
+              "El paciente ya se encuentra registrado en el sistema.",
+            );
+            return;
+          }
+          this.loadAllCatalogs();
+          this.currentStep = 2;
+        },
+        error: (err: HttpErrorResponse) => {
+          this.checking = false;
+          this.toastr.error(
+            err.error?.message ||
+              "Error al verificar el documento. Intenta de nuevo.",
+          );
+        },
+      });
   }
 
   initiateRegistration(): void {
@@ -163,17 +193,21 @@ export class PatientRegisterComponent implements OnInit, OnDestroy {
         this.sessionData = res.data;
         this.currentStep = 3;
         this.startResendCooldown();
-        this.toastr.success('Códigos de verificación enviados a tu correo y celular.');
+        this.toastr.success(
+          "Códigos de verificación enviados a tu correo y celular.",
+        );
       },
       error: (err: HttpErrorResponse) => {
         this.submitting = false;
         if (err.status === 422 && err.error?.data) {
           setBackendErrors(this.registerForm, err.error.data);
-          this.toastr.error('Corrige los errores en el formulario.');
+          this.toastr.error("Corrige los errores en el formulario.");
         } else if (err.status === 500) {
-          this.toastr.error('Error del servidor. Intenta nuevamente.');
+          this.toastr.error("Error del servidor. Intenta nuevamente.");
         } else {
-          this.toastr.error(err.error?.message || 'Ocurrió un error inesperado.');
+          this.toastr.error(
+            err.error?.message || "Ocurrió un error inesperado.",
+          );
         }
       },
     });
@@ -185,24 +219,32 @@ export class PatientRegisterComponent implements OnInit, OnDestroy {
       return;
     }
     this.confirming = true;
-    this.patientService.confirmRegistration({
-      session_token: this.sessionData.session_token,
-      code: this.codeForm.value.code,
-    }).subscribe({
-      next: (res) => {
-        this.confirming = false;
-        this.toastr.success(res.message || 'Paciente registrado correctamente.');
-        this.router.navigate(['/login']);
-      },
-      error: (err: HttpErrorResponse) => {
-        this.confirming = false;
-        if (err.status === 422) {
-          this.toastr.error('Código inválido o sesión expirada. Solicita un nuevo registro.');
-        } else {
-          this.toastr.error(err.error?.message || 'Error al confirmar el registro.');
-        }
-      },
-    });
+    this.patientService
+      .confirmRegistration({
+        session_token: this.sessionData.session_token,
+        code: this.codeForm.value.code,
+      })
+      .subscribe({
+        next: (res) => {
+          this.confirming = false;
+          this.toastr.success(
+            res.message || "Paciente registrado correctamente.",
+          );
+          this.router.navigate(["/login"]);
+        },
+        error: (err: HttpErrorResponse) => {
+          this.confirming = false;
+          if (err.status === 422) {
+            this.toastr.error(
+              "Código inválido o sesión expirada. Solicita un nuevo registro.",
+            );
+          } else {
+            this.toastr.error(
+              err.error?.message || "Error al confirmar el registro.",
+            );
+          }
+        },
+      });
   }
 
   ngOnDestroy(): void {
@@ -220,14 +262,14 @@ export class PatientRegisterComponent implements OnInit, OnDestroy {
 
       if (diff <= 0) {
         this.canResend = true;
-        this.resendCountdown = '';
+        this.resendCountdown = "";
         this.stopResendTimer();
         return;
       }
 
       const minutes = Math.floor(diff / 60000);
       const seconds = Math.floor((diff % 60000) / 1000);
-      this.resendCountdown = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      this.resendCountdown = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
     });
   }
 
@@ -247,14 +289,19 @@ export class PatientRegisterComponent implements OnInit, OnDestroy {
         this.sessionData = res.data;
         this.codeForm.reset();
         this.startResendCooldown();
-        this.toastr.success('Códigos reenviados a tu correo y celular.');
+        this.toastr.success("Códigos reenviados a tu correo y celular.");
       },
       error: (err: HttpErrorResponse) => {
         this.resending = false;
         if (err.status === 422) {
-          this.toastr.error('Sesión expirada. Debes iniciar el registro nuevamente.');
+          this.toastr.error(
+            "Sesión expirada. Debes iniciar el registro nuevamente.",
+          );
         } else {
-          this.toastr.error(err.error?.message || 'Error al reenviar el código. Intenta de nuevo.');
+          this.toastr.error(
+            err.error?.message ||
+              "Error al reenviar el código. Intenta de nuevo.",
+          );
         }
       },
     });
@@ -264,7 +311,7 @@ export class PatientRegisterComponent implements OnInit, OnDestroy {
     const raw = this.registerForm.getRawValue();
     const payload: any = {};
     for (const key of Object.keys(raw)) {
-      if (raw[key] !== '' && raw[key] !== null && raw[key] !== undefined) {
+      if (raw[key] !== "" && raw[key] !== null && raw[key] !== undefined) {
         payload[key] = raw[key];
       }
     }

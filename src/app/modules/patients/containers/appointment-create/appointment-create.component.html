@@ -1,0 +1,92 @@
+@if (loading) {
+<div class="text-center py-5">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Cargando...</span>
+  </div>
+</div>
+}
+
+@if (!loading) {
+<div class="card shadow-sm">
+  <div class="card-body p-4">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <h4 class="card-title mb-0">Nueva Cita</h4>
+    </div>
+
+    <form [formGroup]="form">
+      <h5 class="text-primary mb-3 pb-2 border-bottom">Selección de Examen y Horario</h5>
+      <div class="row g-3 mb-4">
+        <div class="col-12 col-md-6">
+          <label class="form-label" for="idExam">Examen <span class="text-danger">*</span></label>
+          <select id="idExam" class="form-select" formControlName="idExam" (change)="onExamChange()"
+            [class.is-invalid]="form.get('idExam')?.invalid && form.get('idExam')?.touched">
+            <option [ngValue]="null" disabled>Selecciona un examen</option>
+            @for (exam of exams; track exam.code) {
+            <option [ngValue]="exam.code">{{ exam.name }}</option>
+            }
+          </select>
+          @if (form.get('idExam')?.invalid && form.get('idExam')?.touched) {
+          <div class="invalid-feedback">Selecciona un examen.</div>
+          }
+        </div>
+        <div class="col-12 col-md-3">
+          <label class="form-label" for="dateBegin">Fecha Desde <span class="text-danger">*</span></label>
+          <input id="dateBegin" type="date" class="form-control" formControlName="dateBegin"
+            [class.is-invalid]="form.get('dateBegin')?.invalid && form.get('dateBegin')?.touched" />
+          @if (form.get('dateBegin')?.invalid && form.get('dateBegin')?.touched) {
+          <div class="invalid-feedback">Selecciona una fecha de inicio.</div>
+          }
+        </div>
+        <div class="col-12 col-md-3">
+          <label class="form-label" for="dateEnd">Fecha Hasta</label>
+          <input id="dateEnd" type="date" class="form-control" formControlName="dateEnd"
+            [class.is-invalid]="form.get('dateEnd')?.invalid && form.get('dateEnd')?.touched" />
+          @if (form.get('dateEnd')?.invalid && form.get('dateEnd')?.touched) {
+          <div class="invalid-feedback">Selecciona una fecha de fin.</div>
+          }
+        </div>
+      </div>
+
+      <div class="row g-3 mb-4">
+        <div class="col-12">
+          <button type="button" class="btn btn-outline-primary" (click)="searchSlots()"
+            [disabled]="searchingSlots || !form.get('idExam')?.value || !form.get('dateBegin')?.value">
+            @if (searchingSlots) {
+            <span class="spinner-border spinner-border-sm me-1"></span>
+            }
+            <i class="fas fa-search me-1"></i> Buscar Horarios
+          </button>
+        </div>
+      </div>
+
+      @if (slots.length > 0) {
+      <div class="row g-3 mb-4">
+        <div class="col-12 col-md-6">
+          <label class="form-label" for="idSlot">Horario Disponible <span class="text-danger">*</span></label>
+          <select id="idSlot" class="form-select" formControlName="idSlot" (change)="onSlotChange()"
+            [class.is-invalid]="form.get('idSlot')?.invalid && form.get('idSlot')?.touched">
+            <option [ngValue]="null" disabled>Selecciona un horario</option>
+            @for (slot of slots; track slot.idSlot) {
+            <option [ngValue]="slot.idSlot">{{ slot.dateSlot | date:'dd/MM/yyyy HH:mm' }}</option>
+            }
+          </select>
+          @if (form.get('idSlot')?.invalid && form.get('idSlot')?.touched) {
+          <div class="invalid-feedback">Selecciona un horario disponible.</div>
+          }
+        </div>
+        <div class="col-12 col-md-6">
+          <label class="form-label" for="dateExpected">Fecha y Hora de la Cita <span
+              class="text-danger">*</span></label>
+          <input id="dateExpected" type="datetime-local" class="form-control" formControlName="dateExpected"
+            [class.is-invalid]="form.get('dateExpected')?.invalid && form.get('dateExpected')?.touched" />
+          @if (form.get('dateExpected')?.invalid && form.get('dateExpected')?.touched) {
+          <div class="invalid-feedback">La fecha y hora son obligatorias.</div>
+          }
+        </div>
+      </div>
+      }
+
+    </form>
+  </div>
+</div>
+}
