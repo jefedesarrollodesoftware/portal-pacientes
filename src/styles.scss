@@ -1,1 +1,111 @@
 @use "app/styles/bs5-auth-theme" as *;
+
+@use "@ng-select/ng-select/scss/default.theme";
+
+.ng-select.ng-select-single.ng-select-bootstrap {
+  .ng-select-container {
+    min-height: calc(3.35rem + 2px);
+    border-radius: 0.6rem;
+    border: 1px solid #ced4da;
+    background-color: #fff;
+    display: flex;
+    align-items: center;
+    padding: 0.65rem 0.9rem;
+
+    .ng-value-container {
+      padding: 0;
+      align-items: center;
+
+      .ng-placeholder {
+        color: #6c757d;
+        font-size: 1rem;
+      }
+
+      .ng-value {
+        font-size: 1rem;
+      }
+    }
+
+    .ng-arrow-wrapper {
+      .ng-arrow {
+        border-color: #6c757d transparent transparent;
+        border-width: 5px 5px 2.5px;
+      }
+    }
+
+    .ng-clear-wrapper {
+      color: #6c757d;
+    }
+  }
+
+  &.ng-select-focused .ng-select-container {
+    border-color: #0b63ce;
+    box-shadow: 0 0 0 0.2rem rgba(11, 99, 206, 0.12);
+    outline: 0;
+  }
+
+  &.ng-select-disabled .ng-select-container {
+    background-color: #e9ecef;
+  }
+
+  &.is-invalid .ng-select-container {
+    border-color: #dc3545;
+  }
+}
+
+.ng-select.ng-select-bootstrap {
+  &.ng-select-multiple {
+    .ng-select-container {
+      min-height: calc(3.35rem + 2px);
+      border-radius: 0.6rem;
+      border: 1px solid #ced4da;
+      background-color: #fff;
+      padding: 0.35rem 0.9rem;
+
+      .ng-value-container {
+        padding: 0;
+      }
+
+      .ng-input > input {
+        font-size: 1rem;
+      }
+    }
+  }
+
+  .ng-dropdown-panel {
+    border: 1px solid #ced4da;
+    border-radius: 0.6rem;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    margin-top: 2px;
+
+    .ng-dropdown-panel-items {
+      .ng-option {
+        padding: 0.5rem 0.9rem;
+        font-size: 1rem;
+        color: #212529;
+
+        &.ng-option-marked {
+          background-color: #e9ecef;
+        }
+
+        &.ng-option-selected {
+          background-color: #cfe2ff;
+          color: #084298;
+        }
+
+        &.ng-option-disabled {
+          color: #6c757d;
+        }
+      }
+
+      .ng-optgroup {
+        padding: 0.5rem 0.9rem;
+        font-weight: 700;
+        color: #6c757d;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+    }
+  }
+}

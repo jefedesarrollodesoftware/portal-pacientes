@@ -39,6 +39,7 @@ export interface PatientAttribute {
   code: string;
   name: string;
   short: string | null;
+  group: string | null;
   value: string | null;
   description: string | null;
   order: number | null;

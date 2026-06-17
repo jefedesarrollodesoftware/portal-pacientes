@@ -1,6 +1,7 @@
 import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { NgSelectModule } from "@ng-select/ng-select";
 
 import { PatientsRoutingModule } from "./patients-routing.module";
 import { AppointmentListComponent } from "./containers/appointment-list/appointment-list.component";
@@ -17,6 +18,7 @@ import { AppointmentCreateComponent } from "./containers/appointment-create/appo
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
+    NgSelectModule,
     PatientsRoutingModule,
   ],
 })

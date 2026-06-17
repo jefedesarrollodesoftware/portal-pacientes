@@ -2,7 +2,8 @@ import { Component, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ToastrService } from "ngx-toastr";
 import { AppointmentService } from "../../services";
-import { CatalogItem, Slot } from "../../models";
+import { PatientAttributesService } from "../../services";
+import { PatientAttribute, Slot } from "../../models";
 
 @Component({
   selector: "app-appointment-create",
@@ -15,22 +16,26 @@ export class AppointmentCreateComponent implements OnInit {
   loading = true;
   searchingSlots = false;
 
-  exams: CatalogItem[] = [];
+  exams: PatientAttribute[] = [];
   slots: Slot[] = [];
 
   constructor(
     private fb: FormBuilder,
     private appointmentService: AppointmentService,
+    private patientAttributesService: PatientAttributesService,
     private toastr: ToastrService,
   ) {
     this.form = this.buildForm();
   }
 
   ngOnInit(): void {
-    this.appointmentService.getCatalog("Exams").subscribe({
+    this.patientAttributesService.getByType("examenes").subscribe({
       next: (res) => {
-        this.exams = res.data.items;
         this.loading = false;
+        this.exams = res.data.map(
+          (attr: PatientAttribute) =>
+            ({ code: attr.code, name: attr.name, group: attr.group }) as PatientAttribute,
+        );
       },
       error: () => {
         this.loading = false;
