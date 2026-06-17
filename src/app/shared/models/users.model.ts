@@ -3,7 +3,7 @@ export interface UserAvatarItem {
   [key: string]: unknown;
 }
 
-export class Users {
+export interface Users {
   id: string;
   firstName: string;
   lastName: string;

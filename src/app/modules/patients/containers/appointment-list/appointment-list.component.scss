@@ -1,3 +1,5 @@
+@use '../../../../styles/appointment-badge' as *;
+
 .appointment-card {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 
@@ -5,74 +7,6 @@
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
-}
-
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 13px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-
-  i {
-    font-size: 10px;
-  }
-}
-
-.status-requested {
-  background: #fff3e0;
-  color: #e65100;
-  border: 1px solid #ffb74d;
-}
-
-.status-cancelled {
-  background: #ffebee;
-  color: #c62828;
-  border: 1px solid #ef9a9a;
-}
-
-.status-pending {
-  background: #e3f2fd;
-  color: #1565c0;
-  border: 1px solid #64b5f6;
-}
-
-.status-confirmed {
-  background: #e8f5e9;
-  color: #2e7d32;
-  border: 1px solid #81c784;
-}
-
-.status-completed {
-  background: #f3e5f5;
-  color: #7b1fa2;
-  border: 1px solid #ce93d8;
-}
-
-.modality-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 3px 8px;
-  border-radius: 12px;
-  font-size: 11px;
-  font-weight: 500;
-  background: #eceff1;
-  color: #37474f;
-}
-
-.modality-presential {
-  background: #e1f5fe;
-  color: #0277bd;
-}
-
-.modality-virtual {
-  background: #f3e5f5;
-  color: #7b1fa2;
 }
 
 .card-footer {

@@ -1,4 +1,4 @@
-@if (loading) {
+@if (loading()) {
 <div class="text-center py-5">
   <div class="spinner-border text-primary" role="status">
     <span class="visually-hidden">Cargando...</span>
@@ -6,21 +6,21 @@
 </div>
 }
 
-@if (!loading) {
+@if (!loading()) {
 <div class="card shadow-sm">
   <div class="card-body p-4">
     <div class="d-flex align-items-center justify-content-between mb-4">
       <h4 class="card-title mb-0">Nueva Cita</h4>
     </div>
 
-    <form [formGroup]="form">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
       <h5 class="text-primary mb-3 pb-2 border-bottom">Selección de Examen y Horario</h5>
       <div class="row g-3 mb-4">
         <div class="col-12 col-md-6">
           <label class="form-label" for="idExam">Examen <span class="text-danger">*</span></label>
           <ng-select id="idExam"
             class="ng-select-bootstrap"
-            [items]="exams"
+            [items]="exams()"
             bindLabel="name"
             bindValue="code"
             groupBy="group"
@@ -29,26 +29,26 @@
             formControlName="idExam"
             (change)="onExamChange()"
             placeholder="Selecciona un examen"
-            [class.is-invalid]="form.get('idExam')?.invalid && form.get('idExam')?.touched"
+            [class.is-invalid]="idExam.invalid && idExam.touched"
             labelForId="idExam">
           </ng-select>
-          @if (form.get('idExam')?.invalid && form.get('idExam')?.touched) {
+          @if (idExam.invalid && idExam.touched) {
           <div class="invalid-feedback">Selecciona un examen.</div>
           }
         </div>
         <div class="col-12 col-md-3">
           <label class="form-label" for="dateBegin">Fecha Desde <span class="text-danger">*</span></label>
           <input id="dateBegin" type="date" class="form-control" formControlName="dateBegin"
-            [class.is-invalid]="form.get('dateBegin')?.invalid && form.get('dateBegin')?.touched" />
-          @if (form.get('dateBegin')?.invalid && form.get('dateBegin')?.touched) {
+            [class.is-invalid]="dateBegin.invalid && dateBegin.touched" />
+          @if (dateBegin.invalid && dateBegin.touched) {
           <div class="invalid-feedback">Selecciona una fecha de inicio.</div>
           }
         </div>
         <div class="col-12 col-md-3">
           <label class="form-label" for="dateEnd">Fecha Hasta</label>
           <input id="dateEnd" type="date" class="form-control" formControlName="dateEnd"
-            [class.is-invalid]="form.get('dateEnd')?.invalid && form.get('dateEnd')?.touched" />
-          @if (form.get('dateEnd')?.invalid && form.get('dateEnd')?.touched) {
+            [class.is-invalid]="dateEnd.invalid && dateEnd.touched" />
+          @if (dateEnd.invalid && dateEnd.touched) {
           <div class="invalid-feedback">Selecciona una fecha de fin.</div>
           }
         </div>
@@ -57,8 +57,8 @@
       <div class="row g-3 mb-4">
         <div class="col-12">
           <button type="button" class="btn btn-outline-primary" (click)="searchSlots()"
-            [disabled]="searchingSlots || !form.get('idExam')?.value || !form.get('dateBegin')?.value">
-            @if (searchingSlots) {
+            [disabled]="searchingSlots() || !idExam.value || !dateBegin.value">
+            @if (searchingSlots()) {
             <span class="spinner-border spinner-border-sm me-1"></span>
             }
             <i class="fas fa-search me-1"></i> Buscar Horarios
@@ -66,18 +66,18 @@
         </div>
       </div>
 
-      @if (slots.length > 0) {
+      @if (slots().length > 0) {
       <div class="row g-3 mb-4">
         <div class="col-12 col-md-6">
           <label class="form-label" for="idSlot">Horario Disponible <span class="text-danger">*</span></label>
           <select id="idSlot" class="form-select" formControlName="idSlot" (change)="onSlotChange()"
-            [class.is-invalid]="form.get('idSlot')?.invalid && form.get('idSlot')?.touched">
+            [class.is-invalid]="idSlot.invalid && idSlot.touched">
             <option [ngValue]="null" disabled>Selecciona un horario</option>
-            @for (slot of slots; track slot.idSlot) {
+            @for (slot of slots(); track slot.idSlot) {
             <option [ngValue]="slot.idSlot">{{ slot.dateSlot | date:'dd/MM/yyyy HH:mm' }}</option>
             }
           </select>
-          @if (form.get('idSlot')?.invalid && form.get('idSlot')?.touched) {
+          @if (idSlot.invalid && idSlot.touched) {
           <div class="invalid-feedback">Selecciona un horario disponible.</div>
           }
         </div>
@@ -85,14 +85,24 @@
           <label class="form-label" for="dateExpected">Fecha y Hora de la Cita <span
               class="text-danger">*</span></label>
           <input id="dateExpected" type="datetime-local" class="form-control" formControlName="dateExpected"
-            [class.is-invalid]="form.get('dateExpected')?.invalid && form.get('dateExpected')?.touched" />
-          @if (form.get('dateExpected')?.invalid && form.get('dateExpected')?.touched) {
+            [class.is-invalid]="dateExpected.invalid && dateExpected.touched" />
+          @if (dateExpected.invalid && dateExpected.touched) {
           <div class="invalid-feedback">La fecha y hora son obligatorias.</div>
           }
         </div>
       </div>
       }
 
+      <div class="row g-3">
+        <div class="col-12 d-flex justify-content-end gap-2">
+          <button type="button" class="btn btn-secondary" routerLink="/patients/appointments">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="form.invalid || searchingSlots()">
+            <i class="fas fa-check me-1"></i> Agendar Cita
+          </button>
+        </div>
+      </div>
     </form>
   </div>
 </div>
