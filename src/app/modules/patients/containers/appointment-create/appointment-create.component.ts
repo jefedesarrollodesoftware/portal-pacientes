@@ -8,8 +8,7 @@ import { PatientAttribute, Slot } from "../../models";
 interface AppointmentForm {
   idSlot: FormControl<number | null>;
   idExam: FormControl<number | null>;
-  dateBegin: FormControl<string>;
-  dateEnd: FormControl<string | null>;
+  dateRange: FormControl<string>;
   dateExpected: FormControl<string>;
 }
 
@@ -37,13 +36,11 @@ export class AppointmentCreateComponent implements OnInit {
     return this.form.controls.idExam;
   }
 
-  get dateBegin(): FormControl<string> {
-    return this.form.controls.dateBegin;
+  get dateRange(): FormControl<string> {
+    return this.form.controls.dateRange;
   }
 
-  get dateEnd(): FormControl<string | null> {
-    return this.form.controls.dateEnd;
-  }
+  readonly rangeSeparator = " a ";
 
   get idSlot(): FormControl<number | null> {
     return this.form.controls.idSlot;
@@ -77,8 +74,7 @@ export class AppointmentCreateComponent implements OnInit {
     return this.fb.group({
       idSlot: [null as number | null, [Validators.required]],
       idExam: [null as number | null, [Validators.required]],
-      dateBegin: ["" as string, [Validators.required]],
-      dateEnd: [null as string | null],
+      dateRange: ["" as string, [Validators.required]],
       dateExpected: ["" as string, [Validators.required]],
     });
   }
@@ -90,16 +86,20 @@ export class AppointmentCreateComponent implements OnInit {
 
   searchSlots(): void {
     const idExamValue = this.idExam.value;
-    const dateBeginValue = this.dateBegin.value;
+    const rangeValue = this.dateRange.value;
 
-    if (!idExamValue || !dateBeginValue) {
-      this.toastr.error("Selecciona un examen y una fecha de inicio.");
+    if (!idExamValue || !rangeValue) {
+      this.toastr.error("Selecciona un examen y un rango de fechas.");
       return;
     }
 
+    const parts = rangeValue.split(this.rangeSeparator);
+    const dateBegin = parts[0]?.trim();
+    const dateEnd = parts[1]?.trim() || dateBegin;
+
     this.searchingSlots.set(true);
     this.appointmentService
-      .getSlots(idExamValue, dateBeginValue, this.dateEnd.value || dateBeginValue)
+      .getSlots(idExamValue, dateBegin!, dateEnd!)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res) => {

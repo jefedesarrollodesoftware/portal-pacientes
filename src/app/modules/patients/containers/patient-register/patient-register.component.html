@@ -167,13 +167,15 @@
         <div class="col-12 col-md-6">
           <div class="mb-3">
             <label for="docExpDate" class="form-label">Fecha de Expedición del Documento</label>
-            <input id="docExpDate" type="date" class="form-control" formControlName="document_expedition_date" />
+            <input id="docExpDate" type="text" class="form-control" formControlName="document_expedition_date"
+              mwlFlatpickr dateFormat="Y-m-d" [disableMobile]="true" />
           </div>
         </div>
         <div class="col-12 col-md-6">
           <div class="mb-3">
             <label for="dateBirth" class="form-label">Fecha de Nacimiento</label>
-            <input id="dateBirth" type="date" class="form-control" formControlName="date_birth" />
+            <input id="dateBirth" type="text" class="form-control" formControlName="date_birth"
+              mwlFlatpickr dateFormat="Y-m-d" [disableMobile]="true" />
           </div>
         </div>
       </div>

@@ -14,7 +14,7 @@
     </div>
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
-      <h5 class="text-primary mb-3 pb-2 border-bottom">Selección de Examen y Horario</h5>
+      <h5 class="text-primary mb-3 pb-2 border-bottom">Selección de Examen y Fecha</h5>
       <div class="row g-3 mb-4">
         <div class="col-12 col-md-6">
           <label class="form-label" for="idExam">Examen <span class="text-danger">*</span></label>
@@ -36,20 +36,13 @@
           <div class="invalid-feedback">Selecciona un examen.</div>
           }
         </div>
-        <div class="col-12 col-md-3">
-          <label class="form-label" for="dateBegin">Fecha Desde <span class="text-danger">*</span></label>
-          <input id="dateBegin" type="date" class="form-control" formControlName="dateBegin"
-            [class.is-invalid]="dateBegin.invalid && dateBegin.touched" />
-          @if (dateBegin.invalid && dateBegin.touched) {
-          <div class="invalid-feedback">Selecciona una fecha de inicio.</div>
-          }
-        </div>
-        <div class="col-12 col-md-3">
-          <label class="form-label" for="dateEnd">Fecha Hasta</label>
-          <input id="dateEnd" type="date" class="form-control" formControlName="dateEnd"
-            [class.is-invalid]="dateEnd.invalid && dateEnd.touched" />
-          @if (dateEnd.invalid && dateEnd.touched) {
-          <div class="invalid-feedback">Selecciona una fecha de fin.</div>
+        <div class="col-12 col-md-6">
+          <label class="form-label" for="dateRange">Rango de Fechas <span class="text-danger">*</span></label>
+          <input id="dateRange" type="text" class="form-control" formControlName="dateRange" mwlFlatpickr
+            mode="range" dateFormat="Y-m-d" [disableMobile]="true"
+            [class.is-invalid]="dateRange.invalid && dateRange.touched" />
+          @if (dateRange.invalid && dateRange.touched) {
+          <div class="invalid-feedback">Selecciona un rango de fechas.</div>
           }
         </div>
       </div>
@@ -57,7 +50,7 @@
       <div class="row g-3 mb-4">
         <div class="col-12">
           <button type="button" class="btn btn-outline-primary" (click)="searchSlots()"
-            [disabled]="searchingSlots() || !idExam.value || !dateBegin.value">
+            [disabled]="searchingSlots() || !idExam.value || !dateRange.value">
             @if (searchingSlots()) {
             <span class="spinner-border spinner-border-sm me-1"></span>
             }
@@ -84,7 +77,9 @@
         <div class="col-12 col-md-6">
           <label class="form-label" for="dateExpected">Fecha y Hora de la Cita <span
               class="text-danger">*</span></label>
-          <input id="dateExpected" type="datetime-local" class="form-control" formControlName="dateExpected"
+          <input id="dateExpected" type="text" class="form-control" formControlName="dateExpected" mwlFlatpickr
+            [enableTime]="true" dateFormat="Y-m-d\\TH:i:S" [time24hr]="true"
+            [disableMobile]="true"
             [class.is-invalid]="dateExpected.invalid && dateExpected.touched" />
           @if (dateExpected.invalid && dateExpected.touched) {
           <div class="invalid-feedback">La fecha y hora son obligatorias.</div>
@@ -92,17 +87,6 @@
         </div>
       </div>
       }
-
-      <div class="row g-3">
-        <div class="col-12 d-flex justify-content-end gap-2">
-          <button type="button" class="btn btn-secondary" routerLink="/patients/appointments">
-            Cancelar
-          </button>
-          <button type="submit" class="btn btn-primary" [disabled]="form.invalid || searchingSlots()">
-            <i class="fas fa-check me-1"></i> Agendar Cita
-          </button>
-        </div>
-      </div>
     </form>
   </div>
 </div>

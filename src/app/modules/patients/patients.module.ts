@@ -7,6 +7,8 @@ import { PatientsRoutingModule } from "./patients-routing.module";
 import { AppointmentListComponent } from "./containers/appointment-list/appointment-list.component";
 import { AppointmentDetailComponent } from "./containers/appointment-detail/appointment-detail.component";
 import { AppointmentCreateComponent } from "./containers/appointment-create/appointment-create.component";
+import { FlatpickrDirective, provideFlatpickrDefaults } from "angularx-flatpickr";
+import { Spanish } from "flatpickr/dist/esm/l10n/es.js";
 
 @NgModule({
   declarations: [
@@ -20,6 +22,10 @@ import { AppointmentCreateComponent } from "./containers/appointment-create/appo
     ReactiveFormsModule,
     NgSelectModule,
     PatientsRoutingModule,
+    FlatpickrDirective,
+  ],
+  providers: [
+    provideFlatpickrDefaults({ locale: Spanish }),
   ],
 })
 export class PatientsModule {}

@@ -14,13 +14,16 @@ import { PatientService } from "../../services/patient.service";
 import { PatientAttributesService } from "../../services/patient-attributes.service";
 import { PatientAttribute, InitiateRegistrationResponse } from "../../models";
 import { setBackendErrors } from "../../utils/form-error-handler";
+import { FlatpickrDirective, provideFlatpickrDefaults } from "angularx-flatpickr";
+import { Spanish } from "flatpickr/dist/esm/l10n/es.js";
 
 @Component({
   selector: "app-patient-register",
   templateUrl: "./patient-register.component.html",
   styleUrls: [],
   standalone: true,
-  imports: [ReactiveFormsModule, RouterModule],
+  imports: [ReactiveFormsModule, RouterModule, FlatpickrDirective],
+  providers: [provideFlatpickrDefaults({ locale: Spanish })],
 })
 export class PatientRegisterComponent implements OnInit, OnDestroy {
   currentStep = 1;

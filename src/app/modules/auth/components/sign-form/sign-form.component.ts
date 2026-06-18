@@ -11,6 +11,8 @@ import {
   InitiateRegistrationResponse,
 } from '../../../patients/models';
 import { setBackendErrors } from '../../../patients/utils/form-error-handler';
+import { FlatpickrDirective, provideFlatpickrDefaults } from 'angularx-flatpickr';
+import { Spanish } from 'flatpickr/dist/esm/l10n/es.js';
 
 @Component({
   selector: 'app-sign-form',
@@ -19,8 +21,10 @@ import { setBackendErrors } from '../../../patients/utils/form-error-handler';
   standalone: true,
   imports: [
     ReactiveFormsModule,
-    SearchableSelectComponent
-],
+    SearchableSelectComponent,
+    FlatpickrDirective,
+  ],
+  providers: [provideFlatpickrDefaults({ locale: Spanish })],
 })
 export class SignFormComponent implements OnInit, OnDestroy {
   @Output() registrationComplete = new EventEmitter<void>();
