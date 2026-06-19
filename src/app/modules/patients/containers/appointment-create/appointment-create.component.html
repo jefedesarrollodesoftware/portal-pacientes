@@ -14,6 +14,7 @@
     </div>
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      @if (!showSlotPicker()) {
       <h5 class="text-primary mb-3 pb-2 border-bottom">Selección de Examen y Fecha</h5>
       <div class="row g-3 mb-4">
         <div class="col-12 col-md-6">
@@ -22,7 +23,7 @@
             class="ng-select-bootstrap"
             [items]="exams()"
             bindLabel="name"
-            bindValue="id"
+            bindValue="idLegacy"
             groupBy="group"
             [searchable]="true"
             [clearable]="false"
@@ -38,8 +39,8 @@
         </div>
         <div class="col-12 col-md-6">
           <label class="form-label" for="dateRange">Rango de Fechas <span class="text-danger">*</span></label>
-          <input id="dateRange" type="text" class="form-control" formControlName="dateRange" mwlFlatpickr
-            mode="range" dateFormat="Y-m-d" [disableMobile]="true"
+           <input id="dateRange" type="text" class="form-control" formControlName="dateRange" mwlFlatpickr
+            mode="range" dateFormat="Y-m-d" [disableMobile]="true" [minDate]="minDate"
             [class.is-invalid]="dateRange.invalid && dateRange.touched" />
           @if (dateRange.invalid && dateRange.touched) {
           <div class="invalid-feedback">Selecciona un rango de fechas.</div>
@@ -58,35 +59,59 @@
           </button>
         </div>
       </div>
+      }
 
-      @if (slots().length > 0) {
-      <div class="row g-3 mb-4">
-        <div class="col-12 col-md-6">
-          <label class="form-label" for="idSlot">Horario Disponible <span class="text-danger">*</span></label>
-          <select id="idSlot" class="form-select" formControlName="idSlot" (change)="onSlotChange()"
-            [class.is-invalid]="idSlot.invalid && idSlot.touched">
-            <option [ngValue]="null" disabled>Selecciona un horario</option>
-            @for (slot of slots(); track slot.idSlot) {
-            <option [ngValue]="slot.idSlot">{{ slot.dateSlot | date:'dd/MM/yyyy HH:mm' }}</option>
+      @if (showSlotPicker()) {
+      <div class="slot-picker">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h5 class="text-primary mb-0">Selecciona un Horario</h5>
+          <button type="button" class="btn btn-outline-secondary btn-sm" (click)="goBack()">
+            <i class="fas fa-arrow-left me-1"></i> Volver
+          </button>
+        </div>
+
+        <div class="mb-3 p-3 bg-light rounded-3">
+          <div class="row g-2 align-items-center">
+            <div class="col-auto">
+              <span class="badge bg-primary fs-6">{{ slots()[0].nameExam }}</span>
+            </div>
+            <div class="col-auto text-muted small">
+              <i class="far fa-calendar-alt me-1"></i>{{ dateRange.value }}
+            </div>
+          </div>
+        </div>
+
+        @for (group of slotGroups(); track group.date + group.office + group.professional + group.modality) {
+        <div class="mb-4">
+          <div class="d-flex align-items-baseline gap-2 mb-2 pb-1 border-bottom">
+            <span class="fw-bold">{{ group.date | date:'EEEE, d \'de\' MMMM \'del\' y' }}</span>
+            <span class="text-muted small">
+              <i class="fas fa-location-dot me-1"></i>{{ group.office }}
+            </span>
+            <span class="text-muted small">
+              <i class="fas fa-user-md me-1"></i>{{ group.professional }}
+            </span>
+            <span class="text-muted small">
+              <i class="fas fa-tag me-1"></i>{{ group.modality }}
+            </span>
+          </div>
+          <div class="d-flex flex-wrap gap-2">
+            @for (slot of group.slots; track slot.idSlot) {
+            <button type="button" class="btn slot-chip"
+              [class.btn-outline-primary]="selectedSlotId() !== slot.idSlot"
+              [class.btn-primary]="selectedSlotId() === slot.idSlot"
+              (click)="selectSlot(slot.idSlot)">
+              {{ slot.timeSlot }}
+            </button>
             }
-          </select>
-          @if (idSlot.invalid && idSlot.touched) {
-          <div class="invalid-feedback">Selecciona un horario disponible.</div>
-          }
+          </div>
         </div>
-        <div class="col-12 col-md-6">
-          <label class="form-label" for="dateExpected">Fecha y Hora de la Cita <span
-              class="text-danger">*</span></label>
-          <input id="dateExpected" type="text" class="form-control" formControlName="dateExpected" mwlFlatpickr
-            [enableTime]="true" dateFormat="Y-m-d\\TH:i:S" [time24hr]="true"
-            [disableMobile]="true"
-            [class.is-invalid]="dateExpected.invalid && dateExpected.touched" />
-          @if (dateExpected.invalid && dateExpected.touched) {
-          <div class="invalid-feedback">La fecha y hora son obligatorias.</div>
-          }
-        </div>
+        }
       </div>
       }
+
+      <input type="hidden" formControlName="idSlot" />
+      <input type="hidden" formControlName="dateExpected" />
     </form>
   </div>
 </div>

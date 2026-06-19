@@ -1,4 +1,4 @@
-import { Component, DestroyRef, OnInit, inject, signal } from "@angular/core";
+import { Component, DestroyRef, OnInit, computed, inject, signal } from "@angular/core";
 import { FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ToastrService } from "ngx-toastr";
@@ -31,6 +31,27 @@ export class AppointmentCreateComponent implements OnInit {
 
   readonly exams = signal<PatientAttribute[]>([]);
   readonly slots = signal<Slot[]>([]);
+  readonly showSlotPicker = signal(false);
+  readonly selectedSlotId = signal<number | null>(null);
+
+  readonly slotGroups = computed(() => {
+    const slots = this.slots();
+    const map = new Map<string, { date: string; office: string; professional: string; modality: string; slots: Slot[] }>();
+    for (const slot of slots) {
+      const date = slot.startSlot.substring(0, 10);
+      const key = `${date}|${slot.nameOffice}|${slot.nameProfessional}|${slot.modality}`;
+      if (!map.has(key)) {
+        map.set(key, { date, office: slot.nameOffice, professional: slot.nameProfessional, modality: slot.modality, slots: [] });
+      }
+      map.get(key)!.slots.push(slot);
+    }
+    return Array.from(map.values())
+      .map((g) => ({
+        ...g,
+        slots: g.slots.sort((a, b) => a.timeSlot.localeCompare(b.timeSlot)),
+      }))
+      .sort((a, b) => a.date.localeCompare(b.date) || a.office.localeCompare(b.office));
+  });
 
   get idExam(): FormControl<number | null> {
     return this.form.controls.idExam;
@@ -39,6 +60,12 @@ export class AppointmentCreateComponent implements OnInit {
   get dateRange(): FormControl<string> {
     return this.form.controls.dateRange;
   }
+
+  readonly minDate = (() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  })();
 
   readonly rangeSeparator = " a ";
 
@@ -103,12 +130,17 @@ export class AppointmentCreateComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res) => {
-          this.slots.set(res.data.slots.filter((s) => s.available !== false));
+          const allSlots = res.data.slots.filter((s) => s.available !== false);
+          this.slots.set(allSlots);
           this.searchingSlots.set(false);
-          if (this.slots().length === 0) {
+          if (allSlots.length === 0) {
             this.toastr.info(
               "No hay horarios disponibles para este examen y rango de fechas.",
             );
+          } else {
+            this.showSlotPicker.set(true);
+            this.selectedSlotId.set(null);
+            this.form.patchValue({ idSlot: null, dateExpected: "" });
           }
         },
         error: () => {
@@ -118,13 +150,19 @@ export class AppointmentCreateComponent implements OnInit {
       });
   }
 
-  onSlotChange(): void {
-    const selectedId = this.idSlot.value;
-    if (selectedId === null) return;
-    const slot = this.slots().find((s) => s.idSlot === selectedId);
+  selectSlot(slotId: number): void {
+    this.selectedSlotId.set(slotId);
+    const slot = this.slots().find((s) => s.idSlot === slotId);
     if (slot) {
-      this.form.patchValue({ dateExpected: slot.dateSlot });
+      this.form.patchValue({ idSlot: slotId, dateExpected: slot.startSlot });
     }
+  }
+
+  goBack(): void {
+    this.showSlotPicker.set(false);
+    this.slots.set([]);
+    this.selectedSlotId.set(null);
+    this.form.patchValue({ idSlot: null, dateExpected: "" });
   }
 
   onSubmit(): void {

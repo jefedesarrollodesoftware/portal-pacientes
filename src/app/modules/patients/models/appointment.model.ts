@@ -77,8 +77,26 @@ export interface CreateAppointmentResponse {
 export interface Slot {
   idSlot: number;
   idExam: number;
-  dateSlot: string;
-  available: boolean;
+  nameExam: string;
+  startSlot: string;
+  timeSlot: string;
+  durationSlot: number;
+  nameProfessional: string;
+  endSlot: string;
+  state: string;
+  cancelationReason: string;
+  schedulerState: string;
+  documentProfessional: string;
+  nameOffice: string;
+  idOffice: number;
+  nameRoom: string;
+  idRoom: number;
+  modality: string;
+  qualifier: string;
+  products: string;
+  isAssignedByProduct: boolean;
+  isMaximumAmountControl: boolean;
+  available?: boolean;
 }
 
 export interface AppointmentSlotsResponse {
