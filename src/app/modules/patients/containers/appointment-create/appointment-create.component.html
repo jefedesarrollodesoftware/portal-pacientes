@@ -19,18 +19,9 @@
       <div class="row g-3 mb-4">
         <div class="col-12 col-md-6">
           <label class="form-label" for="idExam">Examen <span class="text-danger">*</span></label>
-          <ng-select id="idExam"
-            class="ng-select-bootstrap"
-            [items]="exams()"
-            bindLabel="name"
-            bindValue="idLegacy"
-            groupBy="group"
-            [searchable]="true"
-            [clearable]="false"
-            formControlName="idExam"
-            (change)="onExamChange()"
-            placeholder="Selecciona un examen"
-            [class.is-invalid]="idExam.invalid && idExam.touched"
+          <ng-select id="idExam" class="ng-select-bootstrap" [items]="exams()" bindLabel="name" bindValue="idLegacy"
+            groupBy="group" [searchable]="true" [clearable]="false" formControlName="idExam" (change)="onExamChange()"
+            placeholder="Selecciona un examen" [class.is-invalid]="idExam.invalid && idExam.touched"
             labelForId="idExam">
           </ng-select>
           @if (idExam.invalid && idExam.touched) {
@@ -39,8 +30,8 @@
         </div>
         <div class="col-12 col-md-6">
           <label class="form-label" for="dateRange">Rango de Fechas <span class="text-danger">*</span></label>
-           <input id="dateRange" type="text" class="form-control" formControlName="dateRange" mwlFlatpickr
-            mode="range" dateFormat="Y-m-d" [disableMobile]="true" [minDate]="minDate"
+          <input id="dateRange" type="text" class="form-control" formControlName="dateRange" mwlFlatpickr mode="range"
+            dateFormat="Y-m-d" [disableMobile]="true" [minDate]="minDate"
             [class.is-invalid]="dateRange.invalid && dateRange.touched" />
           @if (dateRange.invalid && dateRange.touched) {
           <div class="invalid-feedback">Selecciona un rango de fechas.</div>
@@ -97,10 +88,8 @@
           </div>
           <div class="d-flex flex-wrap gap-2">
             @for (slot of group.slots; track slot.idSlot) {
-            <button type="button" class="btn slot-chip"
-              [class.btn-outline-primary]="selectedSlotId() !== slot.idSlot"
-              [class.btn-primary]="selectedSlotId() === slot.idSlot"
-              (click)="selectSlot(slot.idSlot)">
+            <button type="button" class="btn slot-chip" [class.btn-outline-primary]="selectedSlotId() !== slot.idSlot"
+              [class.btn-primary]="selectedSlotId() === slot.idSlot" (click)="selectSlot(slot.idSlot)">
               {{ slot.timeSlot }}
             </button>
             }
