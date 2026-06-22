@@ -15,7 +15,9 @@
           </select>
         </div>
       </div>
+    </div>
 
+    <div>
       @if (loading) {
       <div class="text-center py-5">
         <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando...</span></div>
@@ -89,9 +91,13 @@
       }
 
       @if (!loading && !appointments.length) {
-      <div class="text-center py-5">
-        <i class="fas fa-calendar-xmark text-muted d-block mb-2" style="font-size:48px"></i>
-        <p class="text-muted">No se encontraron citas.</p>
+      <div class="row g-3">
+        <div class="col-12 text-center py-5">
+          <p class="text-muted">
+            <i class="fas fa-calendar-xmark fas fa-2x"></i>
+            No se encontraron citas.
+          </p>
+        </div>
       </div>
       }
     </div>
